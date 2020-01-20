@@ -23,3 +23,11 @@ Wheat Ridge CO 80033 USA
 
 # References
 
+Grant Allen, Mike Owens, *The Definitive Guide to SQLite*, 2nd ed.,
+Apress, 2010
+
+Jay A. Kreibich, *Using SQLite*, O'Reilly, 2010
+
+# Links
+
+SQLite Documentation, <https://www.sqlite.org/docs.html>
