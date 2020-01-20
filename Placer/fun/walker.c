@@ -109,7 +109,7 @@ int main(int argc, char * argv[])
     int ii = 0;
 
     if (argc <= 1) {
-        rc = walk(stdout, "/", 0);
+        rc = walk(stdout, ".", 0);
     } else {
         for (ii = 1; ii < argc; ++ii) {
             ic = walk(stdout, argv[ii], 0);
