@@ -32,6 +32,10 @@ static int walk(FILE * fp, const char * path, int depth)
 
     do {
 
+        if (depth <= 0) {
+            fprintf(fp, "%s/\n", path);
+        }
+
         dp = opendir(path);
         if (dp == (DIR *)0) {
             perror(path);
@@ -39,9 +43,12 @@ static int walk(FILE * fp, const char * path, int depth)
             break;
         }
 
+        depth += 1;
+
         while ((ep = readdir(dp)) != (struct dirent *)0) {
 
             if (ep->d_type != DT_DIR) {
+
                 for (ii = 0; ii < depth; ++ii) {
                     fputc(' ', fp);
                 }
@@ -49,15 +56,15 @@ static int walk(FILE * fp, const char * path, int depth)
 
             } else if (strcmp(ep->d_name, "..") == 0) {
                 /* Do ntohing. */
-            } else if ((depth > 0) && (strcmp(ep->d_name, ".") == 0)) {
-                /* Do nothing. */
+            } else if (strcmp(ep->d_name, ".") == 0) {
+                /* Do ntohing. */
             } else {
                 char buffer[PATH_MAX] = { '\0', };
 
                 for (ii = 0; ii < depth; ++ii) {
                     fputc(' ', fp);
                 }
-                fprintf(fp, "%s\n", ep->d_name);
+                fprintf(fp, "%s/\n", ep->d_name);
 
                 strncpy(buffer, path, sizeof(buffer));
                 if (strcmp(path, "/") != 0) {
@@ -71,7 +78,7 @@ static int walk(FILE * fp, const char * path, int depth)
                     perror(buffer);
                     rc = -2;
                 } else {
-                    rc = walk(fp, buffer, depth + 1);
+                    rc = walk(fp, buffer, depth);
                 }
 
             }
