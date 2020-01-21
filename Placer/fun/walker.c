@@ -29,7 +29,8 @@ static int walk(FILE * fp, const char * name, char * path, size_t total, size_t 
 {
     int fc = 0;
     DIR * dp = (DIR *)0;
-    struct dirent * ep = (struct dirent *)0;;
+    struct dirent * ep = (struct dirent *)0;
+    struct stat status = { 0 };
     int rc = 0;
     size_t dd = 0;
     size_t prior = 0;
@@ -68,15 +69,26 @@ static int walk(FILE * fp, const char * name, char * path, size_t total, size_t 
         fputc(' ', fp);
     }
     fputs(name, fp);
-    
-    dp = opendir(path);
-    if (dp == (DIR *)0) {
+
+    rc = stat(path, &status);
+    if (rc < 0) {
+        perror("stat");
+        return -2;
+    }
+
+    if (!S_ISDIR(status.st_mode)) {
 
         fputc('\n', fp);
 
     } else {
 
         fputs("/\n", fp);
+
+        dp = opendir(path);
+        if (dp == (DIR *)0) {
+            perror("opendir");
+            return -3;
+        }
 
         depth += 1;
 
@@ -89,6 +101,7 @@ static int walk(FILE * fp, const char * name, char * path, size_t total, size_t 
                 break;
             } else {
                 perror("readdir");
+                fc = -4;
                 break;
             }
 
@@ -100,13 +113,14 @@ static int walk(FILE * fp, const char * name, char * path, size_t total, size_t 
                 /* Do ntohing. */
             } else {
                 fc = rc;
+                break;
             }
 
         }
 
         if (closedir(dp) < 0) {
             perror("closedir");
-            fc = -4;
+            return -5;
         }
 
     }
