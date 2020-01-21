@@ -9,6 +9,20 @@
  *
  * ABSTRACT
  *
+ * walker walks the file system tree at the specified root or by default
+ * at the current directory and displays the tree on standard output and
+ * the attributes of each entry on standard error.
+ *
+ * USAGE
+ *
+ * walker [ root [ root ... ] ]
+ *
+ * EXAMPLES
+ *
+ * walker
+ * walker .
+ * walker /
+ * walker foo/bar
  */
 
 #include <stdio.h>
@@ -138,22 +152,23 @@ static int walk(const char * name, char * path, size_t total, size_t depth)
     if (S_ISDIR(status.st_mode)) { fputc('/', stdout); }
     fputc('\n', stdout);
 
-    fprintf(stderr, "%s %c 0%o (%d,%d) #%d [%d] %d:%d (%d,%d) [%d] [%d] [%d] %d.%09d %d.%09d %d.%09d\n",
-        path,
-        classify(status.st_mode),
-        (status.st_mode & ~S_IFMT),
-        major(status.st_dev), minor(status.st_dev),
-        status.st_ino,
-        status.st_nlink,
-        status.st_uid,
-        status.st_gid,
-        major(status.st_rdev), minor(status.st_rdev),
-        status.st_size,
-        status.st_blksize,
-        status.st_blocks * 512,
-        status.st_atim.tv_sec,status.st_atim.tv_nsec,
-        status.st_mtim.tv_sec,status.st_mtim.tv_nsec,
-        status.st_ctim.tv_sec,status.st_ctim.tv_nsec
+    fprintf(stderr,
+        "%s %c 0%o (%d,%d) #%d [%d] %d:%d <%d,%d> [%d] [%d] [%d] %d.%09d %d.%09d %d.%09d\n"
+        , path
+        , classify(status.st_mode)
+        , (status.st_mode & ~S_IFMT)
+        , major(status.st_dev), minor(status.st_dev)
+        , status.st_ino
+        , status.st_nlink
+        , status.st_uid
+        , status.st_gid
+        , major(status.st_rdev), minor(status.st_rdev)
+        , status.st_size
+        , status.st_blksize
+        , status.st_blocks * 512
+        , status.st_atim.tv_sec, status.st_atim.tv_nsec
+        , status.st_mtim.tv_sec, status.st_mtim.tv_nsec
+        , status.st_ctim.tv_sec, status.st_ctim.tv_nsec
     );
 
     /*
