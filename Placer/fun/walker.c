@@ -116,7 +116,7 @@ static int walk(const char * name, char * path, size_t total, size_t depth)
      * Get the attributes for the file identified by the path.
      */
 
-    rc = stat(path, &status);
+    rc = lstat(path, &status);
     if (rc < 0) {
         perror("stat");
         return -2;
