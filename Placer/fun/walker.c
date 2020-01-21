@@ -23,101 +23,117 @@
 #include <errno.h>
 #include <assert.h>
 
-static int walk(FILE * fp, const char * path, int depth)
+static const int DEBUG = 0;
+
+static int walk(FILE * fp, const char * name, char * path, size_t total, size_t depth)
 {
-    int rc = 0;
+    int fc = 0;
     DIR * dp = (DIR *)0;
     struct dirent * ep = (struct dirent *)0;;
-    int ii = 0;
+    int rc = 0;
+    size_t dd = 0;
+    size_t prior = 0;
+    size_t length = 0;
 
-    do {
+    if (depth == 0) {
+        path[0] = '\0';
+        path[PATH_MAX - 1] = '\0';
+        total = 0;
+    }
 
-        if (depth <= 0) {
-            fprintf(fp, "%s/\n", path);
-        }
+    length = strnlen(name, PATH_MAX);
+    if ((total + 1 /* '/' */ + length + 1 /* '\0' */) > PATH_MAX) {
+        errno = E2BIG;
+        perror(path);
+        return -1;
+    }
 
-        dp = opendir(path);
-        if (dp == (DIR *)0) {
-            perror(path);
-            rc = -1;
-            break;
-        }
+    if (DEBUG) { fprintf(stderr, "%s@%d: \"%s\" [%zu] \"%s\" [%zu]\n", __FILE__, __LINE__, path, total, name, length); }
+
+    prior = total;
+    if (total == 0) {
+        /* Do nothing. */
+    } else if (path[total - 1] == '/') {
+        /* Do nothing. */
+    } else {
+        path[total++] = '/';
+        path[total] = '\0';
+    }
+    strcat(path, name);
+    total += length;
+
+    if (DEBUG) { fprintf(stderr, "%s@%d: \"%s\" [%zu]\n", __FILE__, __LINE__, path, total); }
+
+    for (dd = 0; dd < depth; ++dd) {
+        fputc(' ', fp);
+    }
+    fputs(name, fp);
+    
+    dp = opendir(path);
+    if (dp == (DIR *)0) {
+
+        fputc('\n', fp);
+
+    } else {
+
+        fputs("/\n", fp);
 
         depth += 1;
 
-        while ((ep = readdir(dp)) != (struct dirent *)0) {
+        while (!0) {
 
-            if (ep->d_type != DT_DIR) {
+            errno = 0;
+            if ((ep = readdir(dp)) != (struct dirent *)0) {
+                /* Do nothing. */
+            } else if (errno == 0) {
+                break;
+            } else {
+                perror("readdir");
+                break;
+            }
 
-                for (ii = 0; ii < depth; ++ii) {
-                    fputc(' ', fp);
-                }
-                fprintf(fp, "%s\n", ep->d_name);
-
-            } else if (strcmp(ep->d_name, "..") == 0) {
+            if (strcmp(ep->d_name, "..") == 0) {
                 /* Do ntohing. */
             } else if (strcmp(ep->d_name, ".") == 0) {
                 /* Do ntohing. */
+            } else if ((rc = walk(fp, ep->d_name, path, total, depth)) == 0) {
+                /* Do ntohing. */
             } else {
-                char buffer[PATH_MAX] = { '\0', };
-
-                for (ii = 0; ii < depth; ++ii) {
-                    fputc(' ', fp);
-                }
-                fprintf(fp, "%s/\n", ep->d_name);
-
-                strncpy(buffer, path, sizeof(buffer));
-                if (strcmp(path, "/") != 0) {
-                    strncat(buffer, "/", sizeof(buffer) - strnlen(buffer, sizeof(buffer)));
-                }
-                strncat(buffer, ep->d_name, sizeof(buffer) - strnlen(buffer, sizeof(buffer)));
-
-                if (buffer[sizeof(buffer) - 1] != '\0') {
-                    buffer[sizeof(buffer) - 1] = '\0';
-                    errno = E2BIG;
-                    perror(buffer);
-                    rc = -2;
-                } else {
-                    rc = walk(fp, buffer, depth);
-                }
-
+                fc = rc;
             }
 
         }
 
-    } while (0);
+        if (closedir(dp) < 0) {
+            perror("closedir");
+            fc = -4;
+        }
 
-    if (dp == (DIR *)0) {
-        /* Do nothing. */
-    } else if (closedir(dp) >= 0) {
-        /* Do nothing. */
-    } else if (rc != 0) {
-        perror(path);
-    } else {
-        perror(path);
-        rc = -4;
     }
 
-    return rc;
+    path[prior] = '\0';
+    if (DEBUG) { fprintf(stderr, "%s@%d: \"%s\" [%zu]\n", __FILE__, __LINE__, path, prior); }
+
+    return fc;
 }
 
 int main(int argc, char * argv[])
 {
+    int xc = 0;
     int rc = 0;
-    int ic = 0;
-    const char * root = "/";
     int ii = 0;
+    char path[PATH_MAX] = { '\0', };
 
     if (argc <= 1) {
-        rc = walk(stdout, ".", 0);
+        xc = walk(stdout, ".", path, 0, 0);
     } else {
         for (ii = 1; ii < argc; ++ii) {
-            ic = walk(stdout, argv[ii], 0);
-            if (rc == 0) {
-                rc = ic;
+            rc = walk(stdout, argv[ii], path, 0, 0);
+            if (xc == 0) {
+                xc = rc;
             }
         }
     }
 
-    return (rc < 0) ? -rc : rc;
+    return (xc < 0) ? -xc : xc;
 }
