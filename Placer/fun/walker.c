@@ -17,15 +17,43 @@
 #include <string.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/sysmacros.h>
 #include <unistd.h>
 #include <dirent.h>
 #include <limits.h>
 #include <errno.h>
 #include <assert.h>
+#include "com/diag/diminuto/diminuto_frequency.h"
+#include "com/diag/diminuto/diminuto_time.h"
 
 static const int DEBUG = 0;
 
-static int walk(FILE * fp, const char * name, char * path, size_t total, size_t depth)
+static char classify(mode_t mode)
+{
+    char class = '\0';
+
+    if (S_ISREG(mode)) {
+        class = '-';
+    } else if (S_ISDIR(mode)) {
+        class = 'd';
+    } else if (S_ISLNK(mode)) {
+        class = 'l';
+    } else if (S_ISCHR(mode)) {
+        class = 'c';
+    } else if (S_ISBLK(mode)) {
+        class = 'b';
+    } else if (S_ISFIFO(mode)) {
+        class = 'p';
+    } else if (S_ISSOCK(mode)) {
+        class = 's';
+    } else {
+        class = '?';
+    }
+
+    return class;
+}
+
+static int walk(const char * name, char * path, size_t total, size_t depth)
 {
     int fc = 0;
     DIR * dp = (DIR *)0;
@@ -35,12 +63,26 @@ static int walk(FILE * fp, const char * name, char * path, size_t total, size_t 
     size_t dd = 0;
     size_t prior = 0;
     size_t length = 0;
+    diminuto_ticks_t atime = 0;
+    diminuto_ticks_t mtime = 0;
+    diminuto_ticks_t ctime = 0;
+
+    /*
+     * If we're at the root of the tree, initialize the path buffer.
+     */
 
     if (depth == 0) {
         path[0] = '\0';
         path[PATH_MAX - 1] = '\0';
         total = 0;
     }
+
+    /*
+     * Insure the path buffer has sufficient room. I'd be surprised
+     * if this failed on a modern system, but back when MAXPATHLEN
+     * was 512 I have seen file systems for which an absolute path
+     * string could not be represented.
+     */
 
     length = strnlen(name, PATH_MAX);
     if ((total + 1 /* '/' */ + length + 1 /* '\0' */) > PATH_MAX) {
@@ -50,6 +92,11 @@ static int walk(FILE * fp, const char * name, char * path, size_t total, size_t 
     }
 
     if (DEBUG) { fprintf(stderr, "%s@%d: \"%s\" [%zu] \"%s\" [%zu]\n", __FILE__, __LINE__, path, total, name, length); }
+
+    /*
+     * Contstruct a path (maybe be relative or absolute depending
+     * on the root).
+     */
 
     prior = total;
     if (total == 0) {
@@ -65,10 +112,9 @@ static int walk(FILE * fp, const char * name, char * path, size_t total, size_t 
 
     if (DEBUG) { fprintf(stderr, "%s@%d: \"%s\" [%zu]\n", __FILE__, __LINE__, path, total); }
 
-    for (dd = 0; dd < depth; ++dd) {
-        fputc(' ', fp);
-    }
-    fputs(name, fp);
+    /*
+     * Get the attributes for the file identified by the path.
+     */
 
     rc = stat(path, &status);
     if (rc < 0) {
@@ -76,13 +122,45 @@ static int walk(FILE * fp, const char * name, char * path, size_t total, size_t 
         return -2;
     }
 
-    if (!S_ISDIR(status.st_mode)) {
+    atime = diminuto_frequency_seconds2ticks(status.st_atim.tv_sec, status.st_atim.tv_nsec, diminuto_time_frequency());
+    mtime = diminuto_frequency_seconds2ticks(status.st_mtim.tv_sec, status.st_mtim.tv_nsec, diminuto_time_frequency());
+    ctime = diminuto_frequency_seconds2ticks(status.st_ctim.tv_sec, status.st_ctim.tv_nsec, diminuto_time_frequency());
 
-        fputc('\n', fp);
+    /*
+     * Display the file in the tree on stdout, and its attribytes
+     * on stderr.
+     */
 
-    } else {
+    for (dd = 0; dd < depth; ++dd) {
+        fputc(' ', stdout);
+    }
+    fputs(name, stdout);
+    if (S_ISDIR(status.st_mode)) { fputc('/', stdout); }
+    fputc('\n', stdout);
 
-        fputs("/\n", fp);
+    fprintf(stderr, "%s %c 0%o (%d,%d) #%d [%d] %d:%d (%d,%d) [%d] [%d] [%d] %d.%09d %d.%09d %d.%09d\n",
+        path,
+        classify(status.st_mode),
+        (status.st_mode & ~S_IFMT),
+        major(status.st_dev), minor(status.st_dev),
+        status.st_ino,
+        status.st_nlink,
+        status.st_uid,
+        status.st_gid,
+        major(status.st_rdev), minor(status.st_rdev),
+        status.st_size,
+        status.st_blksize,
+        status.st_blocks * 512,
+        status.st_atim.tv_sec,status.st_atim.tv_nsec,
+        status.st_mtim.tv_sec,status.st_mtim.tv_nsec,
+        status.st_ctim.tv_sec,status.st_ctim.tv_nsec
+    );
+
+    /*
+     * If a flat file, we're done; if a directory, recurse and descend.
+     */
+
+    if (S_ISDIR(status.st_mode)) {
 
         dp = opendir(path);
         if (dp == (DIR *)0) {
@@ -109,7 +187,7 @@ static int walk(FILE * fp, const char * name, char * path, size_t total, size_t 
                 /* Do ntohing. */
             } else if (strcmp(ep->d_name, ".") == 0) {
                 /* Do ntohing. */
-            } else if ((rc = walk(fp, ep->d_name, path, total, depth)) == 0) {
+            } else if ((rc = walk(ep->d_name, path, total, depth)) == 0) {
                 /* Do ntohing. */
             } else {
                 fc = rc;
@@ -139,10 +217,10 @@ int main(int argc, char * argv[])
     char path[PATH_MAX] = { '\0', };
 
     if (argc <= 1) {
-        xc = walk(stdout, ".", path, 0, 0);
+        xc = walk(".", path, 0, 0);
     } else {
         for (ii = 1; ii < argc; ++ii) {
-            rc = walk(stdout, argv[ii], path, 0, 0);
+            rc = walk(argv[ii], path, 0, 0);
             if (xc == 0) {
                 xc = rc;
             }
