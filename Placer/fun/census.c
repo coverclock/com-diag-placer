@@ -10,19 +10,22 @@
  * ABSTRACT
  *
  * walker walks the file system tree at the specified root or by default
- * at the current directory and displays the tree on standard output and
- * the attributes of each entry on standard error.
+ * at the current directory and adds the metadata to a database.
  *
  * USAGE
  *
- * walker [ root [ root ... ] ]
+ * census [ root [ root ... ] ]
  *
  * EXAMPLES
  *
- * walker
- * walker .
- * walker /
- * walker foo/bar
+ * census
+ * census .
+ * census /
+ * census foo/bar
+ *
+ * REFERENCES
+ *
+ * https://github.com/coverclock/com-diag-diminuto/Diminuto/bin/walker.c
  */
 
 #include <stdio.h>
@@ -37,38 +40,19 @@
 #include <limits.h>
 #include <errno.h>
 #include <assert.h>
-#include "com/diag/diminuto/diminuto_frequency.h"
-#include "com/diag/diminuto/diminuto_time.h"
 #include "sqlite3.h"
 
-static const int DEBUG = 0;
+static const char * Program = (const char *)0;
+static int Debug = 0;
+static int Verbose = 0;
 
-static char classify(mode_t mode)
+static void sqlerror(int error)
 {
-    char class = '\0';
-
-    if (S_ISREG(mode)) {
-        class = '-';
-    } else if (S_ISDIR(mode)) {
-        class = 'd';
-    } else if (S_ISLNK(mode)) {
-        class = 'l';
-    } else if (S_ISCHR(mode)) {
-        class = 'c';
-    } else if (S_ISBLK(mode)) {
-        class = 'b';
-    } else if (S_ISFIFO(mode)) {
-        class = 'p';
-    } else if (S_ISSOCK(mode)) {
-        class = 's';
-    } else {
-        class = '?';
-    }
-
-    return class;
+    fputs(sqlite3_errstr(error), stderr);
+    fputc('\n', stderr);
 }
 
-static int walk(const char * name, char * path, size_t total, size_t depth)
+static int walk(sqlite3 * db, const char * name, char * path, size_t total, size_t depth)
 {
     int fc = 0;
     DIR * dp = (DIR *)0;
@@ -78,9 +62,6 @@ static int walk(const char * name, char * path, size_t total, size_t depth)
     size_t dd = 0;
     size_t prior = 0;
     size_t length = 0;
-    diminuto_ticks_t atime = 0;
-    diminuto_ticks_t mtime = 0;
-    diminuto_ticks_t ctime = 0;
 
     /*
      * If we're at the root of the tree, initialize the path buffer.
@@ -106,8 +87,6 @@ static int walk(const char * name, char * path, size_t total, size_t depth)
         return -1;
     }
 
-    if (DEBUG) { fprintf(stderr, "%s@%d: \"%s\" [%zu] \"%s\" [%zu]\n", __FILE__, __LINE__, path, total, name, length); }
-
     /*
      * Contstruct a path (maybe be relative or absolute depending
      * on the root).
@@ -125,52 +104,57 @@ static int walk(const char * name, char * path, size_t total, size_t depth)
     strcat(path, name);
     total += length;
 
-    if (DEBUG) { fprintf(stderr, "%s@%d: \"%s\" [%zu]\n", __FILE__, __LINE__, path, total); }
-
     /*
      * Get the attributes for the file identified by the path.
      */
 
     rc = lstat(path, &status);
     if (rc < 0) {
-        perror("stat");
+        perror(path);
         return -2;
     }
 
-    atime = diminuto_frequency_seconds2ticks(status.st_atim.tv_sec, status.st_atim.tv_nsec, diminuto_time_frequency());
-    mtime = diminuto_frequency_seconds2ticks(status.st_mtim.tv_sec, status.st_mtim.tv_nsec, diminuto_time_frequency());
-    ctime = diminuto_frequency_seconds2ticks(status.st_ctim.tv_sec, status.st_ctim.tv_nsec, diminuto_time_frequency());
+#if 0
+struct statx_timestamp {
+        __s64   tv_sec;
+        __u32   tv_nsec;
+        __s32   __reserved;
+};
+struct statx {
+        /* 0x00 */
+        __u32   stx_mask;       /* What results were written [uncond] */
+        __u32   stx_blksize;    /* Preferred general I/O size [uncond] */
+        __u64   stx_attributes; /* Flags conveying information about the file [uncond] */
+        /* 0x10 */
+        __u32   stx_nlink;      /* Number of hard links */
+        __u32   stx_uid;        /* User ID of owner */
+        __u32   stx_gid;        /* Group ID of owner */
+        __u16   stx_mode;       /* File mode */
+        __u16   __spare0[1];
+        /* 0x20 */
+        __u64   stx_ino;        /* Inode number */
+        __u64   stx_size;       /* File size */
+        __u64   stx_blocks;     /* Number of 512-byte blocks allocated */
+        __u64   stx_attributes_mask; /* Mask to show what's supported in stx_attributes */
+        /* 0x40 */
+        struct statx_timestamp  stx_atime;      /* Last access time */
+        struct statx_timestamp  stx_btime;      /* File creation time */
+        struct statx_timestamp  stx_ctime;      /* Last attribute change time */
+        struct statx_timestamp  stx_mtime;      /* Last data modification time */
+        /* 0x80 */
+        __u32   stx_rdev_major; /* Device ID of special file [if bdev/cdev] */
+        __u32   stx_rdev_minor;
+        __u32   stx_dev_major;  /* ID of device containing file [uncond] */
+        __u32   stx_dev_minor;
+        /* 0x90 */
+        __u64   __spare2[14];   /* Spare space for future expansion */
+        /* 0x100 */
+};
+#endif
 
     /*
-     * Display the file in the tree on stdout, and its attribytes
-     * on stderr.
+     * HERE
      */
-
-    for (dd = 0; dd < depth; ++dd) {
-        fputc(' ', stdout);
-    }
-    fputs(name, stdout);
-    if (S_ISDIR(status.st_mode)) { fputc('/', stdout); }
-    fputc('\n', stdout);
-
-    fprintf(stderr,
-        "%s %c 0%o (%d,%d) #%d [%d] %d:%d <%d,%d> [%d] [%d] [%d] %d.%09d %d.%09d %d.%09d\n"
-        , path
-        , classify(status.st_mode)
-        , (status.st_mode & ~S_IFMT)
-        , major(status.st_dev), minor(status.st_dev)
-        , status.st_ino
-        , status.st_nlink
-        , status.st_uid
-        , status.st_gid
-        , major(status.st_rdev), minor(status.st_rdev)
-        , status.st_size
-        , status.st_blksize
-        , status.st_blocks * 512
-        , status.st_atim.tv_sec, status.st_atim.tv_nsec
-        , status.st_mtim.tv_sec, status.st_mtim.tv_nsec
-        , status.st_ctim.tv_sec, status.st_ctim.tv_nsec
-    );
 
     /*
      * If a flat file, we're done; if a directory, recurse and descend.
@@ -180,7 +164,7 @@ static int walk(const char * name, char * path, size_t total, size_t depth)
 
         dp = opendir(path);
         if (dp == (DIR *)0) {
-            perror("opendir");
+            perror(path);
             return -3;
         }
 
@@ -194,7 +178,7 @@ static int walk(const char * name, char * path, size_t total, size_t depth)
             } else if (errno == 0) {
                 break;
             } else {
-                perror("readdir");
+                perror(path);
                 fc = -4;
                 break;
             }
@@ -203,7 +187,7 @@ static int walk(const char * name, char * path, size_t total, size_t depth)
                 /* Do ntohing. */
             } else if (strcmp(ep->d_name, ".") == 0) {
                 /* Do ntohing. */
-            } else if ((rc = walk(ep->d_name, path, total, depth)) == 0) {
+            } else if ((rc = walk(db, ep->d_name, path, total, depth)) == 0) {
                 /* Do ntohing. */
             } else {
                 fc = rc;
@@ -213,14 +197,13 @@ static int walk(const char * name, char * path, size_t total, size_t depth)
         }
 
         if (closedir(dp) < 0) {
-            perror("closedir");
+            perror(path);
             return -5;
         }
 
     }
 
     path[prior] = '\0';
-    if (DEBUG) { fprintf(stderr, "%s@%d: \"%s\" [%zu]\n", __FILE__, __LINE__, path, prior); }
 
     return fc;
 }
@@ -231,16 +214,70 @@ int main(int argc, char * argv[])
     int rc = 0;
     int ii = 0;
     char path[PATH_MAX] = { '\0', };
+    sqlite3 * db = (sqlite3 *)0;
+    int opt = 0;
+    const char * database = (const char *)0;
+    extern char * optarg;
+    extern int optind;
+    extern int opterr;
+    extern int optopt;
 
-    if (argc <= 1) {
-        xc = walk(".", path, 0, 0);
+    Program = ((Program = strrchr(argv[0], '/')) == (const char *)0) ? argv[0] : Program + 1;
+
+    while ((opt = getopt(argc, argv, "?Ddv")) >= 0) {
+        switch (opt) {
+        case '?':
+            fprintf(stderr, "usage: %s [ -D DATABASE ] [ ROOT [ ROOT ... ] ]\n", Program);
+            break;
+        case 'D':
+            database = optarg;
+            break;
+        case 'd':
+            Debug = !0;
+            break;
+        case 'v':
+            Verbose = !0;
+            break;
+        default:
+            fprintf(stderr, "usage: %s [ -? ] [ -D DATABASE ] [ ROOT [ ROOT ... ] ]\n", Program);
+            return 1;
+            break;
+        }
+    }
+
+    if (database == (const char *)0) {
+        return 1;
+    }
+
+    if ((rc = sqlite3_open(database, &db)) != SQLITE_OK) {
+        sqlerror(rc);
+        return 2;
+    } else if (db == (sqlite3 *)0) {
+        errno = EADDRNOTAVAIL;
+        perror(database);
+        return 3;
     } else {
-        for (ii = 1; ii < argc; ++ii) {
-            rc = walk(argv[ii], path, 0, 0);
+        /* Do nothing. */
+    }
+
+    if (optind >= argc) {
+        xc = walk(db, ".", path, 0, 0);
+    } else {
+        for (; optind < argc; ++optind) {
+            rc = walk(db, argv[optind], path, 0, 0);
             if (xc == 0) {
                 xc = rc;
             }
         }
+    }
+
+    if (db == (sqlite3 *)0) {
+        /* Do nothing. */
+    } else if ((rc = sqlite3_close(db)) != SQLITE_OK) {
+        sqlerror(rc);
+        return 2;
+    } else {
+        db = (sqlite3 *)0;
     }
 
     return (xc < 0) ? -xc : xc;
