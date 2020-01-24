@@ -31,59 +31,12 @@
 #include <errno.h>
 #include <assert.h>
 #include "sqlite3.h"
+#include "com/diag/diminuto/diminuto_fd.h"
+#include "com/diag/placer/placer_sql.h"
 
 static const char * Program = (const char *)0;
 static int Debug = 0;
 static int Verbose = 0;
-
-static void sqlerror(int error)
-{
-    fputs(sqlite3_errstr(error), stderr);
-    fputc('\n', stderr);
-}
-
-static int sqlcallback(void * state, int ncols, char ** value, char ** keyword)
-{
-    int ii = 0;
-
-    for (ii = 0; ii < ncols; ++ii) {
-        fprintf(stderr, "%s[%d]=\"%s\"\n", keyword[ii], ii, value[ii]);
-    }
-
-    return 0;
-}
-
-static char classify(mode_t mode)
-{
-    char class = '\0';
-
-    if (S_ISREG(mode)) {
-        class = '-';
-    } else if (S_ISDIR(mode)) {
-        class = 'd';
-    } else if (S_ISLNK(mode)) {
-        class = 'l';
-    } else if (S_ISCHR(mode)) {
-        class = 'c';
-    } else if (S_ISBLK(mode)) {
-        class = 'b';
-    } else if (S_ISFIFO(mode)) {
-        class = 'p';
-    } else if (S_ISSOCK(mode)) {
-        class = 's';
-    } else {
-        mode = (mode & S_IFMT) >> 12 /* Fragile! */;
-        if ((0 <= mode) && (mode <= 9)) {
-            class = '0' + mode;
-        }  else if ((0xa <= mode) && (mode <= 0xf)) {
-            class = 'A' + mode - 0xa;
-        } else {
-            class = '?'; /* Impossible unless S_IFMT changes. */
-        }
-    }
-
-    return class;
-}
 
 static int walk(sqlite3 * db, const char * name, char * path, size_t total, size_t depth)
 {
@@ -161,14 +114,10 @@ static int walk(sqlite3 * db, const char * name, char * path, size_t total, size
     }
 
     /*
-     * Escape any single quotes in path.
+     * Expand any single quotes in path.
      */
 
-    for (pp = path, bp = buffer; *pp != '\0'; ++pp, ++bp) {
-        *bp = *pp;
-        if (*pp == '\'') { *(++bp) = '\''; }
-    }
-    *bp = '\0';
+    placer_sql_expand(buffer, path, sizeof(buffer), total);
 
     /*
      * Insert the row into the database.
@@ -177,7 +126,7 @@ static int walk(sqlite3 * db, const char * name, char * path, size_t total, size
     bytes = snprintf(sqlbuffer, sizeof(sqlbuffer),
         "INSERT INTO census VALUES ('%s', '%c', %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d)"
         , buffer
-        , classify(status.st_mode)
+        , diminuto_fd_mode2type(status.st_mode)
         , status.st_nlink
         , status.st_uid
         , status.st_gid
@@ -203,9 +152,9 @@ static int walk(sqlite3 * db, const char * name, char * path, size_t total, size
     fputs(sqlbuffer, stderr);
     fputc('\n', stderr);
 
-    rc = sqlite3_exec(db, sqlbuffer, sqlcallback, (void *)0, &sqlmessage);
+    rc = sqlite3_exec(db, sqlbuffer, placer_sql_callback, stderr, &sqlmessage);
     if (rc != SQLITE_OK) {
-        sqlerror(rc);
+        placer_sql_error(rc);
         return -22;
     }
 
@@ -306,7 +255,7 @@ int main(int argc, char * argv[])
     }
 
     if ((rc = sqlite3_open(database, &db)) != SQLITE_OK) {
-        sqlerror(rc);
+        placer_sql_error(rc);
         return 2;
     } else if (db == (sqlite3 *)0) {
         errno = EADDRNOTAVAIL;
@@ -327,7 +276,7 @@ int main(int argc, char * argv[])
     }
 
     if ((rc = sqlite3_close(db)) != SQLITE_OK) {
-        sqlerror(rc);
+        placer_sql_error(rc);
         return 2;
     } else {
         db = (sqlite3 *)0;
