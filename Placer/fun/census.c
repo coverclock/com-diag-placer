@@ -9,9 +9,17 @@
  *
  * ABSTRACT
  *
+ * Walks the file system tree starting at the indicate root or roots
+ * and inserts the resulting paths plus attributes into the specified
+ * database.
+ *
  * USAGE
  *
+ * census [ -? ] [ -d ] [ -v ] -D DATABASE ROOT [ ROOT ... ]
+ *
  * EXAMPLES
+ *
+ * census -D out/host/sql/census.db /
  *
  * REFERENCES
  *
