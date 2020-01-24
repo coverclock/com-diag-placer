@@ -9,19 +9,9 @@
  *
  * ABSTRACT
  *
- * walker walks the file system tree at the specified root or by default
- * at the current directory and adds the metadata to a database.
- *
  * USAGE
  *
- * census [ root [ root ... ] ]
- *
  * EXAMPLES
- *
- * census
- * census .
- * census /
- * census foo/bar
  *
  * REFERENCES
  *
@@ -52,9 +42,51 @@ static void sqlerror(int error)
     fputc('\n', stderr);
 }
 
+static int sqlcallback(void * state, int ncols, char ** value, char ** keyword)
+{
+    int ii = 0;
+
+    for (ii = 0; ii < ncols; ++ii) {
+        fprintf(stderr, "%s[%d]=\"%s\"\n", keyword[ii], ii, value[ii]);
+    }
+
+    return 0;
+}
+
+static char classify(mode_t mode)
+{
+    char class = '\0';
+
+    if (S_ISREG(mode)) {
+        class = '-';
+    } else if (S_ISDIR(mode)) {
+        class = 'd';
+    } else if (S_ISLNK(mode)) {
+        class = 'l';
+    } else if (S_ISCHR(mode)) {
+        class = 'c';
+    } else if (S_ISBLK(mode)) {
+        class = 'b';
+    } else if (S_ISFIFO(mode)) {
+        class = 'p';
+    } else if (S_ISSOCK(mode)) {
+        class = 's';
+    } else {
+        mode = (mode & S_IFMT) >> 12 /* Fragile! */;
+        if ((0 <= mode) && (mode <= 9)) {
+            class = '0' + mode;
+        }  else if ((0xa <= mode) && (mode <= 0xf)) {
+            class = 'A' + mode - 0xa;
+        } else {
+            class = '?'; /* Impossible unless S_IFMT changes. */
+        }
+    }
+
+    return class;
+}
+
 static int walk(sqlite3 * db, const char * name, char * path, size_t total, size_t depth)
 {
-    int fc = 0;
     DIR * dp = (DIR *)0;
     struct dirent * ep = (struct dirent *)0;
     struct stat status = { 0 };
@@ -62,6 +94,14 @@ static int walk(sqlite3 * db, const char * name, char * path, size_t total, size
     size_t dd = 0;
     size_t prior = 0;
     size_t length = 0;
+    char sqlbuffer[1024] = { '\0' };
+    sqlite3_stmt * sqlstatement = (sqlite3_stmt *)0;
+    const char * sqltail = (const char *)0;
+    char * sqlmessage = (char *)0;
+    int bytes = 0;
+    char buffer[PATH_MAX * 2] = { '\0' };
+    char * pp = (char *)0;
+    char * bp = (char *)0;
 
     /*
      * If we're at the root of the tree, initialize the path buffer.
@@ -84,7 +124,7 @@ static int walk(sqlite3 * db, const char * name, char * path, size_t total, size
     if ((total + 1 /* '/' */ + length + 1 /* '\0' */) > PATH_MAX) {
         errno = E2BIG;
         perror(path);
-        return -1;
+        return -10;
     }
 
     /*
@@ -109,52 +149,65 @@ static int walk(sqlite3 * db, const char * name, char * path, size_t total, size
      */
 
     rc = lstat(path, &status);
-    if (rc < 0) {
+    if (rc >= 0) {
+        /* Do nothing. */
+    } else if ((errno == EACCES) || (errno == ENOENT))  {
         perror(path);
-        return -2;
+        path[prior] = '\0';
+        return 0;
+    } else {
+        perror(path);
+        return -11;
     }
 
-#if 0
-struct statx_timestamp {
-        __s64   tv_sec;
-        __u32   tv_nsec;
-        __s32   __reserved;
-};
-struct statx {
-        /* 0x00 */
-        __u32   stx_mask;       /* What results were written [uncond] */
-        __u32   stx_blksize;    /* Preferred general I/O size [uncond] */
-        __u64   stx_attributes; /* Flags conveying information about the file [uncond] */
-        /* 0x10 */
-        __u32   stx_nlink;      /* Number of hard links */
-        __u32   stx_uid;        /* User ID of owner */
-        __u32   stx_gid;        /* Group ID of owner */
-        __u16   stx_mode;       /* File mode */
-        __u16   __spare0[1];
-        /* 0x20 */
-        __u64   stx_ino;        /* Inode number */
-        __u64   stx_size;       /* File size */
-        __u64   stx_blocks;     /* Number of 512-byte blocks allocated */
-        __u64   stx_attributes_mask; /* Mask to show what's supported in stx_attributes */
-        /* 0x40 */
-        struct statx_timestamp  stx_atime;      /* Last access time */
-        struct statx_timestamp  stx_btime;      /* File creation time */
-        struct statx_timestamp  stx_ctime;      /* Last attribute change time */
-        struct statx_timestamp  stx_mtime;      /* Last data modification time */
-        /* 0x80 */
-        __u32   stx_rdev_major; /* Device ID of special file [if bdev/cdev] */
-        __u32   stx_rdev_minor;
-        __u32   stx_dev_major;  /* ID of device containing file [uncond] */
-        __u32   stx_dev_minor;
-        /* 0x90 */
-        __u64   __spare2[14];   /* Spare space for future expansion */
-        /* 0x100 */
-};
-#endif
+    /*
+     * Escape any single quotes in path.
+     */
+
+    for (pp = path, bp = buffer; *pp != '\0'; ++pp, ++bp) {
+        *bp = *pp;
+        if (*pp == '\'') { *(++bp) = '\''; }
+    }
+    *bp = '\0';
 
     /*
-     * HERE
+     * Insert the row into the database.
      */
+
+    bytes = snprintf(sqlbuffer, sizeof(sqlbuffer),
+        "INSERT INTO census VALUES ('%s', '%c', %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d)"
+        , buffer
+        , classify(status.st_mode)
+        , status.st_nlink
+        , status.st_uid
+        , status.st_gid
+        , (status.st_mode & ~S_IFMT)
+        , status.st_ino
+        , status.st_size
+        , status.st_blocks
+        , major(status.st_rdev)
+        , minor(status.st_rdev)
+        , major(status.st_dev)
+        , minor(status.st_dev)
+        , status.st_ctim.tv_sec
+        , status.st_ctim.tv_nsec
+    );
+
+    if ((bytes >= sizeof(sqlbuffer)) || (sqlbuffer[bytes] != '\0')) {
+        sqlbuffer[sizeof(sqlbuffer) - 1] = '\0';
+        errno = E2BIG;
+        perror(sqlbuffer);
+        return -12;
+    }
+
+    fputs(sqlbuffer, stderr);
+    fputc('\n', stderr);
+
+    rc = sqlite3_exec(db, sqlbuffer, sqlcallback, (void *)0, &sqlmessage);
+    if (rc != SQLITE_OK) {
+        sqlerror(rc);
+        return -22;
+    }
 
     /*
      * If a flat file, we're done; if a directory, recurse and descend.
@@ -163,9 +216,15 @@ struct statx {
     if (S_ISDIR(status.st_mode)) {
 
         dp = opendir(path);
-        if (dp == (DIR *)0) {
+        if (dp != (DIR *)0) {
+            /* Do nothing. */
+        } else if ((errno == EACCES) || (errno == ENOENT))  {
             perror(path);
-            return -3;
+            path[prior] = '\0';
+            return 0;
+        } else {
+            perror(path);
+            return -30;
         }
 
         depth += 1;
@@ -179,8 +238,7 @@ struct statx {
                 break;
             } else {
                 perror(path);
-                fc = -4;
-                break;
+                return -31;
             }
 
             if (strcmp(ep->d_name, "..") == 0) {
@@ -190,22 +248,20 @@ struct statx {
             } else if ((rc = walk(db, ep->d_name, path, total, depth)) == 0) {
                 /* Do ntohing. */
             } else {
-                fc = rc;
-                break;
+                return rc;
             }
 
         }
 
         if (closedir(dp) < 0) {
             perror(path);
-            return -5;
+            return -32;
         }
 
     }
 
     path[prior] = '\0';
-
-    return fc;
+    return 0;
 }
 
 int main(int argc, char * argv[])
@@ -224,7 +280,7 @@ int main(int argc, char * argv[])
 
     Program = ((Program = strrchr(argv[0], '/')) == (const char *)0) ? argv[0] : Program + 1;
 
-    while ((opt = getopt(argc, argv, "?Ddv")) >= 0) {
+    while ((opt = getopt(argc, argv, "?D:dv")) >= 0) {
         switch (opt) {
         case '?':
             fprintf(stderr, "usage: %s [ -D DATABASE ] [ ROOT [ ROOT ... ] ]\n", Program);
@@ -264,16 +320,13 @@ int main(int argc, char * argv[])
         xc = walk(db, ".", path, 0, 0);
     } else {
         for (; optind < argc; ++optind) {
-            rc = walk(db, argv[optind], path, 0, 0);
-            if (xc == 0) {
-                xc = rc;
+            if ((xc = walk(db, argv[optind], path, 0, 0)) != 0) {
+                break;
             }
         }
     }
 
-    if (db == (sqlite3 *)0) {
-        /* Do nothing. */
-    } else if ((rc = sqlite3_close(db)) != SQLITE_OK) {
+    if ((rc = sqlite3_close(db)) != SQLITE_OK) {
         sqlerror(rc);
         return 2;
     } else {

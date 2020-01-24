@@ -64,7 +64,7 @@ HOME_DIR			:=	$(HOME)/Projects
 ########## Directories
 
 ARC_DIR				:=	arc# Archive files for static linking
-BIN_DIR				:=	bin# Utility source files or stripped executable binaries
+BIN_DIR				:=	bin# Executable scripts or stripped executable binaries
 CFG_DIR				:=	cfg# Build configuration files
 DEP_DIR				:=	dep# Generated dependencies and other make files
 DOC_DIR				:=	doc# Documentation
@@ -78,6 +78,7 @@ MOD_DIR				:=	mod# Loadable user modules
 OBC_DIR				:=	obc# C object modules
 OUT_DIR				:=	out# Build artifacts
 SRC_DIR				:=	src# Library source files
+SQL_DIR				:=	sql# SQLite3 database
 SYM_DIR				:=	sym# Unstripped executable binaries
 TGZ_DIR				:=	tgz# Compressed tarballs
 TST_DIR				:=	tst# Unit tests
@@ -550,6 +551,12 @@ $(OUT)/$(BIN_DIR)/setup:	$(OUT)/$(BIN_DIR)/generate
 $(OUT)/$(SYM_DIR)/setup:	$(OUT)/$(SYM_DIR)/generate
 	$< > $@
 	chmod 644 $@
+
+########## SQL databases for testing
+
+$(OUT)/$(SQL_DIR)/census.db:	$(SQL_DIR)/census.sql
+	D=`dirname $@`; mkdir -p $$D
+	sqlite3 -init $^ $@ < /dev/null
 
 ########## User-Space Loadable Modules
 
