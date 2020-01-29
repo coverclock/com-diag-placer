@@ -207,11 +207,14 @@ TARGETALL			:=	$(TARGETLIBRARIES) $(TARGETPROGRAMS)
 
 ########## Main Entry Points
 
-.PHONY:	all dist clean pristine clobber
+.PHONY:	all dist tidy clean pristine clobber
 
 all:	$(TARGETALL)
 
 dist:	distribution
+
+tidy:
+	rm -f $(OUT)/$(SQL_DIR)/census.db
 
 clean:
 	rm -rf $(OUT)

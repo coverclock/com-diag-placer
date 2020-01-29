@@ -21,6 +21,21 @@ Wheat Ridge CO 80033 USA
 
 # Abstract
 
+Placer is my excuse to re-learn SQLite after having been away from it
+for a few years. SQLite is a server-less database system that is featured
+in Android and Apple phones and tablets, Windows 10 (so it is rumored),
+and countless embedded system including some on which I have worked.
+
+# Targets
+
+"Rhodium"    
+Raspberry Pi 4 Model B    
+ARMv8 64-bit    
+Broadcom BCM2711 Cortex-A72 ARMv8 @ 1.5GHz x 4    
+Raspbian 10 "Buster"    
+Linux 4.19.93    
+gcc 8.3.0    
+
 # References
 
 Grant Allen, Mike Owens, *The Definitive Guide to SQLite*, 2nd ed.,

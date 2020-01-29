@@ -11,12 +11,31 @@
  * https://github.com/coverclock/com-diag-placer<BR>
  */
 
+#include "sqlite3.h"
+
+/**
+ * Emit the SQLite error message to standard error if it is
+ * non-NULL.
+ * @param message is the SQLite error message or nULL.
+ */
+static inline void placer_sql_message(const char * message)
+{
+    if (message != (const char *)0) {
+        fputs("SQLite3: ", stderr);
+        fputs(message, stderr);
+        fputc('\n', stderr);
+    }
+}
+
 /**
  * Turn the SQLite error number into a printable string and emit it
  * to standard error.
  * @param error is the SQLite error number.
  */
-extern void placer_sql_error(int error);
+static inline void placer_sql_error(int error)
+{
+    placer_sql_message(sqlite3_errstr(error));
+}
 
 /**
  * Implement a generic SQLite callback useful for debugging.
@@ -26,7 +45,7 @@ extern void placer_sql_error(int error);
  * @param keyword is the array of column names provided by SQLite.
  * @return always SQLITE_OK (0).
  */
-extern int placer_sql_callback(void * vfp, int ncols, char ** value, char ** keyword);
+extern int placer_sql_callback_generic(void * vfp, int ncols, char ** value, char ** keyword);
 
 /**
  * Copy characters from one buffer to another changing each single quote into

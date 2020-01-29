@@ -14,13 +14,7 @@
 #include "com/diag/diminuto/diminuto_types.h"
 #include "com/diag/placer/placer_sql.h"
 
-void placer_sql_error(int error)
-{
-    fputs(sqlite3_errstr(error), stderr);
-    fputc('\n', stderr);
-}
-
-int placer_sql_callback(void * vfp, int ncols, char ** value, char ** keyword)
+int placer_sql_callback_generic(void * vfp, int ncols, char ** value, char ** keyword)
 {
     FILE * fp = (FILE *)0;
     int ii = 0;
