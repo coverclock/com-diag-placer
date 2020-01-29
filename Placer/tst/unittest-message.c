@@ -15,12 +15,12 @@
 
 #define ERRORTEST(_NUMBER_) \
     { \
-        int number = _NUMBER_; \
+        int value = _NUMBER_; \
         const char * name = (const char *)0; \
         const char * message = (const char *)0; \
         name = #_NUMBER_; \
-        message = sqlite3_errstr(number); \
-        COMMENT("name=\"%s\" number=%d message=\"%s\"\n", name, number, message ? message : ""); \
+        message = sqlite3_errstr(value); \
+        COMMENT("name=%s value=%d message=\"%s\"\n", name, value, message ? message : ""); \
         placer_sql_error(_NUMBER_); \
     }
 
@@ -130,6 +130,15 @@ int main(void)
         ERRORTEST(SQLITE_WARNING_AUTOINDEX);
         ERRORTEST(SQLITE_AUTH_USER);
         ERRORTEST(SQLITE_OK_LOAD_PERMANENTLY);
+    }
+
+    {
+        COMMENT();
+        placer_sql_error(-1);
+        COMMENT();
+        placer_sql_error(0);
+        COMMENT();
+        placer_sql_message((const char *)0);
     }
 
     EXIT();

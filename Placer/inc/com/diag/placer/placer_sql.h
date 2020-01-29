@@ -34,7 +34,9 @@ static inline void placer_sql_message(const char * message)
  */
 static inline void placer_sql_error(int error)
 {
-    placer_sql_message(sqlite3_errstr(error));
+    if (error != SQLITE_OK) {
+        placer_sql_message(sqlite3_errstr(error));
+    }
 }
 
 /**
