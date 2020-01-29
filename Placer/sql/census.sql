@@ -8,19 +8,19 @@
  * https://github.com/coverclock/com-diag-placer<BR>
  */
 CREATE TABLE census (
-	path TEXT PRIMARY KEY,
+    path TEXT PRIMARY KEY,
     type TEXT,
-	nlink INTEGER,
-	uid INTEGER,
-	gid INTEGER,
-	mode INTEGER,
-	ino INTEGER,
-	size INTEGER,
-	blocks INTEGER,
-	rdevmajor INTEGER,
-	rdevminor INTEGER,
-	devmajor INTEGER,
-	devminor INTEGER,
+    nlink INTEGER,
+    uid INTEGER,
+    gid INTEGER,
+    mode INTEGER,
+    ino INTEGER,
+    size INTEGER,
+    blocks INTEGER,
+    rdevmajor INTEGER,
+    rdevminor INTEGER,
+    devmajor INTEGER,
+    devminor INTEGER,
     ctime INTEGER,
     ctimensec INTEGER
 );

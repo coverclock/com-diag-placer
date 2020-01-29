@@ -15,15 +15,16 @@
 
 /**
  * Emit the SQLite error message to standard error if it is
- * non-NULL.
+ * non-NULL and then free it.
  * @param message is the SQLite error message or nULL.
  */
-static inline void placer_sql_message(const char * message)
+static inline void placer_sql_message(char * message)
 {
-    if (message != (const char *)0) {
+    if (message != (char *)0) {
         fputs("SQLite3: ", stderr);
         fputs(message, stderr);
         fputc('\n', stderr);
+        sqlite3_free(message);
     }
 }
 
@@ -35,7 +36,9 @@ static inline void placer_sql_message(const char * message)
 static inline void placer_sql_error(int error)
 {
     if (error != SQLITE_OK) {
-        placer_sql_message(sqlite3_errstr(error));
+        fputs("SQLite3: ", stderr);
+        fputs(sqlite3_errstr(error), stderr);
+        fputc('\n', stderr);
     }
 }
 
@@ -60,5 +63,15 @@ extern int placer_sql_callback_generic(void * vfp, int ncols, char ** value, cha
  * @return the number of bytes in the destination including the terminating NUL.
  */
 extern size_t placer_sql_expand(char * to, const char * from, size_t tsize, size_t fsize);
+
+/**
+ * Copy characters from one buffer to a dynamically allocated buffer changing
+ * each single quote into two single quotes. The dynamically allocated buffer
+ * is guaranteed to be NUL terminated. The dynamically allocated buffer must
+ * be freed using free(3).
+ * @param  from points to the source buffer.
+ * @return the dynamically acquired buffer or NULL if malloc(3) failed.
+ */
+extern char * placer_sql_expand_alloc(const char * from);
 
 #endif

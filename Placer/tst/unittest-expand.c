@@ -11,6 +11,7 @@
 #include "com/diag/diminuto/diminuto_unittest.h"
 #include "com/diag/placer/placer_sql.h"
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 int main(void)
@@ -78,6 +79,15 @@ int main(void)
         COMMENT("from=\"%s\" to=\"%s\" result=%zu\n", from, to, result);
         EXPECT(result == 23);
         EXPECT(strncmp(to, "''''AA''''BB''''CC''''", sizeof(to)) == 0);
+    }
+    {
+        const char from[] = "''AA''BB''CC''";
+        char * to = (char *)0;
+        to = placer_sql_expand_alloc(from);
+        ASSERT(to != (char *)0);
+        COMMENT("from=\"%s\" to=\"%s\"\n", from, to);
+        EXPECT(strncmp(to, "''''AA''''BB''''CC''''", sizeof(to)) == 0);
+        free(to);
     }
 
     EXIT();

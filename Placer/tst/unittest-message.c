@@ -138,7 +138,7 @@ int main(void)
         COMMENT();
         placer_sql_error(0);
         COMMENT();
-        placer_sql_message((const char *)0);
+        placer_sql_message((char *)0);
     }
 
     EXIT();

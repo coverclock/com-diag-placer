@@ -47,6 +47,54 @@ static const char * Program = (const char *)0;
 static int Debug = 0;
 static int Verbose = 0;
 
+static int test(sqlite3 * db, diminuto_fd_type_t type)
+{
+    int xc = 0;
+    int rc = 0;
+    char tt[2] = { '\0', '\0' };
+    char * to = (char *)0;
+    size_t bytes = 0;
+    char sqlbuffer[1024] = { '\0' };
+    char * sqlmessage = (char *)0;
+
+    do {
+
+        tt[0] = type;
+        to = placer_sql_expand_alloc(tt);
+
+        bytes = snprintf(sqlbuffer, sizeof(sqlbuffer),
+            "SELECT * FROM census WHERE (type = '%s') AND (mode > 511);"
+            , to
+        );
+
+        free(to);
+
+        if ((bytes >= sizeof(sqlbuffer)) || (sqlbuffer[bytes] != '\0')) {
+            sqlbuffer[sizeof(sqlbuffer) - 1] = '\0';
+            errno = E2BIG;
+            perror(sqlbuffer);
+            xc = -30;
+            break;
+        }
+
+        if (Verbose) {
+            fputs(sqlbuffer, stderr);
+            fputc('\n', stderr);
+        }
+
+        sqlmessage = (char *)0;
+        if ((rc = sqlite3_exec(db, sqlbuffer, placer_sql_callback_generic, stderr, &sqlmessage)) != SQLITE_OK) {
+            placer_sql_message(sqlmessage);
+            placer_sql_error(rc);
+            xc = -31;
+            break;
+        }
+
+    } while (0);
+
+    return xc;
+}
+
 static int walk(sqlite3 * db, const char * name, char * path, size_t total, size_t depth)
 {
     int xc = 0;
@@ -57,14 +105,10 @@ static int walk(sqlite3 * db, const char * name, char * path, size_t total, size
     size_t dd = 0;
     size_t prior = 0;
     size_t length = 0;
+    char * to = (char *)0;
     char sqlbuffer[1024] = { '\0' };
-    sqlite3_stmt * sqlstatement = (sqlite3_stmt *)0;
-    const char * sqltail = (const char *)0;
     char * sqlmessage = (char *)0;
     int bytes = 0;
-    char buffer[PATH_MAX * 2] = { '\0' };
-    char * pp = (char *)0;
-    char * bp = (char *)0;
    
     /*
      * If we're at the root of the tree, initialize the path buffer.
@@ -131,7 +175,7 @@ static int walk(sqlite3 * db, const char * name, char * path, size_t total, size
          * Expand any single quotes in path.
          */
 
-        placer_sql_expand(buffer, path, sizeof(buffer), total);
+        to = placer_sql_expand_alloc(path);
 
         /*
          * Insert the row into the database.
@@ -139,7 +183,7 @@ static int walk(sqlite3 * db, const char * name, char * path, size_t total, size
 
         bytes = snprintf(sqlbuffer, sizeof(sqlbuffer),
             "INSERT INTO census VALUES ('%s', '%c', %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d)"
-            , buffer
+            , to
             , diminuto_fd_mode2type(status.st_mode)
             , status.st_nlink
             , status.st_uid
@@ -156,6 +200,8 @@ static int walk(sqlite3 * db, const char * name, char * path, size_t total, size
             , status.st_ctim.tv_nsec
         );
 
+        free(to);
+
         if ((bytes >= sizeof(sqlbuffer)) || (sqlbuffer[bytes] != '\0')) {
             sqlbuffer[sizeof(sqlbuffer) - 1] = '\0';
             errno = E2BIG;
@@ -170,17 +216,10 @@ static int walk(sqlite3 * db, const char * name, char * path, size_t total, size
         }
 
         sqlmessage = (char *)0;
-        rc = sqlite3_exec(db, sqlbuffer, placer_sql_callback_generic, stderr, &sqlmessage);
-        if (sqlmessage != (char *)0) {
-            fprintf(stderr, "sqlite3_exec: \"%s\"\n", sqlmessage);
-            sqlite3_free(sqlmessage);
-        }
-        if (rc != SQLITE_OK) {
+        if ((rc = sqlite3_exec(db, sqlbuffer, placer_sql_callback_generic, stderr, &sqlmessage)) != SQLITE_OK) {
+            placer_sql_message(sqlmessage);
             placer_sql_error(rc);
-            fputc('"', stderr);
-            fputs(sqlbuffer, stderr);
-            fputs("\"\n", stderr);
-            xc = -22;
+            xc = -13;
             break;
         }
 
@@ -198,7 +237,7 @@ static int walk(sqlite3 * db, const char * name, char * path, size_t total, size
                 break;
             } else {
                 perror(path);
-                xc = -30;
+                xc = -14;
                 break;
             }
 
@@ -213,7 +252,7 @@ static int walk(sqlite3 * db, const char * name, char * path, size_t total, size
                     break;
                 } else {
                     perror(path);
-                    xc = -31;
+                    xc = -15;
                     break;
                 }
 
@@ -232,7 +271,7 @@ static int walk(sqlite3 * db, const char * name, char * path, size_t total, size
 
             if (closedir(dp) < 0) {
                 perror(path);
-                xc = -32;
+                xc = -16;
                 break;
             }
 
@@ -256,6 +295,8 @@ int main(int argc, char * argv[])
     sqlite3 * db = (sqlite3 *)0;
     int opt = 0;
     const char * database = (const char *)0;
+    int test1 = 0;
+    int test2 = 0;
     extern char * optarg;
     extern int optind;
     extern int opterr;
@@ -265,10 +306,16 @@ int main(int argc, char * argv[])
 
         Program = ((Program = strrchr(argv[0], '/')) == (const char *)0) ? argv[0] : Program + 1;
 
-        while ((opt = getopt(argc, argv, "?D:dv")) >= 0) {
+        while ((opt = getopt(argc, argv, "?12D:dv")) >= 0) {
             switch (opt) {
             case '?':
                 fprintf(stderr, "usage: %s [ -D DATABASE ] [ ROOT [ ROOT ... ] ]\n", Program);
+                break;
+            case '1':
+                test1 = !0;
+                break;
+            case '2':
+                test2 = !0;
                 break;
             case 'D':
                 database = optarg;
@@ -315,10 +362,26 @@ int main(int argc, char * argv[])
             }
         }
 
+        if (!test1) {
+            /* Do nothing. */
+        } else if ((rc = test(db, DIMINUTO_FD_TYPE_FILE)) == 0) {
+            /* Do nothing. */
+        } else {
+            xc = 4;
+        }
+
+        if (!test2) {
+            /* Do nothing. */
+        } else if ((rc = test(db, DIMINUTO_FD_TYPE_DIRECTORY)) == 0) {
+            /* Do nothing. */
+        } else {
+            xc = 5;
+        }
+
         if ((rc = sqlite3_close(db)) != SQLITE_OK) {
             placer_sql_error(rc);
             if (xc == 0) {
-                xc = 2;
+                xc = 6;
             }
             break;
         } else {

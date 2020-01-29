@@ -9,6 +9,7 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include "sqlite3.h"
 #include "com/diag/diminuto/diminuto_types.h"
@@ -22,8 +23,9 @@ int placer_sql_callback_generic(void * vfp, int ncols, char ** value, char ** ke
     fp = (FILE *)vfp;
 
     for (ii = 0; ii < ncols; ++ii) {
-        fprintf(fp, "%s[%d]=\"%s\"[%zu]\n", keyword[ii], ii, value[ii], strlen(value[ii]));
+        fprintf(fp, "%s[%d]=\"%s\"[%zu] ", keyword[ii], ii, value[ii], strlen(value[ii]));
     }
+    fputc('\n', fp);
 
     return SQLITE_OK;
 }
@@ -53,4 +55,20 @@ size_t placer_sql_expand(char * to, const char * from, size_t tsize, size_t fsiz
     }
 
     return size;
+}
+
+char * placer_sql_expand_alloc(const char * from)
+{
+    char * to = (char *)0;
+    size_t fsize = 0;
+    size_t tsize = 0;
+
+    fsize = strlen(from);
+    tsize = (fsize * 2) + 1;
+    to = malloc(tsize);
+    if (to != (char *)0) {
+        placer_sql_expand(to, from, tsize, fsize);
+    }
+
+    return to;
 }
