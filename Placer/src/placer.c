@@ -87,8 +87,12 @@ char * placer_format_alloc(size_t size, const char * format, ...)
     char * buffer = (char *)0;
     int length = 0;
     va_list ap;
+    size_t f0 = 1;
+    size_t f1 = 1;
+    size_t fp = 0;
+    size_t ss = 0;
 
-    while (!0) {
+    do {
 
         if (size == 0) {
             errno = EINVAL;
@@ -96,40 +100,50 @@ char * placer_format_alloc(size_t size, const char * format, ...)
             break;
         }
 
-        buffer = malloc(size);
-        if (buffer == (char *)0) {
-            perror("malloc");
-            break;
+        ss = size;
+
+        while (!0) {
+
+#if 0
+            fprintf(stderr, "placer_format_alloc: size=%zu ss=%zu f0=%zu f1=%zu fp=%zu\n", size, ss, f0, f1, fp);
+#endif
+
+            buffer = malloc(ss);
+            if (buffer == (char *)0) {
+                perror("malloc");
+                break;
+            }
+
+            va_start(ap, format);
+            length = vsnprintf(buffer, ss, format, ap);
+            va_end(ap);
+
+            if (length < ss) {
+                break; 
+            }
+
+            free(buffer);
+            buffer = (char *)0;
+
+            /*
+             * Scale the buffer size by the Fibonacci sequence. No, really.
+             */
+
+            fp = f0;
+            f0 = f1;
+            f1 += fp;
+
+            if (size > ((~(size_t)0) / f1)) {
+                errno = E2BIG;
+                perror("size");
+                break;
+            }
+
+            ss = size * f1;
+
         }
 
-        va_start(ap, format);
-        length = vsnprintf(buffer, size, format, ap);
-        va_end(ap);
-
-        if (length < size) {
-            break;
-        }
-
-        free(buffer);
-        buffer = (char *)0;
-
-        /*
-         * Really unlikely. But I'm paranoid, and it's cheap to check.
-         */
-
-        if (size > ((~(size_t)0) / 2)) {
-            errno = E2BIG;
-            perror("size");
-            break;
-        }
-
-        /*
-         * Doubling might be overkill.
-         */
-
-        size *= 2;
-
-    }
+    } while (0);
 
     return buffer;
 }

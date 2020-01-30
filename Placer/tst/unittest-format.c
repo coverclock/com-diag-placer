@@ -31,6 +31,12 @@ int main(void)
     }
     {
         char * pp = (char *)0;
+        pp = placer_format_alloc(2, "SELECT * FROM %s;", "table");
+        EXPECT(strcmp("SELECT * FROM table;", pp) == 0);;
+        free(pp);
+    }
+    {
+        char * pp = (char *)0;
         pp = placer_format_alloc(512, "SELECT * FROM %s;", "table");
         EXPECT(strcmp("SELECT * FROM table;", pp) == 0);;
         free(pp);
