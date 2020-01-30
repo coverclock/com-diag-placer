@@ -24,7 +24,10 @@ Wheat Ridge CO 80033 USA
 Placer is my excuse to re-learn SQLite after having been away from it
 for a few years. SQLite is a server-less database system that is featured
 in Android and Apple phones and tablets, Windows 10 (so it is rumored),
-and countless embedded system including some on which I have worked.
+and countless embedded system including some on which I have worked. I
+am not a database person, but I very much appreciate the persistent data
+management model offered by SQLite that is usable both from applications
+and the command line.
 
 # Targets
 

@@ -9,7 +9,7 @@
  */
 
 #include "com/diag/diminuto/diminuto_unittest.h"
-#include "com/diag/placer/placer_sql.h"
+#include "com/diag/placer/placer.h"
 #include <stdio.h>
 #include <string.h>
 
@@ -21,7 +21,7 @@
         name = #_NUMBER_; \
         message = sqlite3_errstr(value); \
         COMMENT("name=%s value=%d message=\"%s\"\n", name, value, message ? message : ""); \
-        placer_sql_error(_NUMBER_); \
+        placer_error(_NUMBER_); \
     }
 
 int main(void)
@@ -134,11 +134,11 @@ int main(void)
 
     {
         COMMENT();
-        placer_sql_error(-1);
+        placer_error(-1);
         COMMENT();
-        placer_sql_error(0);
+        placer_error(0);
         COMMENT();
-        placer_sql_message((char *)0);
+        placer_message((char *)0);
     }
 
     EXIT();

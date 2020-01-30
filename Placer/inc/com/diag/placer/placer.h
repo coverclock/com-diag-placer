@@ -1,6 +1,6 @@
 /* vi: set ts=4 expandtab shiftwidth=4: */
-#ifndef _H_COM_DIAG_PLACER_SQL_
-#define _H_COM_DIAG_PLACER_SQL_
+#ifndef _H_COM_DIAG_PLACER_
+#define _H_COM_DIAG_PLACER_
 
 /**
  * @file
@@ -18,7 +18,7 @@
  * non-NULL and then free it.
  * @param message is the SQLite error message or nULL.
  */
-static inline void placer_sql_message(char * message)
+static inline void placer_message(char * message)
 {
     if (message != (char *)0) {
         fputs("SQLite3: ", stderr);
@@ -33,7 +33,7 @@ static inline void placer_sql_message(char * message)
  * to standard error.
  * @param error is the SQLite error number.
  */
-static inline void placer_sql_error(int error)
+static inline void placer_error(int error)
 {
     if (error != SQLITE_OK) {
         fputs("SQLite3: ", stderr);
@@ -50,7 +50,7 @@ static inline void placer_sql_error(int error)
  * @param keyword is the array of column names provided by SQLite.
  * @return always SQLITE_OK (0).
  */
-extern int placer_sql_callback_generic(void * vfp, int ncols, char ** value, char ** keyword);
+extern int placer_callback_generic(void * vfp, int ncols, char ** value, char ** keyword);
 
 /**
  * Copy characters from one buffer to another changing each single quote into
@@ -62,7 +62,7 @@ extern int placer_sql_callback_generic(void * vfp, int ncols, char ** value, cha
  * @param fsize is the size of the source buffer.
  * @return the number of bytes in the destination including the terminating NUL.
  */
-extern size_t placer_sql_expand(char * to, const char * from, size_t tsize, size_t fsize);
+extern size_t placer_expand(char * to, const char * from, size_t tsize, size_t fsize);
 
 /**
  * Copy characters from one buffer to a dynamically allocated buffer changing
@@ -70,8 +70,19 @@ extern size_t placer_sql_expand(char * to, const char * from, size_t tsize, size
  * is guaranteed to be NUL terminated. The dynamically allocated buffer must
  * be freed using free(3).
  * @param  from points to the source buffer.
- * @return the dynamically acquired buffer or NULL if malloc(3) failed.
+ * @return the dynamically acquired buffer or NULL if failure.
  */
-extern char * placer_sql_expand_alloc(const char * from);
+extern char * placer_expand_alloc(const char * from);
+
+/**
+ * Format arguments in an snprintf(3) manner into a dynamically acquired
+ * buffer, enarging the buffer to guarantee that the results fit. Initially
+ * allocate the buffer to the specified size. The dynamically allocated
+ * buffer must be freed using free(3).
+ * @param size is the initial allocation size of the buffer in bytes.
+ * @param format is the snprintf(3) format string.
+ * @return the dynamically acquired buffer or NULL if failure.
+ */
+extern char * placer_format_alloc(size_t size, const char * format, ...);
 
 #endif

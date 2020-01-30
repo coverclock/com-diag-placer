@@ -41,11 +41,12 @@
 #include <errno.h>
 #include <assert.h>
 #include "com/diag/diminuto/diminuto_fd.h"
-#include "com/diag/placer/placer_sql.h"
+#include "com/diag/placer/placer.h"
 
 static const char * Program = (const char *)0;
 static int Debug = 0;
 static int Verbose = 0;
+static size_t Buffersize = 256;
 
 static int test(sqlite3 * db, diminuto_fd_type_t type)
 {
@@ -53,39 +54,38 @@ static int test(sqlite3 * db, diminuto_fd_type_t type)
     int rc = 0;
     char tt[2] = { '\0', '\0' };
     char * to = (char *)0;
-    size_t bytes = 0;
-    char sqlbuffer[1024] = { '\0' };
+    char * sql = (char *)0;
     char * sqlmessage = (char *)0;
 
     do {
 
         tt[0] = type;
-        to = placer_sql_expand_alloc(tt);
+        to = placer_expand_alloc(tt);
 
-        bytes = snprintf(sqlbuffer, sizeof(sqlbuffer),
-            "SELECT * FROM census WHERE (type = '%s') AND (mode > 511);"
+        sql = placer_format_alloc(Buffersize, 
+            "SELECT * FROM census WHERE (type = '%s') AND (mode > %u);"
             , to
+            , 0777U
         );
-
         free(to);
 
-        if ((bytes >= sizeof(sqlbuffer)) || (sqlbuffer[bytes] != '\0')) {
-            sqlbuffer[sizeof(sqlbuffer) - 1] = '\0';
-            errno = E2BIG;
-            perror(sqlbuffer);
+        if (sql == (char *)0) {
             xc = -30;
             break;
         }
 
         if (Verbose) {
-            fputs(sqlbuffer, stderr);
+            fputs(sql, stderr);
             fputc('\n', stderr);
         }
 
         sqlmessage = (char *)0;
-        if ((rc = sqlite3_exec(db, sqlbuffer, placer_sql_callback_generic, stderr, &sqlmessage)) != SQLITE_OK) {
-            placer_sql_message(sqlmessage);
-            placer_sql_error(rc);
+        rc = sqlite3_exec(db, sql, placer_callback_generic, stderr, &sqlmessage);
+        free(sql);
+
+        if (rc != SQLITE_OK) {
+            placer_message(sqlmessage);
+            placer_error(rc);
             xc = -31;
             break;
         }
@@ -106,9 +106,8 @@ static int walk(sqlite3 * db, const char * name, char * path, size_t total, size
     size_t prior = 0;
     size_t length = 0;
     char * to = (char *)0;
-    char sqlbuffer[1024] = { '\0' };
+    char * sql = (char *)0;
     char * sqlmessage = (char *)0;
-    int bytes = 0;
    
     /*
      * If we're at the root of the tree, initialize the path buffer.
@@ -124,7 +123,7 @@ static int walk(sqlite3 * db, const char * name, char * path, size_t total, size
      * Insure the path buffer has sufficient room. I'd be surprised
      * if this failed on a modern system, but back when MAXPATHLEN
      * was 512 I have seen file systems for which an absolute path
-     * string could not be represented.
+     * string for an actual file could not be represented.
      */
 
     length = strnlen(name, PATH_MAX);
@@ -175,13 +174,13 @@ static int walk(sqlite3 * db, const char * name, char * path, size_t total, size
          * Expand any single quotes in path.
          */
 
-        to = placer_sql_expand_alloc(path);
+        to = placer_expand_alloc(path);
 
         /*
          * Insert the row into the database.
          */
 
-        bytes = snprintf(sqlbuffer, sizeof(sqlbuffer),
+        sql = placer_format_alloc(Buffersize,
             "INSERT INTO census VALUES ('%s', '%c', %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d)"
             , to
             , diminuto_fd_mode2type(status.st_mode)
@@ -199,26 +198,25 @@ static int walk(sqlite3 * db, const char * name, char * path, size_t total, size
             , status.st_ctim.tv_sec
             , status.st_ctim.tv_nsec
         );
-
         free(to);
 
-        if ((bytes >= sizeof(sqlbuffer)) || (sqlbuffer[bytes] != '\0')) {
-            sqlbuffer[sizeof(sqlbuffer) - 1] = '\0';
-            errno = E2BIG;
-            perror(sqlbuffer);
+        if (sql == (char *)0) {
             xc = -12;
             break;
         }
 
         if (Verbose) {
-            fputs(sqlbuffer, stderr);
+            fputs(sql, stderr);
             fputc('\n', stderr);
         }
 
         sqlmessage = (char *)0;
-        if ((rc = sqlite3_exec(db, sqlbuffer, placer_sql_callback_generic, stderr, &sqlmessage)) != SQLITE_OK) {
-            placer_sql_message(sqlmessage);
-            placer_sql_error(rc);
+        rc = sqlite3_exec(db, sql, placer_callback_generic, stderr, &sqlmessage);
+        free(sql);
+
+        if (rc != SQLITE_OK) {
+            placer_message(sqlmessage);
+            placer_error(rc);
             xc = -13;
             break;
         }
@@ -297,6 +295,8 @@ int main(int argc, char * argv[])
     const char * database = (const char *)0;
     int test1 = 0;
     int test2 = 0;
+    char * end = (char *)0;
+    static const char USAGE[] = "-D DATABASE [ -B BLOCKSIZE ] [ -1 ] [ -2 ] [ ROOT [ ROOT ... ] ]\n";
     extern char * optarg;
     extern int optind;
     extern int opterr;
@@ -306,16 +306,24 @@ int main(int argc, char * argv[])
 
         Program = ((Program = strrchr(argv[0], '/')) == (const char *)0) ? argv[0] : Program + 1;
 
-        while ((opt = getopt(argc, argv, "?12D:dv")) >= 0) {
+        while ((opt = getopt(argc, argv, "?12B:D:dv")) >= 0) {
             switch (opt) {
             case '?':
-                fprintf(stderr, "usage: %s [ -D DATABASE ] [ ROOT [ ROOT ... ] ]\n", Program);
+                fprintf(stderr, "usage: %s %s\n", Program, USAGE);
                 break;
             case '1':
                 test1 = !0;
                 break;
             case '2':
                 test2 = !0;
+                break;
+            case 'B':
+                Buffersize = strtoul(optarg, &end, 0);
+                if ((end != (char *)0) && (end[0] != '\0')) {
+                    errno = EINVAL;
+                    perror(optarg);
+                    xc = 1;
+                }
                 break;
             case 'D':
                 database = optarg;
@@ -327,7 +335,7 @@ int main(int argc, char * argv[])
                 Verbose = !0;
                 break;
             default:
-                fprintf(stderr, "usage: %s [ -? ] [ -D DATABASE ] [ ROOT [ ROOT ... ] ]\n", Program);
+                fprintf(stderr, "usage: %s %s\n", Program, USAGE);
                 xc = 1;
                 break;
             }
@@ -338,12 +346,14 @@ int main(int argc, char * argv[])
         }
 
         if (database == (const char *)0) {
+            errno = EINVAL;
+            perror("-D");
             xc = 1;
             break;
         }
 
         if ((rc = sqlite3_open(database, &db)) != SQLITE_OK) {
-            placer_sql_error(rc);
+            placer_error(rc);
             xc = 2;
             break;
         } else if (db == (sqlite3 *)0) {
@@ -379,7 +389,7 @@ int main(int argc, char * argv[])
         }
 
         if ((rc = sqlite3_close(db)) != SQLITE_OK) {
-            placer_sql_error(rc);
+            placer_error(rc);
             if (xc == 0) {
                 xc = 6;
             }
