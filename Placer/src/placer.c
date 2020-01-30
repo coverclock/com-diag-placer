@@ -131,6 +131,12 @@ char * placer_format_alloc(size_t size, const char * format, ...)
 
             fp = f0;
             f0 = f1;
+            if (f1 > ((~(size_t)0) - fp)) {
+                errno = E2BIG;
+                perror("size");
+                break;
+            }
+
             f1 += fp;
 
             if (size > ((~(size_t)0) / f1)) {
