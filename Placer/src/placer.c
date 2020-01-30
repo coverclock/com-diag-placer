@@ -90,6 +90,12 @@ char * placer_format_alloc(size_t size, const char * format, ...)
 
     while (!0) {
 
+        if (size == 0) {
+            errno = EINVAL;
+            perror("size");
+            break;
+        }
+
         buffer = malloc(size);
         if (buffer == (char *)0) {
             perror("malloc");
