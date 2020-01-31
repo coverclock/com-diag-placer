@@ -16,7 +16,11 @@
 
 int main(void)
 {
+    FILE * debug;
+
     SETLOGMASK();
+
+    debug = placer_debug(stderr);
 
     {
         char * pp = (char *)0;
@@ -26,21 +30,26 @@ int main(void)
     {
         char * pp = (char *)0;
         pp = placer_format_alloc(1, "SELECT * FROM %s;", "table");
+        ASSERT(pp != (char *)0);
         EXPECT(strcmp("SELECT * FROM table;", pp) == 0);;
         free(pp);
     }
     {
         char * pp = (char *)0;
         pp = placer_format_alloc(2, "SELECT * FROM %s;", "table");
+        ASSERT(pp != (char *)0);
         EXPECT(strcmp("SELECT * FROM table;", pp) == 0);;
         free(pp);
     }
     {
         char * pp = (char *)0;
         pp = placer_format_alloc(512, "SELECT * FROM %s;", "table");
+        ASSERT(pp != (char *)0);
         EXPECT(strcmp("SELECT * FROM table;", pp) == 0);;
         free(pp);
     }
+
+    (void)placer_debug(debug);
 
     EXIT();
 }

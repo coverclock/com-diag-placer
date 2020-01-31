@@ -14,6 +14,14 @@
 #include "sqlite3.h"
 
 /**
+ * Sets the debug file pointer. If the pointer is non-NULL, debugging
+ * information is emitted to it. The prior debug file pointer is returned.
+ * @param now is the new file pointer used for debugging, or NULL.
+ * @return the prior debug file pointer (which may be NULL).
+ */
+extern FILE * placer_debug(FILE * now);
+
+/**
  * Emit the SQLite error message to standard error if it is
  * non-NULL and then free it.
  * @param message is the SQLite error message or nULL.

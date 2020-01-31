@@ -17,6 +17,18 @@
 #include "com/diag/diminuto/diminuto_types.h"
 #include "com/diag/placer/placer.h"
 
+static FILE * Debug = (FILE *)0;
+
+FILE * placer_debug(FILE * now)
+{
+    FILE * was;
+
+    was = Debug;
+    Debug = now;
+
+    return was;
+}
+
 int placer_callback_generic(void * vfp, int ncols, char ** value, char ** keyword)
 {
     FILE * fp = (FILE *)0;
@@ -89,7 +101,7 @@ char * placer_format_alloc(size_t size, const char * format, ...)
     va_list ap;
     size_t f0 = 1;
     size_t f1 = 1;
-    size_t fp = 0;
+    size_t f2 = 0;
     size_t ss = 0;
 
     do {
@@ -104,9 +116,9 @@ char * placer_format_alloc(size_t size, const char * format, ...)
 
         while (!0) {
 
-#if 0
-            fprintf(stderr, "placer_format_alloc: size=%zu ss=%zu f0=%zu f1=%zu fp=%zu\n", size, ss, f0, f1, fp);
-#endif
+            if (Debug != (FILE *)0) {
+                fprintf(Debug, "%s@%d: size=%zu ss=%zu f0=%zu f1=%zu f2=%zu\n", __FILE__, __LINE__, size, ss, f0, f1, f2);
+            }
 
             buffer = malloc(ss);
             if (buffer == (char *)0) {
@@ -129,15 +141,16 @@ char * placer_format_alloc(size_t size, const char * format, ...)
              * Scale the buffer size by the Fibonacci sequence. No, really.
              */
 
-            fp = f0;
+            f2 = f0;
             f0 = f1;
-            if (f1 > ((~(size_t)0) - fp)) {
+
+            if (f1 > ((~(size_t)0) - f2)) {
                 errno = E2BIG;
                 perror("size");
                 break;
             }
 
-            f1 += fp;
+            f1 += f2;
 
             if (size > ((~(size_t)0) / f1)) {
                 errno = E2BIG;
