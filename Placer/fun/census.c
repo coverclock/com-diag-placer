@@ -17,7 +17,7 @@
  *
  * USAGE
  *
- * census [ -? ] [ -d ] [ -v ] -D DATABASE ROOT [ ROOT ... ]
+ * census [ -? ] [ -d ] [ -v ] -D DATABASE [ -1 ] [ -2 ] [ -3 ]  ROOT [ ROOT ... ]
  *
  * EXAMPLES
  *
@@ -48,7 +48,214 @@ static int Debug = 0;
 static int Verbose = 0;
 static size_t Buffersize = 256;
 
-static int test(sqlite3 * db, diminuto_fd_type_t type)
+static int enumerator(void * vp, int ncols, char ** value, char ** keyword)
+{
+    int * ip = (int *)0;
+
+    ip = (int *)vp;
+    (*ip) += 1;
+
+    return SQLITE_OK;
+}
+
+static int enumerate(sqlite3 * db, const char * name, char * path, size_t total, size_t depth)
+{
+    int xc = 0;
+    DIR * dp = (DIR *)0;
+    struct dirent * ep = (struct dirent *)0;
+    struct stat status = { 0 };
+    int rc = 0;
+    size_t dd = 0;
+    size_t prior = 0;
+    size_t length = 0;
+    char * to = (char *)0;
+    char * sql = (char *)0;
+    char * sqlmessage = (char *)0;
+    int enumeration = 0;
+   
+    /*
+     * If we're at the root of the tree, initialize the path buffer.
+     */
+
+    if (depth == 0) {
+        path[0] = '\0';
+        path[PATH_MAX - 1] = '\0';
+        total = 0;
+    }
+
+    /*
+     * Insure the path buffer has sufficient room. I'd be surprised
+     * if this failed on a modern system, but back when MAXPATHLEN
+     * was 512 I have seen file systems for which an absolute path
+     * string for an actual file could not be represented.
+     */
+
+    length = strnlen(name, PATH_MAX);
+
+    do {
+
+        if ((total + 1 /* '/' */ + length + 1 /* '\0' */) > PATH_MAX) {
+            errno = E2BIG;
+            perror(path);
+            xc = -10;
+            break;
+        }
+
+        /*
+         * Contstruct a path (maybe be relative or absolute depending
+         * on the root).
+         */
+
+        prior = total;
+        if (total == 0) {
+            /* Do nothing. */
+        } else if (path[total - 1] == '/') {
+            /* Do nothing. */
+        } else {
+            path[total++] = '/';
+            path[total] = '\0';
+        }
+        strcat(path, name);
+        total += length;
+
+        /*
+         * Get the attributes for the file identified by the path.
+         * N.B. It is *not* sufficient to just use the opendir(3)
+         * success to determine whether the path points to a
+         * directory; it will succeeed for soft links as well.
+         * Folling such soft links that point to directories can
+         * result in a file system loop, where the soft link
+         * ultimately points to the directory containing the
+         * soft link.
+         */
+
+        rc = lstat(path, &status);
+        if (rc >= 0) {
+            /* Do nothing. */
+        } else if ((errno == EACCES) || (errno == ENOENT))  {
+            perror(path);
+            break;
+        } else {
+            perror(path);
+            xc = -11;
+            break;
+        }
+
+        /*
+         * Expand any single quotes in path.
+         */
+
+        to = placer_expand_alloc(path);
+
+        /*
+         * Select the row from the database.
+         */
+
+        sql = placer_format_alloc(Buffersize,
+            "SELECT * FROM census WHERE (path = '%s');"
+            , to
+        );
+        free(to);
+
+        if (sql == (char *)0) {
+            xc = -12;
+            break;
+        }
+
+        if (Verbose) {
+            fputs(sql, stderr);
+            fputc('\n', stderr);
+        }
+
+        enumeration = 0;
+
+        sqlmessage = (char *)0;
+        rc = sqlite3_exec(db, sql, enumerator, &enumeration, &sqlmessage);
+        free(sql);
+
+        if (rc != SQLITE_OK) {
+            placer_message(sqlmessage);
+            placer_error(rc);
+            xc = -13;
+            break;
+        }
+
+        if (enumeration < 1) {
+            fputs("NONE: ", stderr);
+            fputs(path, stderr);
+            fputc('\n', stderr);
+        } else if (enumeration > 1) {
+            fputs("MANY: ", stderr);
+            fputs(path, stderr);
+            fputc('\n', stderr);
+        } else {
+            /* Do nothing. */
+        }
+
+        /*
+         * If a flat file, we're done; if a directory, recurse and descend.
+         */
+
+        if (S_ISDIR(status.st_mode)) {
+
+            dp = opendir(path);
+            if (dp != (DIR *)0) {
+                /* Do nothing. */
+            } else if ((errno == EACCES) || (errno == ENOENT))  {
+                perror(path);
+                break;
+            } else {
+                perror(path);
+                xc = -14;
+                break;
+            }
+
+            depth += 1;
+
+            while (!0) {
+
+                errno = 0;
+                if ((ep = readdir(dp)) != (struct dirent *)0) {
+                    /* Do nothing. */
+                } else if (errno == 0) {
+                    break;
+                } else {
+                    perror(path);
+                    xc = -15;
+                    break;
+                }
+
+                if (strcmp(ep->d_name, "..") == 0) {
+                    /* Do ntohing. */
+                } else if (strcmp(ep->d_name, ".") == 0) {
+                    /* Do ntohing. */
+                } else if ((rc = enumerate(db, ep->d_name, path, total, depth)) == 0) {
+                    /* Do ntohing. */
+                } else {
+                    xc = rc;
+                    break;
+                }
+
+            }
+
+            if (closedir(dp) < 0) {
+                perror(path);
+                xc = -16;
+                break;
+            }
+
+        }
+
+    } while (0);
+
+    if (xc == 0) {
+        path[prior] = '\0';
+    }
+
+    return xc;
+}
+
+static int extract(sqlite3 * db, diminuto_fd_type_t type)
 {
     int xc = 0;
     int rc = 0;
@@ -70,7 +277,7 @@ static int test(sqlite3 * db, diminuto_fd_type_t type)
         free(to);
 
         if (sql == (char *)0) {
-            xc = -30;
+            xc = -20;
             break;
         }
 
@@ -86,7 +293,7 @@ static int test(sqlite3 * db, diminuto_fd_type_t type)
         if (rc != SQLITE_OK) {
             placer_message(sqlmessage);
             placer_error(rc);
-            xc = -31;
+            xc = -21;
             break;
         }
 
@@ -95,7 +302,7 @@ static int test(sqlite3 * db, diminuto_fd_type_t type)
     return xc;
 }
 
-static int walk(sqlite3 * db, const char * name, char * path, size_t total, size_t depth)
+static int insert(sqlite3 * db, const char * name, char * path, size_t total, size_t depth)
 {
     int xc = 0;
     DIR * dp = (DIR *)0;
@@ -258,7 +465,7 @@ static int walk(sqlite3 * db, const char * name, char * path, size_t total, size
                     /* Do ntohing. */
                 } else if (strcmp(ep->d_name, ".") == 0) {
                     /* Do ntohing. */
-                } else if ((rc = walk(db, ep->d_name, path, total, depth)) == 0) {
+                } else if ((rc = insert(db, ep->d_name, path, total, depth)) == 0) {
                     /* Do ntohing. */
                 } else {
                     xc = rc;
@@ -290,13 +497,15 @@ int main(int argc, char * argv[])
     int rc = 0;
     int ii = 0;
     char path[PATH_MAX] = { '\0', };
+    char effective[PATH_MAX] = { '\0', };
     sqlite3 * db = (sqlite3 *)0;
     int opt = 0;
     const char * database = (const char *)0;
     int test1 = 0;
     int test2 = 0;
+    int test3 = 0;
     char * end = (char *)0;
-    static const char USAGE[] = "-D DATABASE [ -B BLOCKSIZE ] [ -1 ] [ -2 ] [ ROOT [ ROOT ... ] ]\n";
+    static const char USAGE[] = "-D DATABASE [ -B BLOCKSIZE ] [ -1 ] [ -2 ] [ -3 ] [ ROOT [ ROOT ... ] ]\n";
     extern char * optarg;
     extern int optind;
     extern int opterr;
@@ -306,7 +515,7 @@ int main(int argc, char * argv[])
 
         Program = ((Program = strrchr(argv[0], '/')) == (const char *)0) ? argv[0] : Program + 1;
 
-        while ((opt = getopt(argc, argv, "?12B:D:dv")) >= 0) {
+        while ((opt = getopt(argc, argv, "?123B:D:dv")) >= 0) {
             switch (opt) {
             case '?':
                 fprintf(stderr, "usage: %s %s\n", Program, USAGE);
@@ -316,6 +525,9 @@ int main(int argc, char * argv[])
                 break;
             case '2':
                 test2 = !0;
+                break;
+            case '3':
+                test3 = !0;
                 break;
             case 'B':
                 Buffersize = strtoul(optarg, &end, 0);
@@ -352,6 +564,10 @@ int main(int argc, char * argv[])
             break;
         }
 
+        if (Debug) {
+            (void)placer_debug(stderr);
+        }
+
         if ((rc = sqlite3_open(database, &db)) != SQLITE_OK) {
             placer_error(rc);
             xc = 2;
@@ -366,32 +582,46 @@ int main(int argc, char * argv[])
         }
 
         for (; optind < argc; ++optind) {
-            if ((rc = walk(db, argv[optind], path, 0, 0)) != 0) {
+            if (realpath(argv[optind], effective) == (char *)0) {
+                perror(argv[optind]);
+                xc = 4;
+                break;
+            } else if ((rc = insert(db, effective, path, 0, 0)) != 0) {
                 xc = rc;
                 break;
+            } else {
+                /* Do nothing. */
             }
         }
 
         if (!test1) {
             /* Do nothing. */
-        } else if ((rc = test(db, DIMINUTO_FD_TYPE_FILE)) == 0) {
-            /* Do nothing. */
-        } else {
-            xc = 4;
-        }
-
-        if (!test2) {
-            /* Do nothing. */
-        } else if ((rc = test(db, DIMINUTO_FD_TYPE_DIRECTORY)) == 0) {
+        } else if ((rc = extract(db, DIMINUTO_FD_TYPE_FILE)) == 0) {
             /* Do nothing. */
         } else {
             xc = 5;
         }
 
+        if (!test2) {
+            /* Do nothing. */
+        } else if ((rc = extract(db, DIMINUTO_FD_TYPE_DIRECTORY)) == 0) {
+            /* Do nothing. */
+        } else {
+            xc = 6;
+        }
+
+        if (!test3) {
+            /* Do nothing. */
+        } else if ((rc = enumerate(db, "/", path, 0, 0)) == 0) {
+            /* Do nothing. */
+        } else {
+            xc = 7;
+        }
+
         if ((rc = sqlite3_close(db)) != SQLITE_OK) {
             placer_error(rc);
             if (xc == 0) {
-                xc = 6;
+                xc = 9;
             }
             break;
         } else {
