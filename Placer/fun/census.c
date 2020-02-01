@@ -48,6 +48,221 @@ static int Debug = 0;
 static int Verbose = 0;
 static size_t Buffersize = 256;
 
+/*
+ * For every file in the file system, see if there is a file in the DB
+ * with the same inode number but a different path name. This could be
+ * a hard link, in which case the number of links field should be greater
+ * than one. But it could also be that the file system has changed since
+ * the census, and the inode number reused.
+ */
+
+static int identifier(void * vp, int ncols, char ** value, char ** keyword)
+{
+    char * pp = (char *)0;
+    int ii = 0;
+
+    pp = (char *)vp;
+
+    for (ii = 0; ii < ncols; ++ii) {
+        if (strcmp(keyword[ii], "path") != 0) {
+            /* Do nothing. */
+        } else if (strcmp(value[ii], pp) == 0) {
+            /* Do nothing. */
+        } else {
+            fputs("Aliased: \"", stderr);
+            fputs(value[ii], stderr);
+            fputs("\" \"", stderr);
+            fputs((char *)pp, stderr);
+            fputs("\"\n", stderr);
+        }
+    }
+
+    return SQLITE_OK;
+}
+
+static int identify(sqlite3 * db, const char * name, char * path, size_t total, size_t depth)
+{
+    int xc = 0;
+    DIR * dp = (DIR *)0;
+    struct dirent * ep = (struct dirent *)0;
+    struct stat status = { 0 };
+    int rc = 0;
+    size_t dd = 0;
+    size_t prior = 0;
+    size_t length = 0;
+    char * sql = (char *)0;
+    char * sqlmessage = (char *)0;
+   
+    /*
+     * If we're at the root of the tree, initialize the path buffer.
+     */
+
+    if (depth == 0) {
+        path[0] = '\0';
+        path[PATH_MAX - 1] = '\0';
+        total = 0;
+    }
+
+    /*
+     * Insure the path buffer has sufficient room. I'd be surprised
+     * if this failed on a modern system, but back when MAXPATHLEN
+     * was 512 I have seen file systems for which an absolute path
+     * string for an actual file could not be represented.
+     */
+
+    length = strnlen(name, PATH_MAX);
+
+    do {
+
+        if ((total + 1 /* '/' */ + length + 1 /* '\0' */) > PATH_MAX) {
+            errno = E2BIG;
+            perror(path);
+            xc = -10;
+            break;
+        }
+
+        /*
+         * Contstruct a path (maybe be relative or absolute depending
+         * on the root).
+         */
+
+        prior = total;
+        if (total == 0) {
+            /* Do nothing. */
+        } else if (path[total - 1] == '/') {
+            /* Do nothing. */
+        } else {
+            path[total++] = '/';
+            path[total] = '\0';
+        }
+        strcat(path, name);
+        total += length;
+
+        /*
+         * Get the attributes for the file identified by the path.
+         * N.B. It is *not* sufficient to just use the opendir(3)
+         * success to determine whether the path points to a
+         * directory; it will succeeed for soft links as well.
+         * Folling such soft links that point to directories can
+         * result in a file system loop, where the soft link
+         * ultimately points to the directory containing the
+         * soft link.
+         */
+
+        rc = lstat(path, &status);
+        if (rc >= 0) {
+            /* Do nothing. */
+        } else if ((errno == EACCES) || (errno == ENOENT))  {
+            perror(path);
+            break;
+        } else {
+            perror(path);
+            xc = -11;
+            break;
+        }
+
+        /*
+         * Select the row from the database.
+         */
+
+        sql = placer_format_alloc(Buffersize,
+            "SELECT * FROM census WHERE (ino = %d) AND (devmajor = %d) AND (devminor = %d);"
+            , status.st_ino
+            , major(status.st_dev)
+            , minor(status.st_dev)
+        );
+
+        if (sql == (char *)0) {
+            xc = -12;
+            break;
+        }
+
+        if (Verbose) {
+            fputs(sql, stderr);
+            fputc('\n', stderr);
+        }
+
+        sqlmessage = (char *)0;
+        rc = sqlite3_exec(db, sql, identifier, path, &sqlmessage);
+        free(sql);
+
+        if (rc != SQLITE_OK) {
+            placer_message(sqlmessage);
+            placer_error(rc);
+            xc = -13;
+            break;
+        }
+
+        /*
+         * If a flat file, we're done; if a directory, recurse and descend.
+         */
+
+        if (S_ISDIR(status.st_mode)) {
+
+            dp = opendir(path);
+            if (dp != (DIR *)0) {
+                /* Do nothing. */
+            } else if ((errno == EACCES) || (errno == ENOENT))  {
+                perror(path);
+                break;
+            } else {
+                perror(path);
+                xc = -14;
+                break;
+            }
+
+            depth += 1;
+
+            while (!0) {
+
+                errno = 0;
+                if ((ep = readdir(dp)) != (struct dirent *)0) {
+                    /* Do nothing. */
+                } else if (errno == 0) {
+                    break;
+                } else {
+                    perror(path);
+                    xc = -15;
+                    break;
+                }
+
+                if (strcmp(ep->d_name, "..") == 0) {
+                    /* Do ntohing. */
+                } else if (strcmp(ep->d_name, ".") == 0) {
+                    /* Do ntohing. */
+                } else if ((rc = identify(db, ep->d_name, path, total, depth)) == 0) {
+                    /* Do ntohing. */
+                } else {
+                    xc = rc;
+                    break;
+                }
+
+            }
+
+            if (closedir(dp) < 0) {
+                perror(path);
+                xc = -16;
+                break;
+            }
+
+        }
+
+    } while (0);
+
+    if (xc == 0) {
+        path[prior] = '\0';
+    }
+
+    return xc;
+}
+
+/*
+ * For every file in the file system, enumerate the number of entries
+ * for the same path in the DB. Something is amiss if that number if
+ * greater than one. But it could also be zero, if the file has been
+ * deleted since the census was done.
+ */
+
 static int enumerator(void * vp, int ncols, char ** value, char ** keyword)
 {
     int * ip = (int *)0;
@@ -255,6 +470,12 @@ static int enumerate(sqlite3 * db, const char * name, char * path, size_t total,
     return xc;
 }
 
+/*
+ * Find all files in the census which have the specified type and
+ * for which any of the higher order mode bits - those that don't
+ * deal with the basic user, group, other permissions - are set.
+ */
+
 static int extract(sqlite3 * db, diminuto_fd_type_t type)
 {
     int xc = 0;
@@ -301,6 +522,11 @@ static int extract(sqlite3 * db, diminuto_fd_type_t type)
 
     return xc;
 }
+
+/*
+ * Perform a census by walking the file system and storing the absolute
+ * path and attributes of every object encountered.
+ */
 
 static int insert(sqlite3 * db, const char * name, char * path, size_t total, size_t depth)
 {
@@ -491,6 +717,10 @@ static int insert(sqlite3 * db, const char * name, char * path, size_t total, si
     return xc;
 }
 
+/*
+ * Main programn.
+ */
+
 int main(int argc, char * argv[])
 {
     int xc = 0;
@@ -504,8 +734,9 @@ int main(int argc, char * argv[])
     int test1 = 0;
     int test2 = 0;
     int test3 = 0;
+    int test4 = 0;
     char * end = (char *)0;
-    static const char USAGE[] = "-D DATABASE [ -B BLOCKSIZE ] [ -1 ] [ -2 ] [ -3 ] [ ROOT [ ROOT ... ] ]\n";
+    static const char USAGE[] = "-D DATABASE [ -B BLOCKSIZE ] [ -1 ] [ -2 ] [ -3 ] [ -4 ] [ ROOT [ ROOT ... ] ]\n";
     extern char * optarg;
     extern int optind;
     extern int opterr;
@@ -515,7 +746,7 @@ int main(int argc, char * argv[])
 
         Program = ((Program = strrchr(argv[0], '/')) == (const char *)0) ? argv[0] : Program + 1;
 
-        while ((opt = getopt(argc, argv, "?123B:D:dv")) >= 0) {
+        while ((opt = getopt(argc, argv, "?1234B:D:dv")) >= 0) {
             switch (opt) {
             case '?':
                 fprintf(stderr, "usage: %s %s\n", Program, USAGE);
@@ -528,6 +759,9 @@ int main(int argc, char * argv[])
                 break;
             case '3':
                 test3 = !0;
+                break;
+            case '4':
+                test4 = !0;
                 break;
             case 'B':
                 Buffersize = strtoul(optarg, &end, 0);
@@ -613,6 +847,14 @@ int main(int argc, char * argv[])
         if (!test3) {
             /* Do nothing. */
         } else if ((rc = enumerate(db, "/", path, 0, 0)) == 0) {
+            /* Do nothing. */
+        } else {
+            xc = 7;
+        }
+
+        if (!test4) {
+            /* Do nothing. */
+        } else if ((rc = identify(db, "/", path, 0, 0)) == 0) {
             /* Do nothing. */
         } else {
             xc = 7;
