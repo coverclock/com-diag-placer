@@ -40,7 +40,7 @@
 #include <limits.h>
 #include <errno.h>
 #include <assert.h>
-#include "com/diag/diminuto/diminuto_fd.h"
+#include "com/diag/diminuto/diminuto_fs.h"
 #include "com/diag/placer/placer.h"
 
 static const char * Program = (const char *)0;
@@ -476,7 +476,7 @@ static int enumerate(sqlite3 * db, const char * name, char * path, size_t total,
  * deal with the basic user, group, other permissions - are set.
  */
 
-static int extract(sqlite3 * db, diminuto_fd_type_t type)
+static int extract(sqlite3 * db, diminuto_fs_type_t type)
 {
     int xc = 0;
     int rc = 0;
@@ -616,7 +616,7 @@ static int insert(sqlite3 * db, const char * name, char * path, size_t total, si
         sql = placer_format_alloc(Buffersize,
             "INSERT INTO census VALUES ('%s', '%c', %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d)"
             , to
-            , diminuto_fd_mode2type(status.st_mode)
+            , diminuto_fs_type(status.st_mode)
             , status.st_nlink
             , status.st_uid
             , status.st_gid
@@ -830,7 +830,7 @@ int main(int argc, char * argv[])
 
         if (!test1) {
             /* Do nothing. */
-        } else if ((rc = extract(db, DIMINUTO_FD_TYPE_FILE)) == 0) {
+        } else if ((rc = extract(db, DIMINUTO_FS_TYPE_FILE)) == 0) {
             /* Do nothing. */
         } else {
             xc = 5;
@@ -838,7 +838,7 @@ int main(int argc, char * argv[])
 
         if (!test2) {
             /* Do nothing. */
-        } else if ((rc = extract(db, DIMINUTO_FD_TYPE_DIRECTORY)) == 0) {
+        } else if ((rc = extract(db, DIMINUTO_FS_TYPE_DIRECTORY)) == 0) {
             /* Do nothing. */
         } else {
             xc = 6;
