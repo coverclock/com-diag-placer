@@ -58,10 +58,10 @@ static size_t Buffersize = 256;
 
 static int identifier(void * vp, int ncols, char ** value, char ** keyword)
 {
-    char * pp = (char *)0;
+    const char * pp = (char *)0;
     int ii = 0;
 
-    pp = (char *)vp;
+    pp = (const char *)vp;
 
     for (ii = 0; ii < ncols; ++ii) {
         if (strcmp(keyword[ii], "path") != 0) {
@@ -72,7 +72,7 @@ static int identifier(void * vp, int ncols, char ** value, char ** keyword)
             fputs("Aliased: \"", stderr);
             fputs(value[ii], stderr);
             fputs("\" \"", stderr);
-            fputs((char *)pp, stderr);
+            fputs(pp, stderr);
             fputs("\"\n", stderr);
         }
     }
@@ -80,86 +80,17 @@ static int identifier(void * vp, int ncols, char ** value, char ** keyword)
     return SQLITE_OK;
 }
 
-static int identify(sqlite3 * db, const char * name, char * path, size_t total, size_t depth)
+static int identify(void * vp, const char * name, const char * path, size_t depth, const struct stat * statp)
 {
     int xc = 0;
-    DIR * dp = (DIR *)0;
-    struct dirent * ep = (struct dirent *)0;
-    struct stat status = { 0 };
     int rc = 0;
-    size_t dd = 0;
-    size_t prior = 0;
-    size_t length = 0;
+    sqlite3 * db = (sqlite3 *)0;
     char * sql = (char *)0;
     char * sqlmessage = (char *)0;
    
-    /*
-     * If we're at the root of the tree, initialize the path buffer.
-     */
-
-    if (depth == 0) {
-        path[0] = '\0';
-        path[PATH_MAX - 1] = '\0';
-        total = 0;
-    }
-
-    /*
-     * Insure the path buffer has sufficient room. I'd be surprised
-     * if this failed on a modern system, but back when MAXPATHLEN
-     * was 512 I have seen file systems for which an absolute path
-     * string for an actual file could not be represented.
-     */
-
-    length = strnlen(name, PATH_MAX);
-
     do {
 
-        if ((total + 1 /* '/' */ + length + 1 /* '\0' */) > PATH_MAX) {
-            errno = E2BIG;
-            perror(path);
-            xc = -10;
-            break;
-        }
-
-        /*
-         * Contstruct a path (maybe be relative or absolute depending
-         * on the root).
-         */
-
-        prior = total;
-        if (total == 0) {
-            /* Do nothing. */
-        } else if (path[total - 1] == '/') {
-            /* Do nothing. */
-        } else {
-            path[total++] = '/';
-            path[total] = '\0';
-        }
-        strcat(path, name);
-        total += length;
-
-        /*
-         * Get the attributes for the file identified by the path.
-         * N.B. It is *not* sufficient to just use the opendir(3)
-         * success to determine whether the path points to a
-         * directory; it will succeeed for soft links as well.
-         * Folling such soft links that point to directories can
-         * result in a file system loop, where the soft link
-         * ultimately points to the directory containing the
-         * soft link.
-         */
-
-        rc = lstat(path, &status);
-        if (rc >= 0) {
-            /* Do nothing. */
-        } else if ((errno == EACCES) || (errno == ENOENT))  {
-            perror(path);
-            break;
-        } else {
-            perror(path);
-            xc = -11;
-            break;
-        }
+        db = (sqlite3 *)vp;
 
         /*
          * Select the row from the database.
@@ -167,9 +98,9 @@ static int identify(sqlite3 * db, const char * name, char * path, size_t total, 
 
         sql = placer_format_alloc(Buffersize,
             "SELECT * FROM census WHERE (ino = %d) AND (devmajor = %d) AND (devminor = %d);"
-            , status.st_ino
-            , major(status.st_dev)
-            , minor(status.st_dev)
+            , statp->st_ino
+            , major(statp->st_dev)
+            , minor(statp->st_dev)
         );
 
         if (sql == (char *)0) {
@@ -183,7 +114,7 @@ static int identify(sqlite3 * db, const char * name, char * path, size_t total, 
         }
 
         sqlmessage = (char *)0;
-        rc = sqlite3_exec(db, sql, identifier, path, &sqlmessage);
+        rc = sqlite3_exec(db, sql, identifier, (char *)path, &sqlmessage);
         free(sql);
 
         if (rc != SQLITE_OK) {
@@ -193,65 +124,7 @@ static int identify(sqlite3 * db, const char * name, char * path, size_t total, 
             break;
         }
 
-        /*
-         * If a flat file, we're done; if a directory, recurse and descend.
-         */
-
-        if (S_ISDIR(status.st_mode)) {
-
-            dp = opendir(path);
-            if (dp != (DIR *)0) {
-                /* Do nothing. */
-            } else if ((errno == EACCES) || (errno == ENOENT))  {
-                perror(path);
-                break;
-            } else {
-                perror(path);
-                xc = -14;
-                break;
-            }
-
-            depth += 1;
-
-            while (!0) {
-
-                errno = 0;
-                if ((ep = readdir(dp)) != (struct dirent *)0) {
-                    /* Do nothing. */
-                } else if (errno == 0) {
-                    break;
-                } else {
-                    perror(path);
-                    xc = -15;
-                    break;
-                }
-
-                if (strcmp(ep->d_name, "..") == 0) {
-                    /* Do ntohing. */
-                } else if (strcmp(ep->d_name, ".") == 0) {
-                    /* Do ntohing. */
-                } else if ((rc = identify(db, ep->d_name, path, total, depth)) == 0) {
-                    /* Do ntohing. */
-                } else {
-                    xc = rc;
-                    break;
-                }
-
-            }
-
-            if (closedir(dp) < 0) {
-                perror(path);
-                xc = -16;
-                break;
-            }
-
-        }
-
     } while (0);
-
-    if (xc == 0) {
-        path[prior] = '\0';
-    }
 
     return xc;
 }
@@ -273,92 +146,19 @@ static int enumerator(void * vp, int ncols, char ** value, char ** keyword)
     return SQLITE_OK;
 }
 
-static int enumerate(sqlite3 * db, const char * name, char * path, size_t total, size_t depth)
+static int enumerate(void * vp, const char * name, const char * path, size_t depth, const struct stat * statp)
 {
     int xc = 0;
-    DIR * dp = (DIR *)0;
-    struct dirent * ep = (struct dirent *)0;
-    struct stat status = { 0 };
+    sqlite3 * db = (sqlite3 *)0; 
     int rc = 0;
-    size_t dd = 0;
-    size_t prior = 0;
-    size_t length = 0;
     char * to = (char *)0;
     char * sql = (char *)0;
     char * sqlmessage = (char *)0;
     int enumeration = 0;
    
-    /*
-     * If we're at the root of the tree, initialize the path buffer.
-     */
-
-    if (depth == 0) {
-        path[0] = '\0';
-        path[PATH_MAX - 1] = '\0';
-        total = 0;
-    }
-
-    /*
-     * Insure the path buffer has sufficient room. I'd be surprised
-     * if this failed on a modern system, but back when MAXPATHLEN
-     * was 512 I have seen file systems for which an absolute path
-     * string for an actual file could not be represented.
-     */
-
-    length = strnlen(name, PATH_MAX);
-
     do {
 
-        if ((total + 1 /* '/' */ + length + 1 /* '\0' */) > PATH_MAX) {
-            errno = E2BIG;
-            perror(path);
-            xc = -10;
-            break;
-        }
-
-        /*
-         * Contstruct a path (maybe be relative or absolute depending
-         * on the root).
-         */
-
-        prior = total;
-        if (total == 0) {
-            /* Do nothing. */
-        } else if (path[total - 1] == '/') {
-            /* Do nothing. */
-        } else {
-            path[total++] = '/';
-            path[total] = '\0';
-        }
-        strcat(path, name);
-        total += length;
-
-        /*
-         * Get the attributes for the file identified by the path.
-         * N.B. It is *not* sufficient to just use the opendir(3)
-         * success to determine whether the path points to a
-         * directory; it will succeeed for soft links as well.
-         * Folling such soft links that point to directories can
-         * result in a file system loop, where the soft link
-         * ultimately points to the directory containing the
-         * soft link.
-         */
-
-        rc = lstat(path, &status);
-        if (rc >= 0) {
-            /* Do nothing. */
-        } else if ((errno == EACCES) || (errno == ENOENT))  {
-            perror(path);
-            break;
-        } else {
-            perror(path);
-            xc = -11;
-            break;
-        }
-
-        /*
-         * Expand any single quotes in path.
-         */
+        db = (sqlite3 *)vp;
 
         to = placer_expand_alloc(path);
 
@@ -407,65 +207,7 @@ static int enumerate(sqlite3 * db, const char * name, char * path, size_t total,
             /* Do nothing. */
         }
 
-        /*
-         * If a flat file, we're done; if a directory, recurse and descend.
-         */
-
-        if (S_ISDIR(status.st_mode)) {
-
-            dp = opendir(path);
-            if (dp != (DIR *)0) {
-                /* Do nothing. */
-            } else if ((errno == EACCES) || (errno == ENOENT))  {
-                perror(path);
-                break;
-            } else {
-                perror(path);
-                xc = -14;
-                break;
-            }
-
-            depth += 1;
-
-            while (!0) {
-
-                errno = 0;
-                if ((ep = readdir(dp)) != (struct dirent *)0) {
-                    /* Do nothing. */
-                } else if (errno == 0) {
-                    break;
-                } else {
-                    perror(path);
-                    xc = -15;
-                    break;
-                }
-
-                if (strcmp(ep->d_name, "..") == 0) {
-                    /* Do ntohing. */
-                } else if (strcmp(ep->d_name, ".") == 0) {
-                    /* Do ntohing. */
-                } else if ((rc = enumerate(db, ep->d_name, path, total, depth)) == 0) {
-                    /* Do ntohing. */
-                } else {
-                    xc = rc;
-                    break;
-                }
-
-            }
-
-            if (closedir(dp) < 0) {
-                perror(path);
-                xc = -16;
-                break;
-            }
-
-        }
-
     } while (0);
-
-    if (xc == 0) {
-        path[prior] = '\0';
-    }
 
     return xc;
 }
@@ -528,81 +270,19 @@ static int extract(sqlite3 * db, diminuto_fs_type_t type)
  * path and attributes of every object encountered.
  */
 
-static int insert(sqlite3 * db, const char * name, char * path, size_t total, size_t depth)
+static int insert(void * vp, const char * name, const char * path, size_t depth, const struct stat * statp)
 {
     int xc = 0;
-    DIR * dp = (DIR *)0;
-    struct dirent * ep = (struct dirent *)0;
-    struct stat status = { 0 };
+    sqlite3 * db = (sqlite3 *)0;
     int rc = 0;
-    size_t dd = 0;
-    size_t prior = 0;
-    size_t length = 0;
     char * to = (char *)0;
     char * sql = (char *)0;
     char * sqlmessage = (char *)0;
-   
-    /*
-     * If we're at the root of the tree, initialize the path buffer.
-     */
-
-    if (depth == 0) {
-        path[0] = '\0';
-        path[PATH_MAX - 1] = '\0';
-        total = 0;
-    }
-
-    /*
-     * Insure the path buffer has sufficient room. I'd be surprised
-     * if this failed on a modern system, but back when MAXPATHLEN
-     * was 512 I have seen file systems for which an absolute path
-     * string for an actual file could not be represented.
-     */
-
-    length = strnlen(name, PATH_MAX);
 
     do {
 
-        if ((total + 1 /* '/' */ + length + 1 /* '\0' */) > PATH_MAX) {
-            errno = E2BIG;
-            perror(path);
-            xc = -10;
-            break;
-        }
-
-        /*
-         * Contstruct a path (maybe be relative or absolute depending
-         * on the root).
-         */
-
-        prior = total;
-        if (total == 0) {
-            /* Do nothing. */
-        } else if (path[total - 1] == '/') {
-            /* Do nothing. */
-        } else {
-            path[total++] = '/';
-            path[total] = '\0';
-        }
-        strcat(path, name);
-        total += length;
-
-        /*
-         * Get the attributes for the file identified by the path.
-         */
-
-        rc = lstat(path, &status);
-        if (rc >= 0) {
-            /* Do nothing. */
-        } else if ((errno == EACCES) || (errno == ENOENT))  {
-            perror(path);
-            break;
-        } else {
-            perror(path);
-            xc = -11;
-            break;
-        }
-
+        db = (sqlite3 *)vp;
+   
         /*
          * Expand any single quotes in path.
          */
@@ -614,22 +294,23 @@ static int insert(sqlite3 * db, const char * name, char * path, size_t total, si
          */
 
         sql = placer_format_alloc(Buffersize,
-            "INSERT INTO census VALUES ('%s', '%c', %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d)"
+            "INSERT INTO census VALUES ('%s', '%c', %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d)"
             , to
-            , diminuto_fs_type(status.st_mode)
-            , status.st_nlink
-            , status.st_uid
-            , status.st_gid
-            , (status.st_mode & ~S_IFMT)
-            , status.st_ino
-            , status.st_size
-            , status.st_blocks
-            , major(status.st_rdev)
-            , minor(status.st_rdev)
-            , major(status.st_dev)
-            , minor(status.st_dev)
-            , status.st_ctim.tv_sec
-            , status.st_ctim.tv_nsec
+            , diminuto_fs_type(statp->st_mode)
+            , statp->st_nlink
+            , statp->st_uid
+            , statp->st_gid
+            , (statp->st_mode & ~S_IFMT)
+            , statp->st_ino
+            , statp->st_size
+            , statp->st_blocks
+            , major(statp->st_rdev)
+            , minor(statp->st_rdev)
+            , major(statp->st_dev)
+            , minor(statp->st_dev)
+            , statp->st_ctim.tv_sec
+            , statp->st_ctim.tv_nsec
+            , 0
         );
         free(to);
 
@@ -654,65 +335,7 @@ static int insert(sqlite3 * db, const char * name, char * path, size_t total, si
             break;
         }
 
-        /*
-         * If a flat file, we're done; if a directory, recurse and descend.
-         */
-
-        if (S_ISDIR(status.st_mode)) {
-
-            dp = opendir(path);
-            if (dp != (DIR *)0) {
-                /* Do nothing. */
-            } else if ((errno == EACCES) || (errno == ENOENT))  {
-                perror(path);
-                break;
-            } else {
-                perror(path);
-                xc = -14;
-                break;
-            }
-
-            depth += 1;
-
-            while (!0) {
-
-                errno = 0;
-                if ((ep = readdir(dp)) != (struct dirent *)0) {
-                    /* Do nothing. */
-                } else if (errno == 0) {
-                    break;
-                } else {
-                    perror(path);
-                    xc = -15;
-                    break;
-                }
-
-                if (strcmp(ep->d_name, "..") == 0) {
-                    /* Do ntohing. */
-                } else if (strcmp(ep->d_name, ".") == 0) {
-                    /* Do ntohing. */
-                } else if ((rc = insert(db, ep->d_name, path, total, depth)) == 0) {
-                    /* Do ntohing. */
-                } else {
-                    xc = rc;
-                    break;
-                }
-
-            }
-
-            if (closedir(dp) < 0) {
-                perror(path);
-                xc = -16;
-                break;
-            }
-
-        }
-
     } while (0);
-
-    if (xc == 0) {
-        path[prior] = '\0';
-    }
 
     return xc;
 }
@@ -726,8 +349,6 @@ int main(int argc, char * argv[])
     int xc = 0;
     int rc = 0;
     int ii = 0;
-    char path[PATH_MAX] = { '\0', };
-    char effective[PATH_MAX] = { '\0', };
     sqlite3 * db = (sqlite3 *)0;
     int opt = 0;
     const char * database = (const char *)0;
@@ -816,15 +437,11 @@ int main(int argc, char * argv[])
         }
 
         for (; optind < argc; ++optind) {
-            if (realpath(argv[optind], effective) == (char *)0) {
-                perror(argv[optind]);
-                xc = 4;
-                break;
-            } else if ((rc = insert(db, effective, path, 0, 0)) != 0) {
+            if ((rc = diminuto_fs_walk(argv[optind], insert, db)) == 0) {
+                /* Do nothing. */
+            } else {
                 xc = rc;
                 break;
-            } else {
-                /* Do nothing. */
             }
         }
 
@@ -846,7 +463,7 @@ int main(int argc, char * argv[])
 
         if (!test3) {
             /* Do nothing. */
-        } else if ((rc = enumerate(db, "/", path, 0, 0)) == 0) {
+        } else if ((rc = diminuto_fs_walk("/", enumerate, db)) == 0) {
             /* Do nothing. */
         } else {
             xc = 7;
@@ -854,7 +471,7 @@ int main(int argc, char * argv[])
 
         if (!test4) {
             /* Do nothing. */
-        } else if ((rc = identify(db, "/", path, 0, 0)) == 0) {
+        } else if ((rc = diminuto_fs_walk("/", identify, db)) == 0) {
             /* Do nothing. */
         } else {
             xc = 7;

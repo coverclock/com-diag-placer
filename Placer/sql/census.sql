@@ -22,5 +22,6 @@ CREATE TABLE census (
     devmajor INTEGER,
     devminor INTEGER,
     ctime INTEGER,
-    ctimensec INTEGER
+    ctimensec INTEGER,
+    mark INTEGER
 );
