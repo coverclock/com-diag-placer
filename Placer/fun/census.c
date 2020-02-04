@@ -48,6 +48,196 @@ static int Debug = 0;
 static int Verbose = 0;
 static size_t Buffersize = 256;
 
+/*
+ * Remove the entries for files that are not marked.
+ */
+
+static int clean(sqlite3 * db)
+{
+    int xc = 0;
+    int rc = 0;
+    char * sql = (char *)0;
+    char * sqlmessage = (char *)0;
+   
+    do {
+
+        /*
+         *
+         */
+
+        sql = placer_format_alloc(Buffersize,
+            "SELECT * FROM census WHERE mark == 0;"
+        );
+
+        if (sql == (char *)0) {
+            xc = -12;
+            break;
+        }
+
+        if (Verbose) {
+            fputs(sql, stderr);
+            fputc('\n', stderr);
+        }
+
+        sqlmessage = (char *)0;
+        rc = sqlite3_exec(db, sql, placer_callback_generic, stderr, &sqlmessage);
+        free(sql);
+
+        if (rc != SQLITE_OK) {
+            placer_message(sqlmessage);
+            placer_error(rc);
+            xc = -13;
+            break;
+        }
+
+        /*
+         *
+         */
+
+        sql = placer_format_alloc(Buffersize,
+            "DELETE FROM census WHERE mark == 0;"
+        );
+
+        if (sql == (char *)0) {
+            xc = -12;
+            break;
+        }
+
+        if (Verbose) {
+            fputs(sql, stderr);
+            fputc('\n', stderr);
+        }
+
+        sqlmessage = (char *)0;
+        rc = sqlite3_exec(db, sql, placer_callback_generic, stderr, &sqlmessage);
+        free(sql);
+
+        if (rc != SQLITE_OK) {
+            placer_message(sqlmessage);
+            placer_error(rc);
+            xc = -13;
+            break;
+        }
+
+        /*
+         *
+         */
+
+        sql = placer_format_alloc(Buffersize,
+            "UPDATE census SET mark = 0 WHERE mark != 0;"
+        );
+
+        if (sql == (char *)0) {
+            xc = -12;
+            break;
+        }
+
+        if (Verbose) {
+            fputs(sql, stderr);
+            fputc('\n', stderr);
+        }
+
+        sqlmessage = (char *)0;
+        rc = sqlite3_exec(db, sql, placer_callback_generic, stderr, &sqlmessage);
+        free(sql);
+
+        if (rc != SQLITE_OK) {
+            placer_message(sqlmessage);
+            placer_error(rc);
+            xc = -13;
+            break;
+        }
+
+    } while (0);
+
+    return xc;
+}
+
+/*
+ * For every file in the file system, see if there is a file in the DB
+ * with the same inode number but a different path name. This could be
+ * a hard link, in which case the number of links field should be greater
+ * than one. But it could also be that the file system has changed since
+ * the census, and the inode number reused. We make that less likely by
+ * only selecting those DB entries whose link count is greater than one.
+ */
+
+
+/*
+ * Update a census by walking the file system and storing the absolute
+ * path and attributes of every object encountered.
+ */
+
+static int replace(void * vp, const char * name, const char * path, size_t depth, const struct stat * statp)
+{
+    int xc = 0;
+    sqlite3 * db = (sqlite3 *)0;
+    int rc = 0;
+    char * to = (char *)0;
+    char * sql = (char *)0;
+    char * sqlmessage = (char *)0;
+
+    do {
+
+        db = (sqlite3 *)vp;
+   
+        /*
+         * Expand any single quotes in path.
+         */
+
+        to = placer_expand_alloc(path);
+
+        /*
+         * Insert the row into the database.
+         */
+
+        sql = placer_format_alloc(Buffersize,
+            "INSERT OR REPLACE INTO census VALUES ('%s', '%c', %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d);"
+            , to
+            , diminuto_fs_type(statp->st_mode)
+            , statp->st_nlink
+            , statp->st_uid
+            , statp->st_gid
+            , (statp->st_mode & ~S_IFMT)
+            , statp->st_ino
+            , statp->st_size
+            , statp->st_blocks
+            , major(statp->st_rdev)
+            , minor(statp->st_rdev)
+            , major(statp->st_dev)
+            , minor(statp->st_dev)
+            , statp->st_ctim.tv_sec
+            , statp->st_ctim.tv_nsec
+            , 1
+        );
+        free(to);
+
+        if (sql == (char *)0) {
+            xc = -12;
+            break;
+        }
+
+        if (Verbose) {
+            fputs(sql, stderr);
+            fputc('\n', stderr);
+        }
+
+        sqlmessage = (char *)0;
+        rc = sqlite3_exec(db, sql, placer_callback_generic, stderr, &sqlmessage);
+        free(sql);
+
+        if (rc != SQLITE_OK) {
+            placer_message(sqlmessage);
+            placer_error(rc);
+            xc = -13;
+            break;
+        }
+
+    } while (0);
+
+    return xc;
+}
+
 static int mark(sqlite3 * db)
 {
     int xc = 0;
@@ -454,7 +644,7 @@ static int insert(void * vp, const char * name, const char * path, size_t depth,
          */
 
         sql = placer_format_alloc(Buffersize,
-            "INSERT INTO census VALUES ('%s', '%c', %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d)"
+            "INSERT INTO census VALUES ('%s', '%c', %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d);"
             , to
             , diminuto_fs_type(statp->st_mode)
             , statp->st_nlink
@@ -510,15 +700,17 @@ int main(int argc, char * argv[])
     int rc = 0;
     int ii = 0;
     sqlite3 * db = (sqlite3 *)0;
-    int opt = 0;
+    diminuto_fs_walker_t * cp = (diminuto_fs_walker_t *)0;
     const char * database = (const char *)0;
     int test1 = 0;
     int test2 = 0;
     int test3 = 0;
     int test4 = 0;
     int test5 = 0;
+    int test6 = 0;
     char * end = (char *)0;
-    static const char USAGE[] = "-D DATABASE [ -B BLOCKSIZE ] [ -1 ] [ -2 ] [ -3 ] [ -4 ] [ -5 ] [ ROOT [ ROOT ... ] ]\n";
+    static const char USAGE[] = "-D DATABASE [ -B BLOCKSIZE ] [ -d ] [ -v ] [ -1 ] [ -2 ] [ -3 ] [ -4 ] [ -5 ] [ -6 ] [ [ -r ]  ROOT [ ROOT ... ] ]\n";
+    int opt = 0;
     extern char * optarg;
     extern int optind;
     extern int opterr;
@@ -528,7 +720,9 @@ int main(int argc, char * argv[])
 
         Program = ((Program = strrchr(argv[0], '/')) == (const char *)0) ? argv[0] : Program + 1;
 
-        while ((opt = getopt(argc, argv, "?12345B:D:dv")) >= 0) {
+        cp = insert;
+
+        while ((opt = getopt(argc, argv, "?123456B:D:drv")) >= 0) {
             switch (opt) {
             case '?':
                 fprintf(stderr, "usage: %s %s\n", Program, USAGE);
@@ -548,6 +742,9 @@ int main(int argc, char * argv[])
             case '5':
                 test5 = !0;
                 break;
+            case '6':
+                test6 = !0;
+                break;
             case 'B':
                 Buffersize = strtoul(optarg, &end, 0);
                 if ((end != (char *)0) && (end[0] != '\0')) {
@@ -561,6 +758,9 @@ int main(int argc, char * argv[])
                 break;
             case 'd':
                 Debug = !0;
+                break;
+            case 'r':
+                cp = replace;
                 break;
             case 'v':
                 Verbose = !0;
@@ -601,7 +801,7 @@ int main(int argc, char * argv[])
         }
 
         for (; optind < argc; ++optind) {
-            if ((rc = diminuto_fs_walk(argv[optind], insert, db)) == 0) {
+            if ((rc = diminuto_fs_walk(argv[optind], cp, db)) == 0) {
                 /* Do nothing. */
             } else {
                 xc = rc;
@@ -644,6 +844,14 @@ int main(int argc, char * argv[])
         if (!test5) {
             /* Do nothing. */
         } else if ((rc = mark(db)) == 0) {
+            /* Do nothing. */
+        } else {
+            xc = 5;
+        }
+
+        if (!test6) {
+            /* Do nothing. */
+        } else if ((rc = clean(db)) == 0) {
             /* Do nothing. */
         } else {
             xc = 5;
