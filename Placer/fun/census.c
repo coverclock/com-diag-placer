@@ -48,12 +48,172 @@ static int Debug = 0;
 static int Verbose = 0;
 static size_t Buffersize = 256;
 
+static int mark(sqlite3 * db)
+{
+    int xc = 0;
+    int rc = 0;
+    char * sql = (char *)0;
+    char * sqlmessage = (char *)0;
+   
+    do {
+
+        /*
+         *
+         */
+
+        sql = placer_format_alloc(Buffersize,
+            "UPDATE census SET mark = 1 WHERE nlink > 1;"
+        );
+
+        if (sql == (char *)0) {
+            xc = -12;
+            break;
+        }
+
+        if (Verbose) {
+            fputs(sql, stderr);
+            fputc('\n', stderr);
+        }
+
+        sqlmessage = (char *)0;
+        rc = sqlite3_exec(db, sql, placer_callback_generic, stderr, &sqlmessage);
+        free(sql);
+
+        if (rc != SQLITE_OK) {
+            placer_message(sqlmessage);
+            placer_error(rc);
+            xc = -13;
+            break;
+        }
+
+        /*
+         *
+         */
+
+        sql = placer_format_alloc(Buffersize,
+            "SELECT * FROM census WHERE mark != 0;"
+        );
+
+        if (sql == (char *)0) {
+            xc = -12;
+            break;
+        }
+
+        if (Verbose) {
+            fputs(sql, stderr);
+            fputc('\n', stderr);
+        }
+
+        sqlmessage = (char *)0;
+        rc = sqlite3_exec(db, sql, placer_callback_generic, stderr, &sqlmessage);
+        free(sql);
+
+        if (rc != SQLITE_OK) {
+            placer_message(sqlmessage);
+            placer_error(rc);
+            xc = -13;
+            break;
+        }
+
+        /*
+         *
+         */
+
+        sql = placer_format_alloc(Buffersize,
+            "SELECT * FROM census WHERE (mark != 0) AND (nlink <= 1);"
+        );
+
+        if (sql == (char *)0) {
+            xc = -12;
+            break;
+        }
+
+        if (Verbose) {
+            fputs(sql, stderr);
+            fputc('\n', stderr);
+        }
+
+        sqlmessage = (char *)0;
+        rc = sqlite3_exec(db, sql, placer_callback_generic, stderr, &sqlmessage);
+        free(sql);
+
+        if (rc != SQLITE_OK) {
+            placer_message(sqlmessage);
+            placer_error(rc);
+            xc = -13;
+            break;
+        }
+
+        /*
+         *
+         */
+
+        sql = placer_format_alloc(Buffersize,
+            "SELECT * FROM census WHERE (mark == 0) AND (nlink > 1);"
+        );
+
+        if (sql == (char *)0) {
+            xc = -12;
+            break;
+        }
+
+        if (Verbose) {
+            fputs(sql, stderr);
+            fputc('\n', stderr);
+        }
+
+        sqlmessage = (char *)0;
+        rc = sqlite3_exec(db, sql, placer_callback_generic, stderr, &sqlmessage);
+        free(sql);
+
+        if (rc != SQLITE_OK) {
+            placer_message(sqlmessage);
+            placer_error(rc);
+            xc = -13;
+            break;
+        }
+
+        /*
+         *
+         */
+
+        sql = placer_format_alloc(Buffersize,
+            "UPDATE census SET mark = 0 WHERE mark != 0;"
+        );
+
+        if (sql == (char *)0) {
+            xc = -12;
+            break;
+        }
+
+        if (Verbose) {
+            fputs(sql, stderr);
+            fputc('\n', stderr);
+        }
+
+        sqlmessage = (char *)0;
+        rc = sqlite3_exec(db, sql, placer_callback_generic, stderr, &sqlmessage);
+        free(sql);
+
+        if (rc != SQLITE_OK) {
+            placer_message(sqlmessage);
+            placer_error(rc);
+            xc = -13;
+            break;
+        }
+
+    } while (0);
+
+    return xc;
+}
+
 /*
  * For every file in the file system, see if there is a file in the DB
  * with the same inode number but a different path name. This could be
  * a hard link, in which case the number of links field should be greater
  * than one. But it could also be that the file system has changed since
- * the census, and the inode number reused.
+ * the census, and the inode number reused. We make that less likely by
+ * only selecting those DB entries whose link count is greater than one.
  */
 
 static int identifier(void * vp, int ncols, char ** value, char ** keyword)
@@ -64,11 +224,7 @@ static int identifier(void * vp, int ncols, char ** value, char ** keyword)
     pp = (const char *)vp;
 
     for (ii = 0; ii < ncols; ++ii) {
-        if (strcmp(keyword[ii], "path") != 0) {
-            /* Do nothing. */
-        } else if (strcmp(value[ii], pp) == 0) {
-            /* Do nothing. */
-        } else {
+        if ((strcmp(keyword[ii], "path") == 0)  && (strcmp(value[ii], pp) != 0)) {
             fputs("Aliased: \"", stderr);
             fputs(value[ii], stderr);
             fputs("\" \"", stderr);
@@ -90,6 +246,10 @@ static int identify(void * vp, const char * name, const char * path, size_t dept
    
     do {
 
+        if (statp->st_nlink <= 1) {
+            break;
+        }
+
         db = (sqlite3 *)vp;
 
         /*
@@ -97,7 +257,7 @@ static int identify(void * vp, const char * name, const char * path, size_t dept
          */
 
         sql = placer_format_alloc(Buffersize,
-            "SELECT * FROM census WHERE (ino = %d) AND (devmajor = %d) AND (devminor = %d);"
+            "SELECT * FROM census WHERE (ino = %d) AND (devmajor = %d) AND (devminor = %d) AND (nlink > 1);"
             , statp->st_ino
             , major(statp->st_dev)
             , minor(statp->st_dev)
@@ -356,8 +516,9 @@ int main(int argc, char * argv[])
     int test2 = 0;
     int test3 = 0;
     int test4 = 0;
+    int test5 = 0;
     char * end = (char *)0;
-    static const char USAGE[] = "-D DATABASE [ -B BLOCKSIZE ] [ -1 ] [ -2 ] [ -3 ] [ -4 ] [ ROOT [ ROOT ... ] ]\n";
+    static const char USAGE[] = "-D DATABASE [ -B BLOCKSIZE ] [ -1 ] [ -2 ] [ -3 ] [ -4 ] [ -5 ] [ ROOT [ ROOT ... ] ]\n";
     extern char * optarg;
     extern int optind;
     extern int opterr;
@@ -367,7 +528,7 @@ int main(int argc, char * argv[])
 
         Program = ((Program = strrchr(argv[0], '/')) == (const char *)0) ? argv[0] : Program + 1;
 
-        while ((opt = getopt(argc, argv, "?1234B:D:dv")) >= 0) {
+        while ((opt = getopt(argc, argv, "?12345B:D:dv")) >= 0) {
             switch (opt) {
             case '?':
                 fprintf(stderr, "usage: %s %s\n", Program, USAGE);
@@ -383,6 +544,9 @@ int main(int argc, char * argv[])
                 break;
             case '4':
                 test4 = !0;
+                break;
+            case '5':
+                test5 = !0;
                 break;
             case 'B':
                 Buffersize = strtoul(optarg, &end, 0);
@@ -458,7 +622,7 @@ int main(int argc, char * argv[])
         } else if ((rc = extract(db, DIMINUTO_FS_TYPE_DIRECTORY)) == 0) {
             /* Do nothing. */
         } else {
-            xc = 6;
+            xc = 5;
         }
 
         if (!test3) {
@@ -466,7 +630,7 @@ int main(int argc, char * argv[])
         } else if ((rc = diminuto_fs_walk("/", enumerate, db)) == 0) {
             /* Do nothing. */
         } else {
-            xc = 7;
+            xc = 5;
         }
 
         if (!test4) {
@@ -474,7 +638,15 @@ int main(int argc, char * argv[])
         } else if ((rc = diminuto_fs_walk("/", identify, db)) == 0) {
             /* Do nothing. */
         } else {
-            xc = 7;
+            xc = 5;
+        }
+
+        if (!test5) {
+            /* Do nothing. */
+        } else if ((rc = mark(db)) == 0) {
+            /* Do nothing. */
+        } else {
+            xc = 5;
         }
 
         if ((rc = sqlite3_close(db)) != SQLITE_OK) {
