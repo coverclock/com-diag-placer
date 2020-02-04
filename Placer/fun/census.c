@@ -49,7 +49,8 @@ static int Verbose = 0;
 static size_t Buffersize = 256;
 
 /*
- * Remove the entries for files that are not marked.
+ * Remove the entries for files that are not marked following a replace, then
+ * unmark all entries.
  */
 
 static int clean(sqlite3 * db)
