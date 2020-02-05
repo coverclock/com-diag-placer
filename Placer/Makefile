@@ -126,6 +126,14 @@ include $(TARGETMAKEFILE)
 
 ########## SQLite Configuration
 
+# On Rhodium, I installed SQLite3 manually by downloading and building it
+# and installing the build artifacts in the default root of /usr/local. On
+# Nickel, I just installed the Debian sqlite3 and libsqlite3-dev packages
+# which places the binary, header, and library in the usual locations.
+# But these make rules worked for me in either case, since on Nickel the
+# build found the necessary components in the standard locations. Your
+# mileage may vary.
+
 SQLITE_TITLE		:=	SQLite3
 
 SQLITE_PROJECT		:=	$(shell echo $(SQLITE_TITLE) | tr '[A-Z]' '[a-z]')
