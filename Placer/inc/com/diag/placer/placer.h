@@ -11,6 +11,7 @@
  * https://github.com/coverclock/com-diag-placer<BR>
  */
 
+#include <sys/types.h>
 #include "sqlite3.h"
 
 /**
@@ -51,14 +52,24 @@ static inline void placer_error(int error)
 }
 
 /**
+ * Defines a structure used by the generic callback to (if not null)
+ * emit a message for each call and (if initially zeroed) count the
+ * number of entries.
+ */
+typedef struct PlacerCallbackGeneric {
+    FILE * fp;
+    size_t count;
+} placer_callback_generic_t;
+
+/**
  * Implement a generic SQLite callback useful for debugging.
- * @param vfp is the FILE * to be used to emit debugging information.
+ * @param vp is a pointer to a generic callback structure or NULL.
  * @param ncols is the number of columns provided by SQLite.
  * @param value is the array of column values provided by SQLite.
  * @param keyword is the array of column names provided by SQLite.
  * @return always SQLITE_OK (0).
  */
-extern int placer_callback_generic(void * vfp, int ncols, char ** value, char ** keyword);
+extern int placer_callback_generic(void * vp, int ncols, char ** value, char ** keyword);
 
 /**
  * Copy characters from one buffer to another changing each single quote into

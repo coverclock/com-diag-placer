@@ -29,17 +29,29 @@ FILE * placer_debug(FILE * now)
     return was;
 }
 
-int placer_callback_generic(void * vfp, int ncols, char ** value, char ** keyword)
+int placer_callback_generic(void * vp, int ncols, char ** value, char ** keyword)
 {
-    FILE * fp = (FILE *)0;
+    placer_callback_generic_t * pp = (placer_callback_generic_t *)0;
     int ii = 0;
 
-    fp = (FILE *)vfp;
+    if (vp != (void *)0) {
 
-    for (ii = 0; ii < ncols; ++ii) {
-        fprintf(fp, "%s[%d]=\"%s\"[%zu] ", keyword[ii], ii, value[ii], strlen(value[ii]));
+        pp = (placer_callback_generic_t *)vp;
+
+        ++(pp->count);
+
+        if (pp->fp == (FILE *)0) {
+            /* Do nothing. */
+        } else if (ncols <= 0) {
+            /* Do nothing. */
+        } else {
+            for (ii = 0; ii < ncols; ++ii) {
+                fprintf(pp->fp, "%s[%d]=\"%s\" ", keyword[ii], ii, value[ii]);
+            }
+            fputc('\n', pp->fp);
+        }
+
     }
-    fputc('\n', fp);
 
     return SQLITE_OK;
 }
