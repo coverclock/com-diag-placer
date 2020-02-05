@@ -38,6 +38,16 @@ Broadcom BCM2711 Cortex-A72 ARMv8 @ 1.5GHz x 4
 Raspbian 10 "Buster"    
 Linux 4.19.93    
 gcc 8.3.0    
+sqlite 3.30.1    
+
+"Nickel"    
+Intel NUC5i7RYH    
+Intel x86_64    
+Intel Core i7-5557U @ 3.1GHz x 2 x 2    
+Ubuntu 16.04.4 "xenial"    
+Linux 4.13.0     
+gcc 5.4.0    
+sqlite 3.22.0    
 
 # References
 
