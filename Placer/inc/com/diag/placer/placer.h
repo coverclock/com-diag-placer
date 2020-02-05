@@ -104,4 +104,15 @@ extern char * placer_expand_alloc(const char * from);
  */
 extern char * placer_format_alloc(size_t size, const char * format, ...);
 
+/**
+ * A convenience function that calls sqlite3_exec(), emits any error messages to standard
+ * error, and returns the SQLite3 return code. The sql statement is NOT freed.
+ * @param db points to the database object.
+ * @param sql points to the sql statement.
+ * @param cp points to the callback function or NULL.
+ * @param vp points to the callback state object or NULL.
+ * @return the SQLite3 return code.
+ */
+extern int placer_exec(sqlite3 * db, const char * sql, int (*cp)(void *, int, char **, char **), void * vp);
+
 #endif

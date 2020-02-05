@@ -178,3 +178,17 @@ char * placer_format_alloc(size_t size, const char * format, ...)
 
     return buffer;
 }
+
+int placer_exec(sqlite3 * db, const char * sql, int (*cp)(void *, int, char **, char **), void * vp)
+{
+    int rc = 0;
+    char * sqlmessage = (char *)0;
+
+    rc = sqlite3_exec(db, sql, cp, vp, &sqlmessage);
+    if (rc != SQLITE_OK) {
+        placer_message(sqlmessage);
+        placer_error(rc);
+    }
+
+    return rc;
+}

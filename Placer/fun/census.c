@@ -60,7 +60,6 @@ static int clean(sqlite3 * db)
     int xc = 0;
     int rc = 0;
     char * sql = (char *)0;
-    char * sqlmessage = (char *)0;
     placer_callback_generic_t state = { stderr, 0 };
    
     do {
@@ -72,7 +71,6 @@ static int clean(sqlite3 * db)
         sql = placer_format_alloc(Buffersize,
             "SELECT * FROM census WHERE mark == 0;"
         );
-
         if (sql == (char *)0) {
             xc = -12;
             break;
@@ -83,13 +81,9 @@ static int clean(sqlite3 * db)
             fputc('\n', stderr);
         }
 
-        sqlmessage = (char *)0;
-        rc = sqlite3_exec(db, sql, placer_callback_generic, &state, &sqlmessage);
+        rc = placer_exec(db, sql, placer_callback_generic, &state);
         free(sql);
-
         if (rc != SQLITE_OK) {
-            placer_message(sqlmessage);
-            placer_error(rc);
             xc = -13;
             break;
         }
@@ -101,7 +95,6 @@ static int clean(sqlite3 * db)
         sql = placer_format_alloc(Buffersize,
             "DELETE FROM census WHERE mark == 0;"
         );
-
         if (sql == (char *)0) {
             xc = -12;
             break;
@@ -112,13 +105,9 @@ static int clean(sqlite3 * db)
             fputc('\n', stderr);
         }
 
-        sqlmessage = (char *)0;
-        rc = sqlite3_exec(db, sql, placer_callback_generic, &state, &sqlmessage);
+        rc = placer_exec(db, sql, placer_callback_generic, &state);
         free(sql);
-
         if (rc != SQLITE_OK) {
-            placer_message(sqlmessage);
-            placer_error(rc);
             xc = -13;
             break;
         }
@@ -130,7 +119,6 @@ static int clean(sqlite3 * db)
         sql = placer_format_alloc(Buffersize,
             "UPDATE census SET mark = 0 WHERE mark != 0;"
         );
-
         if (sql == (char *)0) {
             xc = -12;
             break;
@@ -141,13 +129,9 @@ static int clean(sqlite3 * db)
             fputc('\n', stderr);
         }
 
-        sqlmessage = (char *)0;
-        rc = sqlite3_exec(db, sql, placer_callback_generic, &state, &sqlmessage);
+        rc = placer_exec(db, sql, placer_callback_generic, &state);
         free(sql);
-
         if (rc != SQLITE_OK) {
-            placer_message(sqlmessage);
-            placer_error(rc);
             xc = -13;
             break;
         }
@@ -172,7 +156,6 @@ static int mark(sqlite3 * db)
     int xc = 0;
     int rc = 0;
     char * sql = (char *)0;
-    char * sqlmessage = (char *)0;
     placer_callback_generic_t state = { stderr, 0 };
    
     do {
@@ -184,7 +167,6 @@ static int mark(sqlite3 * db)
         sql = placer_format_alloc(Buffersize,
             "UPDATE census SET mark = 1 WHERE nlink > 1;"
         );
-
         if (sql == (char *)0) {
             xc = -12;
             break;
@@ -195,13 +177,9 @@ static int mark(sqlite3 * db)
             fputc('\n', stderr);
         }
 
-        sqlmessage = (char *)0;
-        rc = sqlite3_exec(db, sql, placer_callback_generic, &state, &sqlmessage);
+        rc = placer_exec(db, sql, placer_callback_generic, &state);
         free(sql);
-
         if (rc != SQLITE_OK) {
-            placer_message(sqlmessage);
-            placer_error(rc);
             xc = -13;
             break;
         }
@@ -213,7 +191,6 @@ static int mark(sqlite3 * db)
         sql = placer_format_alloc(Buffersize,
             "SELECT * FROM census WHERE mark != 0;"
         );
-
         if (sql == (char *)0) {
             xc = -12;
             break;
@@ -224,13 +201,9 @@ static int mark(sqlite3 * db)
             fputc('\n', stderr);
         }
 
-        sqlmessage = (char *)0;
-        rc = sqlite3_exec(db, sql, placer_callback_generic, &state, &sqlmessage);
+        rc = placer_exec(db, sql, placer_callback_generic, &state);
         free(sql);
-
         if (rc != SQLITE_OK) {
-            placer_message(sqlmessage);
-            placer_error(rc);
             xc = -13;
             break;
         }
@@ -242,7 +215,6 @@ static int mark(sqlite3 * db)
         sql = placer_format_alloc(Buffersize,
             "SELECT * FROM census WHERE (mark != 0) AND (nlink <= 1);"
         );
-
         if (sql == (char *)0) {
             xc = -12;
             break;
@@ -253,13 +225,9 @@ static int mark(sqlite3 * db)
             fputc('\n', stderr);
         }
 
-        sqlmessage = (char *)0;
-        rc = sqlite3_exec(db, sql, placer_callback_generic, &state, &sqlmessage);
+        rc = placer_exec(db, sql, placer_callback_generic, &state);
         free(sql);
-
         if (rc != SQLITE_OK) {
-            placer_message(sqlmessage);
-            placer_error(rc);
             xc = -13;
             break;
         }
@@ -271,7 +239,6 @@ static int mark(sqlite3 * db)
         sql = placer_format_alloc(Buffersize,
             "SELECT * FROM census WHERE (mark == 0) AND (nlink > 1);"
         );
-
         if (sql == (char *)0) {
             xc = -12;
             break;
@@ -282,13 +249,9 @@ static int mark(sqlite3 * db)
             fputc('\n', stderr);
         }
 
-        sqlmessage = (char *)0;
-        rc = sqlite3_exec(db, sql, placer_callback_generic, &state, &sqlmessage);
+        rc = placer_exec(db, sql, placer_callback_generic, &state);
         free(sql);
-
         if (rc != SQLITE_OK) {
-            placer_message(sqlmessage);
-            placer_error(rc);
             xc = -13;
             break;
         }
@@ -300,7 +263,6 @@ static int mark(sqlite3 * db)
         sql = placer_format_alloc(Buffersize,
             "UPDATE census SET mark = 0 WHERE mark != 0;"
         );
-
         if (sql == (char *)0) {
             xc = -12;
             break;
@@ -311,13 +273,9 @@ static int mark(sqlite3 * db)
             fputc('\n', stderr);
         }
 
-        sqlmessage = (char *)0;
-        rc = sqlite3_exec(db, sql, placer_callback_generic, &state, &sqlmessage);
+        rc = placer_exec(db, sql, placer_callback_generic, &state);
         free(sql);
-
         if (rc != SQLITE_OK) {
-            placer_message(sqlmessage);
-            placer_error(rc);
             xc = -13;
             break;
         }
@@ -364,7 +322,6 @@ static int identify(void * vp, const char * name, const char * path, size_t dept
     int rc = 0;
     sqlite3 * db = (sqlite3 *)0;
     char * sql = (char *)0;
-    char * sqlmessage = (char *)0;
    
     do {
 
@@ -384,7 +341,6 @@ static int identify(void * vp, const char * name, const char * path, size_t dept
             , major(statp->st_dev)
             , minor(statp->st_dev)
         );
-
         if (sql == (char *)0) {
             xc = -12;
             break;
@@ -395,13 +351,9 @@ static int identify(void * vp, const char * name, const char * path, size_t dept
             fputc('\n', stderr);
         }
 
-        sqlmessage = (char *)0;
-        rc = sqlite3_exec(db, sql, identifier, (char *)path, &sqlmessage);
+        rc = placer_exec(db, sql, identifier, (char *)path);
         free(sql);
-
         if (rc != SQLITE_OK) {
-            placer_message(sqlmessage);
-            placer_error(rc);
             xc = -13;
             break;
         }
@@ -427,7 +379,6 @@ static int enumerate(void * vp, const char * name, const char * path, size_t dep
     int rc = 0;
     char * to = (char *)0;
     char * sql = (char *)0;
-    char * sqlmessage = (char *)0;
     placer_callback_generic_t state = { (FILE *)0, 0 };
    
     do {
@@ -445,7 +396,6 @@ static int enumerate(void * vp, const char * name, const char * path, size_t dep
             , to
         );
         free(to);
-
         if (sql == (char *)0) {
             xc = -12;
             break;
@@ -456,14 +406,10 @@ static int enumerate(void * vp, const char * name, const char * path, size_t dep
             fputc('\n', stderr);
         }
 
-        sqlmessage = (char *)0;
         state.count = 0;
-        rc = sqlite3_exec(db, sql, placer_callback_generic, &state, &sqlmessage);
+        rc = placer_exec(db, sql, placer_callback_generic, &state);
         free(sql);
-
         if (rc != SQLITE_OK) {
-            placer_message(sqlmessage);
-            placer_error(rc);
             xc = -13;
             break;
         }
@@ -500,7 +446,6 @@ static int extract(sqlite3 * db, diminuto_fs_type_t type)
     char tt[2] = { '\0', '\0' };
     char * to = (char *)0;
     char * sql = (char *)0;
-    char * sqlmessage = (char *)0;
     placer_callback_generic_t state = { stderr, 0 };
 
     do {
@@ -514,7 +459,6 @@ static int extract(sqlite3 * db, diminuto_fs_type_t type)
             , 0777U
         );
         free(to);
-
         if (sql == (char *)0) {
             xc = -20;
             break;
@@ -525,13 +469,9 @@ static int extract(sqlite3 * db, diminuto_fs_type_t type)
             fputc('\n', stderr);
         }
 
-        sqlmessage = (char *)0;
-        rc = sqlite3_exec(db, sql, placer_callback_generic, &state, &sqlmessage);
+        rc = placer_exec(db, sql, placer_callback_generic, &state);
         free(sql);
-
         if (rc != SQLITE_OK) {
-            placer_message(sqlmessage);
-            placer_error(rc);
             xc = -21;
             break;
         }
@@ -553,7 +493,6 @@ static int replace(void * vp, const char * name, const char * path, size_t depth
     int rc = 0;
     char * to = (char *)0;
     char * sql = (char *)0;
-    char * sqlmessage = (char *)0;
     placer_callback_generic_t state = { stderr, 0 };
 
     do {
@@ -590,7 +529,6 @@ static int replace(void * vp, const char * name, const char * path, size_t depth
             , 1
         );
         free(to);
-
         if (sql == (char *)0) {
             xc = -12;
             break;
@@ -601,13 +539,9 @@ static int replace(void * vp, const char * name, const char * path, size_t depth
             fputc('\n', stderr);
         }
 
-        sqlmessage = (char *)0;
-        rc = sqlite3_exec(db, sql, placer_callback_generic, &state, &sqlmessage);
+        rc = placer_exec(db, sql, placer_callback_generic, &state);
         free(sql);
-
         if (rc != SQLITE_OK) {
-            placer_message(sqlmessage);
-            placer_error(rc);
             xc = -13;
             break;
         }
@@ -630,7 +564,6 @@ static int insert(void * vp, const char * name, const char * path, size_t depth,
     int rc = 0;
     char * to = (char *)0;
     char * sql = (char *)0;
-    char * sqlmessage = (char *)0;
     placer_callback_generic_t state = { stderr, 0 };
 
     do {
@@ -667,7 +600,6 @@ static int insert(void * vp, const char * name, const char * path, size_t depth,
             , 0
         );
         free(to);
-
         if (sql == (char *)0) {
             xc = -12;
             break;
@@ -678,13 +610,9 @@ static int insert(void * vp, const char * name, const char * path, size_t depth,
             fputc('\n', stderr);
         }
 
-        sqlmessage = (char *)0;
-        rc = sqlite3_exec(db, sql, placer_callback_generic, &state, &sqlmessage);
+        rc = placer_exec(db, sql, placer_callback_generic, &state);
         free(sql);
-
         if (rc != SQLITE_OK) {
-            placer_message(sqlmessage);
-            placer_error(rc);
             xc = -13;
             break;
         }
