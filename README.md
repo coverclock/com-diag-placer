@@ -73,3 +73,5 @@ Jay A. Kreibich, *Using SQLite*, O'Reilly, 2010
 # Links
 
 SQLite Documentation, <https://www.sqlite.org/docs.html>
+
+SQLite Tutorial, <https://www.sqlitetutorial.net>
