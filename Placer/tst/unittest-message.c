@@ -143,10 +143,23 @@ int main(void)
     {
         COMMENT();
         placer_error(-1);
+    }
+    {
         COMMENT();
         placer_error(0);
+    }
+    {
         COMMENT();
         placer_message((char *)0);
+    }
+    {
+        COMMENT();
+        char * pp;
+        pp = sqlite3_malloc(sizeof("Message!"));
+        ASSERT(pp != (char *)0);
+        strcpy(pp, "Message!");
+        placer_message(pp);
+        pp = (char *)0;
     }
 
     EXIT();

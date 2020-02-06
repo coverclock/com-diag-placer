@@ -40,9 +40,9 @@ FILE * placer_debug(FILE * now)
 void placer_message(char * message)
 {
     if (message != (char *)0) {
-        fputs("SQLite3: ", stderr);
+        fputs("SQLite: \"", stderr);
         fputs(message, stderr);
-        fputc('\n', stderr);
+        fputs("\"\n", stderr);
         sqlite3_free(message);
     }
 }
@@ -50,9 +50,9 @@ void placer_message(char * message)
 void placer_error(int error)
 {
     if (error != SQLITE_OK) {
-        fputs("SQLite3: ", stderr);
+        fprintf(stderr, "SQLite: [%d] \"", error);
         fputs(sqlite3_errstr(error), stderr);
-        fputc('\n', stderr);
+        fputs("\"\n", stderr);
     }
 }
 
