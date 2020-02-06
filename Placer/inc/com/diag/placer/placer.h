@@ -27,29 +27,14 @@ extern FILE * placer_debug(FILE * now);
  * non-NULL and then free it.
  * @param message is the SQLite error message or nULL.
  */
-static inline void placer_message(char * message)
-{
-    if (message != (char *)0) {
-        fputs("SQLite3: ", stderr);
-        fputs(message, stderr);
-        fputc('\n', stderr);
-        sqlite3_free(message);
-    }
-}
+extern void placer_message(char * message);
 
 /**
  * Turn the SQLite error number into a printable string and emit it
  * to standard error.
  * @param error is the SQLite error number.
  */
-static inline void placer_error(int error)
-{
-    if (error != SQLITE_OK) {
-        fputs("SQLite3: ", stderr);
-        fputs(sqlite3_errstr(error), stderr);
-        fputc('\n', stderr);
-    }
-}
+extern void placer_error(int error);
 
 /**
  * Defines a structure used by the generic callback to (if not null)
@@ -77,11 +62,10 @@ extern int placer_callback_generic(void * vp, int ncols, char ** value, char ** 
  * providing it is at least one byte in length.
  * @param to points to the destination buffer.
  * @param from points to the source buffer.
- * @param tsize is the size of the destination buffer.
- * @param fsize is the size of the source buffer.
+ * @param size is the size of the destination buffer in bytes.
  * @return the number of bytes in the destination including the terminating NUL.
  */
-extern size_t placer_expand(char * to, const char * from, size_t tsize, size_t fsize);
+extern size_t placer_str_expand(char * to, const char * from, size_t size);
 
 /**
  * Copy characters from one buffer to a dynamically allocated buffer changing
@@ -91,7 +75,7 @@ extern size_t placer_expand(char * to, const char * from, size_t tsize, size_t f
  * @param  from points to the source buffer.
  * @return the dynamically acquired buffer or NULL if failure.
  */
-extern char * placer_expand_alloc(const char * from);
+extern char * placer_str_expanda(const char * from);
 
 /**
  * Format arguments in an snprintf(3) manner into a dynamically acquired
@@ -102,7 +86,7 @@ extern char * placer_expand_alloc(const char * from);
  * @param format is the snprintf(3) format string.
  * @return the dynamically acquired buffer or NULL if failure.
  */
-extern char * placer_format_alloc(size_t size, const char * format, ...);
+extern char * placer_sql_formata(size_t size, const char * format, ...);
 
 /**
  * A convenience function that calls sqlite3_exec(), emits any error messages to standard
@@ -113,6 +97,6 @@ extern char * placer_format_alloc(size_t size, const char * format, ...);
  * @param vp points to the callback state object or NULL.
  * @return the SQLite3 return code.
  */
-extern int placer_exec(sqlite3 * db, const char * sql, int (*cp)(void *, int, char **, char **), void * vp);
+extern int placer_db_exec(sqlite3 * db, const char * sql, int (*cp)(void *, int, char **, char **), void * vp);
 
 #endif

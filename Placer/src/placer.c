@@ -29,6 +29,25 @@ FILE * placer_debug(FILE * now)
     return was;
 }
 
+void placer_message(char * message)
+{
+    if (message != (char *)0) {
+        fputs("SQLite3: ", stderr);
+        fputs(message, stderr);
+        fputc('\n', stderr);
+        sqlite3_free(message);
+    }
+}
+
+void placer_error(int error)
+{
+    if (error != SQLITE_OK) {
+        fputs("SQLite3: ", stderr);
+        fputs(sqlite3_errstr(error), stderr);
+        fputc('\n', stderr);
+    }
+}
+
 int placer_callback_generic(void * vp, int ncols, char ** value, char ** keyword)
 {
     placer_callback_generic_t * pp = (placer_callback_generic_t *)0;
@@ -56,57 +75,55 @@ int placer_callback_generic(void * vp, int ncols, char ** value, char ** keyword
     return SQLITE_OK;
 }
 
-size_t placer_expand(char * to, const char * from, size_t tsize, size_t fsize) {
-    size_t size = 0;
+size_t placer_str_expand(char * to, const char * from, size_t size) {
+    size_t length = 0;
 
-    while ((fsize > 0) && (tsize > 1) && (*from != '\0')) {
-        *(to++) = *from;
+    while ((size > 1) && (*from != '\0')) {
         if (*from != '\'') {
-            /* Do nothing. */
-        } else if (tsize > 2) {
-            *(to++) = '\'';
-            --tsize;
-            ++size;
+            *(to++) = *(from++);
+        } else if (size > 2) {
+            *(to++) = *from;
+            *(to++) = *(from++);
+            --size;
+            ++length;
         } else {
             break;
         }
-        ++from;
-        --fsize;
-        --tsize;
-        ++size;
-    }
-    if (tsize > 0) {
-        *to = '\0';
-        ++size;
+        --size;
+        ++length;
     }
 
-    return size;
+    if (size > 0) {
+        *to = '\0';
+        ++length;
+    }
+
+    return length;
 }
 
-char * placer_expand_alloc(const char * from)
+char * placer_str_expanda(const char * from)
 {
     char * to = (char *)0;
-    size_t fsize = 0;
-    size_t tsize = 0;
+    const char * ff = (const char *)0;
+    size_t count = 0;
+    size_t size = 0;
 
-    /*
-     * I could scan the from string and determine exactly how many
-     * single quotes there are. But I decided to optimize CPU usage
-     * instead of memory usage. The memory can be freed quite quickly
-     * if the application is building a SQL string using snprintf(3).
-     */
+    for (ff = from; *ff != '\0'; ++ff) {
+        if (*ff == '\'') {
+            ++count;
+        }
+    }
 
-    fsize = strlen(from);
-    tsize = (fsize * 2) + 1;
-    to = malloc(tsize);
+    size = strlen(from) + count + 1;
+    to = malloc(size);
     if (to != (char *)0) {
-        placer_expand(to, from, tsize, fsize);
+        placer_str_expand(to, from, size);
     }
 
     return to;
 }
 
-char * placer_format_alloc(size_t size, const char * format, ...)
+char * placer_sql_formata(size_t size, const char * format, ...)
 {
     char * buffer = (char *)0;
     int length = 0;
@@ -179,7 +196,7 @@ char * placer_format_alloc(size_t size, const char * format, ...)
     return buffer;
 }
 
-int placer_exec(sqlite3 * db, const char * sql, int (*cp)(void *, int, char **, char **), void * vp)
+int placer_db_exec(sqlite3 * db, const char * sql, int (*cp)(void *, int, char **, char **), void * vp)
 {
     int rc = 0;
     char * sqlmessage = (char *)0;

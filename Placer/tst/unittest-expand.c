@@ -20,19 +20,19 @@ int main(void)
 
     {
         size_t result;
-        result = placer_expand((char *)0, (const char *)0, 0, 0);
+        result = placer_str_expand((char *)0, (const char *)0, 0);
         EXPECT(result == 0);
     }
     {
         size_t result;
         const char from[] = "";
-        result = placer_expand((char *)0, from, 0, sizeof(from));
+        result = placer_str_expand((char *)0, from, 0);
         EXPECT(result == 0);
     }
     {
         size_t result;
         char to[1];
-        result = placer_expand(to, (const char *)0, sizeof(to), 0);
+        result = placer_str_expand(to, (const char *)0, sizeof(to));
         EXPECT(result == 1);
         EXPECT(strncmp(to, "", sizeof(to)) == 0);
     }
@@ -40,7 +40,7 @@ int main(void)
         size_t result;
         const char from[] = "";
         char to[sizeof(from) * 2];
-        result = placer_expand(to, from, sizeof(to), sizeof(from));
+        result = placer_str_expand(to, from, sizeof(to));
         EXPECT(result == 1);
         EXPECT(strncmp(to, "", sizeof(to)) == 0);
     }
@@ -48,7 +48,7 @@ int main(void)
         size_t result;
         const char from[] = "'";
         char to[sizeof(from) * 2];
-        result = placer_expand(to, from, sizeof(to), sizeof(from));
+        result = placer_str_expand(to, from, sizeof(to));
         COMMENT("from=\"%s\" to=\"%s\" result=%zu\n", from, to, result);
         EXPECT(result == 3);
         EXPECT(strncmp(to, "''", sizeof(to)) == 0);
@@ -57,7 +57,7 @@ int main(void)
         size_t result;
         const char from[] = "AA'BB'CC";
         char to[sizeof(from) * 2];
-        result = placer_expand(to, from, sizeof(to), sizeof(from));
+        result = placer_str_expand(to, from, sizeof(to));
         COMMENT("from=\"%s\" to=\"%s\" result=%zu\n", from, to, result);
         EXPECT(result == 11);
         EXPECT(strncmp(to, "AA''BB''CC", sizeof(to)) == 0);
@@ -66,7 +66,7 @@ int main(void)
         size_t result;
         const char from[] = "'AA'BB'CC'";
         char to[sizeof(from) * 2];
-        result = placer_expand(to, from, sizeof(to), sizeof(from));
+        result = placer_str_expand(to, from, sizeof(to));
         COMMENT("from=\"%s\" to=\"%s\" result=%zu\n", from, to, result);
         EXPECT(result == 15);
         EXPECT(strncmp(to, "''AA''BB''CC''", sizeof(to)) == 0);
@@ -75,7 +75,7 @@ int main(void)
         size_t result;
         const char from[] = "''AA''BB''CC''";
         char to[sizeof(from) * 2];
-        result = placer_expand(to, from, sizeof(to), sizeof(from));
+        result = placer_str_expand(to, from, sizeof(to));
         COMMENT("from=\"%s\" to=\"%s\" result=%zu\n", from, to, result);
         EXPECT(result == 23);
         EXPECT(strncmp(to, "''''AA''''BB''''CC''''", sizeof(to)) == 0);
@@ -83,7 +83,7 @@ int main(void)
     {
         const char from[] = "''AA''BB''CC''";
         char * to = (char *)0;
-        to = placer_expand_alloc(from);
+        to = placer_str_expanda(from);
         ASSERT(to != (char *)0);
         COMMENT("from=\"%s\" to=\"%s\"\n", from, to);
         EXPECT(strncmp(to, "''''AA''''BB''''CC''''", sizeof(to)) == 0);
@@ -92,7 +92,7 @@ int main(void)
     {
         const char from[] = "''''''''";
         char * to = (char *)0;
-        to = placer_expand_alloc(from);
+        to = placer_str_expanda(from);
         ASSERT(to != (char *)0);
         COMMENT("from=\"%s\" to=\"%s\"\n", from, to);
         EXPECT(strncmp(to, "''''''''''''''''", sizeof(to)) == 0);
