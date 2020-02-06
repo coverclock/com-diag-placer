@@ -66,6 +66,61 @@ ARMv8 valgrind(1) seems to be broken in the Debian package that installs
 on Rhodium. I've been successfully running it instead on Nickel, even
 though most of my development remains on Rhodium.
 
+# Dependencies
+
+Placer depends on SQLite3, and on Diminuto, my C-based systems programming library.
+
+# Repositories
+
+<https://github.com/coverclock/com-diag-placer>
+
+<https://github.com/coverclock/com-diag-diminuto>
+
+# Build
+
+Install SQLite.
+
+    sudo apt-get install sqlite3
+    sudo apt-get install libsqlite3-dev
+
+Clone and build Diminuto.
+
+    cd ~
+    mkdir -p src
+    cd src
+    git clone https://github.com/coverclock/com-diag-diminuto
+    cd com-diag-diminuto/Diminuto
+    make pristine
+    make depend
+    make all
+
+Clone and build Placer. (If you don't build Diminuto where the Placer Makefile
+expects it, some minor Makefile hacking might be required.)
+
+    cd ~
+    mkdir -p src
+    cd src
+    git clone https://github.com/coverclock/com-diag-placer
+    cd com-diag-hazer/Placer
+    make pristine
+    make depend
+    make all
+
+Run the unit tests
+
+    cd ~/src/com-diag-placer/Placer
+    . out/host/bin/setup
+    unittest-expand
+    unittest-format
+    unittest-message
+
+Run the functional test.
+
+    cd ~/src/com-diag-placer/Placer
+    make out/host/sql/census.db
+    . out/host/bin/setup
+    census -D out/host/sql/census.db -v -0 /
+
 # References
 
 Grant Allen, Mike Owens, *The Definitive Guide to SQLite*, 2nd ed.,
