@@ -1,6 +1,6 @@
 # com-diag-placer
 
-Musings with SQLite.
+Musings with SQLite (WORK IN PROGRESS).
 
 # Copyright
 
@@ -48,6 +48,20 @@ Ubuntu 16.04.4 "xenial"
 Linux 4.13.0     
 gcc 5.4.0    
 sqlite 3.22.0    
+
+# Notes
+
+On Rhodium, I installed SQLite3 3.30 manually by downloading and
+building it and installing the build artifacts in the default root
+of /usr/local. On Nickel, I just installed the Debian sqlite3 and
+libsqlite3-dev 3.22 packages which places the binary, header, and library
+in the usual locations.  But thes Makefile rules worked for me in either
+case, since on Nickel the build found the necessary components in the
+standard locations. Your mileage may vary.
+
+ARMv8 valgrind(1) seems to be broken in the Debian package that installs
+on Rhodium. I've been successfully running it instead on Nickel, even
+though most of my development remains on Rhodium.
 
 # References
 
