@@ -26,6 +26,10 @@
  */
 extern FILE * placer_debug(FILE * now);
 
+/*******************************************************************************
+ *
+ ******************************************************************************/
+
 /**
  * Emit the SQLite error message to standard error if it is
  * non-NULL and then free it.
