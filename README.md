@@ -21,13 +21,16 @@ Wheat Ridge CO 80033 USA
 
 # Abstract
 
-Placer is my excuse to re-learn SQLite after having been away from it
-for a few years. SQLite is a server-less database system that is featured
-in Android and Apple phones and tablets, Windows 10 (so it is rumored),
-and countless embedded system including some on which I have worked. I
-am not a database person, but I very much appreciate the persistent data
-management model offered by SQLite that is usable both from applications
-and the command line.
+Placer is a small collection of helper and convenience functions to assist
+in the use of SQLite in the C programming language.  It is also my excuse
+to re-learn SQLite after having been away from it for a few years.
+
+SQLite is a server-less relational database system that is featured in
+Android and Apple phones and tablets, Windows 10 (so it is rumored),
+and countless embedded system including some on which I have helped
+develop. I am not a database person, but I very much appreciate the
+persistent data management model offered by SQLite that is usable both
+from within applications and the command line.
 
 # Targets
 
@@ -55,9 +58,9 @@ On Rhodium, I installed SQLite3 3.30 manually by downloading and
 building it and installing the build artifacts in the default root
 of /usr/local. On Nickel, I just installed the Debian sqlite3 and
 libsqlite3-dev 3.22 packages which places the binary, header, and library
-in the usual locations.  But thes Makefile rules worked for me in either
-case, since on Nickel the build found the necessary components in the
-standard locations. Your mileage may vary.
+in the usual locations. But the same Makefile rules worked for me in
+either case, since on Nickel the build found the necessary components
+in the standard locations. Your mileage may vary.
 
 ARMv8 valgrind(1) seems to be broken in the Debian package that installs
 on Rhodium. I've been successfully running it instead on Nickel, even
@@ -69,6 +72,8 @@ Grant Allen, Mike Owens, *The Definitive Guide to SQLite*, 2nd ed.,
 Apress, 2010
 
 Jay A. Kreibich, *Using SQLite*, O'Reilly, 2010
+
+Anthony Molinaro, *SQL Cookbook*, O/Reilly, 2006
 
 # Links
 

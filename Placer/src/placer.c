@@ -77,7 +77,7 @@ int placer_callback_generic(void * vp, int ncols, char ** value, char ** keyword
             /* Do nothing. */
         } else {
             for (ii = 0; ii < ncols; ++ii) {
-                fprintf(pp->fp, "%s[%d]=\"%s\" ", keyword[ii], ii, value[ii]);
+                fprintf(pp->fp, "%s=\"%s\" ", keyword[ii], value[ii]);
             }
             fputc('\n', pp->fp);
         }
