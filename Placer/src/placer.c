@@ -17,6 +17,10 @@
 #include "com/diag/diminuto/diminuto_types.h"
 #include "com/diag/placer/placer.h"
 
+/*******************************************************************************
+ *
+ ******************************************************************************/
+
 static FILE * Debug = (FILE *)0;
 
 FILE * placer_debug(FILE * now)
@@ -28,6 +32,10 @@ FILE * placer_debug(FILE * now)
 
     return was;
 }
+
+/*******************************************************************************
+ *
+ ******************************************************************************/
 
 void placer_message(char * message)
 {
@@ -47,6 +55,10 @@ void placer_error(int error)
         fputc('\n', stderr);
     }
 }
+
+/*******************************************************************************
+ *
+ ******************************************************************************/
 
 int placer_callback_generic(void * vp, int ncols, char ** value, char ** keyword)
 {
@@ -74,6 +86,10 @@ int placer_callback_generic(void * vp, int ncols, char ** value, char ** keyword
 
     return SQLITE_OK;
 }
+
+/*******************************************************************************
+ *
+ ******************************************************************************/
 
 size_t placer_str_expand(char * to, const char * from, size_t size) {
     size_t length = 0;
@@ -122,6 +138,10 @@ char * placer_str_expanda(const char * from)
 
     return to;
 }
+
+/*******************************************************************************
+ *
+ ******************************************************************************/
 
 char * placer_sql_vformata(size_t size, const char * format, va_list op)
 {
@@ -206,6 +226,10 @@ char * placer_sql_formata(size_t size, const char * format, ...)
 
     return buffer;
 }
+
+/*******************************************************************************
+ *
+ ******************************************************************************/
 
 int placer_db_exec(sqlite3 * db, const char * sql, int (*cp)(void *, int, char **, char **), void * vp)
 {

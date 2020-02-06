@@ -14,6 +14,10 @@
 #include <sys/types.h>
 #include "sqlite3.h"
 
+/*******************************************************************************
+ *
+ ******************************************************************************/
+
 /**
  * Sets the debug file pointer. If the pointer is non-NULL, debugging
  * information is emitted to it. The prior debug file pointer is returned.
@@ -36,6 +40,10 @@ extern void placer_message(char * message);
  */
 extern void placer_error(int error);
 
+/*******************************************************************************
+ *
+ ******************************************************************************/
+
 /**
  * Defines a structure used by the generic callback to (if not null)
  * emit a message for each call and (if initially zeroed) count the
@@ -55,6 +63,10 @@ typedef struct PlacerCallbackGeneric {
  * @return always SQLITE_OK (0).
  */
 extern int placer_callback_generic(void * vp, int ncols, char ** value, char ** keyword);
+
+/*******************************************************************************
+ *
+ ******************************************************************************/
 
 /**
  * Copy characters from one buffer to another changing each single quote into
@@ -76,6 +88,10 @@ extern size_t placer_str_expand(char * to, const char * from, size_t size);
  * @return the dynamically acquired buffer or NULL if failure.
  */
 extern char * placer_str_expanda(const char * from);
+
+/*******************************************************************************
+ *
+ ******************************************************************************/
 
 /**
  * Format arguments in an vsnprintf(3) manner into a dynamically acquired
@@ -99,6 +115,10 @@ extern char * placer_sql_vformata(size_t size, const char * format, va_list op);
  * @return the dynamically acquired buffer or NULL if failure.
  */
 extern char * placer_sql_formata(size_t size, const char * format, ...);
+
+/*******************************************************************************
+ *
+ ******************************************************************************/
 
 /**
  * A convenience function that calls sqlite3_exec(), emits any error messages to standard
