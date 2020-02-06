@@ -78,6 +78,18 @@ extern size_t placer_str_expand(char * to, const char * from, size_t size);
 extern char * placer_str_expanda(const char * from);
 
 /**
+ * Format arguments in an vsnprintf(3) manner into a dynamically acquired
+ * buffer, enarging the buffer to guarantee that the results fit. Initially
+ * allocate the buffer to the specified size. The dynamically allocated
+ * buffer must be freed using free(3).
+ * @param size is the initial allocation size of the buffer in bytes.
+ * @param format is the snprintf(3) format string.
+ * @param op is the variable length argument list.
+ * @return the dynamically acquired buffer or NULL if failure.
+ */
+extern char * placer_sql_vformata(size_t size, const char * format, va_list op);
+
+/**
  * Format arguments in an snprintf(3) manner into a dynamically acquired
  * buffer, enarging the buffer to guarantee that the results fit. Initially
  * allocate the buffer to the specified size. The dynamically allocated

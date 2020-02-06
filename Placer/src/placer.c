@@ -123,7 +123,7 @@ char * placer_str_expanda(const char * from)
     return to;
 }
 
-char * placer_sql_formata(size_t size, const char * format, ...)
+char * placer_sql_vformata(size_t size, const char * format, va_list op)
 {
     char * buffer = (char *)0;
     int length = 0;
@@ -155,9 +155,8 @@ char * placer_sql_formata(size_t size, const char * format, ...)
                 break;
             }
 
-            va_start(ap, format);
+            va_copy(ap, op);
             length = vsnprintf(buffer, ss, format, ap);
-            va_end(ap);
 
             if (length < ss) {
                 break; 
@@ -192,6 +191,18 @@ char * placer_sql_formata(size_t size, const char * format, ...)
         }
 
     } while (0);
+
+    return buffer;
+}
+
+char * placer_sql_formata(size_t size, const char * format, ...)
+{
+    char * buffer = (char *)0;
+    va_list ap;
+
+    va_start(ap, format);
+    buffer = placer_sql_vformata(size, format, ap);
+    va_end(ap);
 
     return buffer;
 }
