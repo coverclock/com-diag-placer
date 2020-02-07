@@ -27,7 +27,7 @@ to re-learn SQLite after having been away from it for a few years.
 
 SQLite is a server-less relational database system that is featured in
 Android and Apple phones and tablets, Windows 10 (so it is rumored),
-and countless embedded system including some on which I have helped
+and countless embedded system including some of which I have helped
 develop. I am not a database person, but I very much appreciate the
 persistent data management model offered by SQLite that is usable both
 from within applications and the command line.
