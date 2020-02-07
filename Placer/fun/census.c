@@ -77,8 +77,8 @@ static int clean(sqlite3 * db)
         }
 
         if (Verbose) {
-            fputs(sql, stdout);
-            fputc('\n', stdout);
+            fputs(sql, stderr);
+            fputc('\n', stderr);
         }
 
         rc = placer_db_exec(db, sql, placer_callback_generic, &state);
@@ -101,8 +101,8 @@ static int clean(sqlite3 * db)
         }
 
         if (Verbose) {
-            fputs(sql, stdout);
-            fputc('\n', stdout);
+            fputs(sql, stderr);
+            fputc('\n', stderr);
         }
 
         rc = placer_db_exec(db, sql, placer_callback_generic, &state);
@@ -125,8 +125,8 @@ static int clean(sqlite3 * db)
         }
 
         if (Verbose) {
-            fputs(sql, stdout);
-            fputc('\n', stdout);
+            fputs(sql, stderr);
+            fputc('\n', stderr);
         }
 
         rc = placer_db_exec(db, sql, placer_callback_generic, &state);
@@ -174,8 +174,8 @@ static int mark(sqlite3 * db)
         }
 
         if (Verbose) {
-            fputs(sql, stdout);
-            fputc('\n', stdout);
+            fputs(sql, stderr);
+            fputc('\n', stderr);
         }
 
         rc = placer_db_exec(db, sql, placer_callback_generic, &state);
@@ -198,8 +198,8 @@ static int mark(sqlite3 * db)
         }
 
         if (Verbose) {
-            fputs(sql, stdout);
-            fputc('\n', stdout);
+            fputs(sql, stderr);
+            fputc('\n', stderr);
         }
 
         rc = placer_db_exec(db, sql, placer_callback_generic, &state);
@@ -222,8 +222,8 @@ static int mark(sqlite3 * db)
         }
 
         if (Verbose) {
-            fputs(sql, stdout);
-            fputc('\n', stdout);
+            fputs(sql, stderr);
+            fputc('\n', stderr);
         }
 
         rc = placer_db_exec(db, sql, placer_callback_generic, &state);
@@ -246,8 +246,8 @@ static int mark(sqlite3 * db)
         }
 
         if (Verbose) {
-            fputs(sql, stdout);
-            fputc('\n', stdout);
+            fputs(sql, stderr);
+            fputc('\n', stderr);
         }
 
         rc = placer_db_exec(db, sql, placer_callback_generic, &state);
@@ -270,8 +270,8 @@ static int mark(sqlite3 * db)
         }
 
         if (Verbose) {
-            fputs(sql, stdout);
-            fputc('\n', stdout);
+            fputs(sql, stderr);
+            fputc('\n', stderr);
         }
 
         rc = placer_db_exec(db, sql, placer_callback_generic, &state);
@@ -294,8 +294,8 @@ static int mark(sqlite3 * db)
         }
 
         if (Verbose) {
-            fputs(sql, stdout);
-            fputc('\n', stdout);
+            fputs(sql, stderr);
+            fputc('\n', stderr);
         }
 
         rc = placer_db_exec(db, sql, placer_callback_generic, &state);
@@ -372,8 +372,8 @@ static int identify(void * vp, const char * name, const char * path, size_t dept
         }
 
         if (Verbose) {
-            fputs(sql, stdout);
-            fputc('\n', stdout);
+            fputs(sql, stderr);
+            fputc('\n', stderr);
         }
 
         rc = placer_db_exec(db, sql, identifier, (char *)path);
@@ -427,8 +427,8 @@ static int enumerate(void * vp, const char * name, const char * path, size_t dep
         }
 
         if (Verbose) {
-            fputs(sql, stdout);
-            fputc('\n', stdout);
+            fputs(sql, stderr);
+            fputc('\n', stderr);
         }
 
         state.count = 0;
@@ -490,8 +490,8 @@ static int extract(sqlite3 * db, diminuto_fs_type_t type)
         }
 
         if (Verbose) {
-            fputs(sql, stdout);
-            fputc('\n', stdout);
+            fputs(sql, stderr);
+            fputc('\n', stderr);
         }
 
         rc = placer_db_exec(db, sql, placer_callback_generic, &state);
@@ -560,8 +560,8 @@ static int replace(void * vp, const char * name, const char * path, size_t depth
         }
 
         if (Verbose) {
-            fputs(sql, stdout);
-            fputc('\n', stdout);
+            fputs(sql, stderr);
+            fputc('\n', stderr);
         }
 
         rc = placer_db_exec(db, sql, placer_callback_generic, &state);
@@ -631,8 +631,8 @@ static int insert(void * vp, const char * name, const char * path, size_t depth,
         }
 
         if (Verbose) {
-            fputs(sql, stdout);
-            fputc('\n', stdout);
+            fputs(sql, stderr);
+            fputc('\n', stderr);
         }
 
         rc = placer_db_exec(db, sql, placer_callback_generic, &state);
@@ -675,8 +675,8 @@ static int show(sqlite3 * db)
         }
 
         if (Verbose) {
-            fputs(sql, stdout);
-            fputc('\n', stdout);
+            fputs(sql, stderr);
+            fputc('\n', stderr);
         }
 
         rc = placer_db_exec(db, sql, placer_callback_generic, &state);
@@ -686,7 +686,7 @@ static int show(sqlite3 * db)
             break;
         }
 
-        printf("count=%zu\n", state.count);
+        fprintf(stderr, "count=%zu\n", state.count);
 
     } while (0);
 

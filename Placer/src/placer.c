@@ -62,6 +62,7 @@ void placer_error(int error)
 
 int placer_callback_generic(void * vp, int ncols, char ** value, char ** keyword)
 {
+    static const char SEPERATOR = '|';
     placer_callback_generic_t * pp = (placer_callback_generic_t *)0;
     int ii = 0;
 
@@ -76,8 +77,20 @@ int placer_callback_generic(void * vp, int ncols, char ** value, char ** keyword
         } else if (ncols <= 0) {
             /* Do nothing. */
         } else {
+            if (pp->count == 1) {
+                for (ii = 0; ii < ncols; ++ii) {
+                    if (ii > 0) {
+                        fputc(SEPERATOR, pp->fp);
+                    }
+                    fputs(keyword[ii], pp->fp);
+                }
+                fputc('\n', pp->fp);
+            }
             for (ii = 0; ii < ncols; ++ii) {
-                fprintf(pp->fp, "%s=\"%s\" ", keyword[ii], value[ii]);
+                if (ii > 0) {
+                    fputc(SEPERATOR, pp->fp);
+                }
+                fputs(value[ii], pp->fp);
             }
             fputc('\n', pp->fp);
         }
