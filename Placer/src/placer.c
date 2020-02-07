@@ -94,24 +94,32 @@ int placer_callback_generic(void * vp, int ncols, char ** value, char ** keyword
 size_t placer_str_expand(char * to, const char * from, size_t size) {
     size_t length = 0;
 
+    if (Debug != (FILE *)0) {
+        fprintf(Debug, "%s@%d: size=%zu\n", __FILE__, __LINE__, size);
+    }
+
     while ((size > 1) && (*from != '\0')) {
         if (*from != '\'') {
             *(to++) = *(from++);
+            size -= 1;
+            length += 1;
         } else if (size > 2) {
             *(to++) = *from;
             *(to++) = *(from++);
-            --size;
-            ++length;
+            size -= 2;
+            length += 2;
         } else {
             break;
         }
-        --size;
-        ++length;
     }
 
     if (size > 0) {
         *to = '\0';
-        ++length;
+        length += 1;
+    }
+
+    if (Debug != (FILE *)0) {
+        fprintf(Debug, "%s@%d: length=%zu\n", __FILE__, __LINE__, length);
     }
 
     return length;
@@ -128,6 +136,10 @@ char * placer_str_expanda(const char * from)
         if (*ff == '\'') {
             ++count;
         }
+    }
+
+    if (Debug != (FILE *)0) {
+        fprintf(Debug, "%s@%d: count=%zu\n", __FILE__, __LINE__, count);
     }
 
     size = strlen(from) + count + 1;

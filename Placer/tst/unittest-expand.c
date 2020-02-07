@@ -16,7 +16,11 @@
 
 int main(void)
 {
+    FILE * debug;
+
     SETLOGMASK();
+
+    debug = placer_debug(stderr);
 
     {
         size_t result;
@@ -99,6 +103,7 @@ int main(void)
         free(to);
     }
 
+    (void)placer_debug(debug);
 
     EXIT();
 }
