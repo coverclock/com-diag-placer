@@ -128,7 +128,7 @@ Apress, 2010
 
 Jay A. Kreibich, *Using SQLite*, O'Reilly, 2010
 
-Anthony Molinaro, *SQL Cookbook*, O/Reilly, 2006
+Anthony Molinaro, *SQL Cookbook*, O'Reilly, 2006
 
 # Links
 
