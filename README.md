@@ -135,3 +135,5 @@ Anthony Molinaro, *SQL Cookbook*, O'Reilly, 2006
 SQLite Documentation, <https://www.sqlite.org/docs.html>
 
 SQLite Tutorial, <https://www.sqlitetutorial.net>
+
+X Macro, <https://en.wikipedia.org/wiki/X_Macro>
