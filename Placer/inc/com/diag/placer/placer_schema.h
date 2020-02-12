@@ -19,51 +19,7 @@
  *
  ******************************************************************************/
 
-#if defined(BLOB)
-#undef BLOB
-#endif
-
-#if defined(FLOAT)
-#undef FLOAT
-#endif
-
-#if defined(INTEGER)
-#undef INTEGER
-#endif
-
-#if defined(INTEGER64)
-#undef INTEGER64
-#endif
-
-#if defined(TEXT)
-#undef TEXT
-#endif
-
-#if defined(TEXT16)
-#undef TEXT16
-#endif
-
-/*******************************************************************************
- *
- ******************************************************************************/
-
-#define BLOB        "BLOB"
-
-#define FLOAT       "FLOAT"
-
-#define INTEGER     "INTEGER"
-
-#define INTEGER64   "INTEGER"
-
-#define TEXT        "TEXT"
-
-#define TEXT16      "TEXT"
-
-/*******************************************************************************
- *
- ******************************************************************************/
-
-typedef void * placer_schema_BLOB_t;
+typedef uint8_t placer_schema_BLOB_t;
 
 typedef double placer_schema_FLOAT_t;
 
@@ -71,25 +27,25 @@ typedef int32_t placer_schema_INTEGER_t;
 
 typedef int64_t placer_schema_INTEGER64_t;
 
-typedef char * placer_schema_TEXT_t;
+typedef char placer_schema_TEXT_t;
 
-typedef wchar_t * placer_schema_TEXT16_t;
+typedef wchar_t placer_schema_TEXT16_t;
 
 /*******************************************************************************
  *
  ******************************************************************************/
 
-extern void placer_schema_BLOB_import(placer_schema_BLOB_t * dest, char * src);
+extern int placer_schema_BLOB_import(placer_schema_BLOB_t * dest, size_t items, const char * src);
 
-extern void placer_schema_FLOAT_import(placer_schema_FLOAT_t * dest, char * src);
+extern int placer_schema_FLOAT_import(placer_schema_FLOAT_t * dest, const char * src);
 
-extern void placer_schema_INTEGER_import(placer_schema_INTEGER_t * dest, char * src);
+extern int placer_schema_INTEGER_import(placer_schema_INTEGER_t * dest, const char * src);
 
-extern void placer_schema_INTEGER64_import(placer_schema_INTEGER64_t * dest, char * src);
+extern int placer_schema_INTEGER64_import(placer_schema_INTEGER64_t * dest, const char * src);
 
-extern void placer_schema_TEXT_import(placer_schema_TEXT_t * dest, char * src);
+extern int placer_schema_TEXT_import(placer_schema_TEXT_t * dest, size_t items, const char * src);
 
-extern void placer_schema_TEXT16_import(placer_schema_TEXT16_t * dest, char * src);
+extern int placer_schema_TEXT16_import(placer_schema_TEXT16_t * dest, size_t items, const char * src);
 
 /*******************************************************************************
  *

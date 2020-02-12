@@ -130,10 +130,12 @@ Jay A. Kreibich, *Using SQLite*, O'Reilly, 2010
 
 Anthony Molinaro, *SQL Cookbook*, O'Reilly, 2006
 
-# Links
+# Documentation
 
 SQLite Documentation, <https://www.sqlite.org/docs.html>
 
 SQLite Tutorial, <https://www.sqlitetutorial.net>
+
+sqlite3.h Comments, <https://www.sqlite.org/cgi/src/artifact/572ea78b08ee9052>
 
 X Macro, <https://en.wikipedia.org/wiki/X_Macro>
