@@ -32,8 +32,8 @@ int main(void)
 
         COMMENT("sizeof(struct UnitTestSchema)=%zu\n", sizeof(struct UnitTestSchema));
         COMMENT("sizeof(record)=%zu\n", sizeof(record));
-        EXPECT(sizeof(struct UnitTestSchema) == 40);
-        EXPECT(sizeof(record) == 40);
+        EXPECT(sizeof(struct UnitTestSchema) == 4392);
+        EXPECT(sizeof(record) == 4392);
         EXPECT(record.id == (int32_t)0);
         EXPECT(record.name[0] == L'\0');
         EXPECT(record.age == (double)0.0);
@@ -43,10 +43,10 @@ int main(void)
     }
 
     {
+        const char CREATE[] = "CREATE TABLE UnitTestSchema (id INTEGER PRIMARY KEY, name TEXT , age FLOAT , image BLOB , sn INTEGER , ssn TEXT  );";
         const char * create =
 #include "com/diag/placer/placer_schema_create.h"
 #include "unittest-schema.h"
-        const char CREATE[] = "CREATE TABLE UnitTestSchema (id INTEGER PRIMARY KEY, name TEXT , age FLOAT , image BLOB , sn INTEGER , ssn TEXT , );";
 
         COMMENT("create=\"%s\"\n", create);
         EXPECT(strcmp(create, CREATE) == 0);

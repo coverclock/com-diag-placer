@@ -16,22 +16,22 @@
     {
 
 #define PLACER_BLOB(_NAME_, _ITEMS_) \
-    { (placer_schema_BLOB_t)0, },
+    { (placer_schema_BLOB_t)0, }
 
 #define PLACER_FLOAT(_NAME_) \
-    (placer_schema_FLOAT_t)0,
+    (placer_schema_FLOAT_t)0
 
 #define PLACER_INTEGER(_NAME_) \
-    (placer_schema_INTEGER_t)0,
+    (placer_schema_INTEGER_t)0
 
 #define PLACER_INTEGER64(_NAME_) \
-    (placer_schema_INTEGER64_t)0,
+    (placer_schema_INTEGER64_t)0
 
 #define PLACER_TEXT(_NAME_, _ITEMS_) \
-    { (placer_schema_TEXT_t)0, },
+    { (placer_schema_TEXT_t)0, }
 
 #define PLACER_TEXT16(_NAME_, _ITEMS_) \
-    { (placer_schema_TEXT16_t)0, },
+    { (placer_schema_TEXT16_t)0, }
 
 #define PLACER_FIELD(_CONSTRAINTS_) \
     ,

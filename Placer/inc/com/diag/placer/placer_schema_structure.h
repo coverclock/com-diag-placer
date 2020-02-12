@@ -12,30 +12,30 @@
 
 #include "placer_schema_undef.h"
 
-#define COM_DIAG_PLACER_SCHEMA_BEGIN(_STRUCTURE_) \
+#define PLACER_BEGIN(_STRUCTURE_) \
     struct _STRUCTURE_ {
 
-#define COM_DIAG_PLACER_SCHEMA_BLOB(_NAME_, _ITEMS_, _CONSTRAINTS_) \
+#define PLACER_BLOB(_NAME_, _ITEMS_) \
 	placer_schema_BLOB_t _NAME_ [ _ITEMS_ ];
 
-#define COM_DIAG_PLACER_SCHEMA_FLOAT(_NAME_, _CONSTRAINTS_) \
+#define PLACER_FLOAT(_NAME_) \
 	placer_schema_FLOAT_t _NAME_;
 
-#define COM_DIAG_PLACER_SCHEMA_INTEGER(_NAME_, _CONSTRAINTS_) \
+#define PLACER_INTEGER(_NAME_) \
 	placer_schema_INTEGER_t _NAME_;
 
-#define COM_DIAG_PLACER_SCHEMA_INTEGER64(_NAME_, _CONSTRAINTS_) \
+#define PLACER_INTEGER64(_NAME_) \
 	placer_schema_INTEGER64_t _NAME_;
 
-#define COM_DIAG_PLACER_SCHEMA_TEXT(_NAME_, _ITEMS_, _CONSTRAINTS_) \
+#define PLACER_TEXT(_NAME_, _ITEMS_) \
 	placer_schema_TEXT_t _NAME_ [ _ITEMS_ ];
 
-#define COM_DIAG_PLACER_SCHEMA_TEXT16(_NAME_, _ITEMS_, _CONSTRAINTS_) \
+#define PLACER_TEXT16(_NAME_, _ITEMS_) \
 	placer_schema_TEXT16_t _NAME_ [ _ITEMS_ ];
 
 #define PLACER_FIELD(_CONSTRAINTS_)
 
 #define PLACER_FINAL(_CONSTRAINTS_)
 
-#define COM_DIAG_PLACER_SCHEMA_END(_CONSTRAINTS_) \
+#define PLACER_END(_CONSTRAINTS_) \
     };
