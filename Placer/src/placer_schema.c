@@ -19,16 +19,16 @@
  *
  ******************************************************************************/
 
-int placer_schema_BLOB_import(placer_schema_BLOB_t * dest, size_t items, const char * src)
+int placer_BLOB_import(placer_BLOB_t * dest, size_t items, const char * src)
 {
     int rc = SQLITE_OK;
 
-    (void)memcpy(dest, (placer_schema_BLOB_t *)src, items);
+    (void)memcpy(dest, (placer_BLOB_t *)src, items);
 
     return rc;
 }
 
-int placer_schema_FLOAT_import(placer_schema_FLOAT_t * dest, const char * src)
+int placer_FLOAT_import(placer_FLOAT_t * dest, const char * src)
 {
     int rc = SQLITE_ERROR;
     char * end = (char *)0;
@@ -41,7 +41,7 @@ int placer_schema_FLOAT_import(placer_schema_FLOAT_t * dest, const char * src)
     return rc;
 }
 
-int placer_schema_INTEGER_import(placer_schema_INTEGER_t * dest, const char * src)
+int placer_INTEGER_import(placer_INTEGER_t * dest, const char * src)
 {
     int rc = SQLITE_ERROR;
     char * end = (char *)0;
@@ -54,7 +54,7 @@ int placer_schema_INTEGER_import(placer_schema_INTEGER_t * dest, const char * sr
     return rc;
 }
 
-int placer_schema_INTEGER64_import(placer_schema_INTEGER64_t * dest, const char * src)
+int placer_INTEGER64_import(placer_INTEGER64_t * dest, const char * src)
 {
     int rc = SQLITE_ERROR;
     char * end = (char *)0;
@@ -67,11 +67,11 @@ int placer_schema_INTEGER64_import(placer_schema_INTEGER64_t * dest, const char 
     return rc;
 }
 
-int placer_schema_TEXT_import(placer_schema_TEXT_t * dest, size_t items, const char * src)
+int placer_TEXT_import(placer_TEXT_t * dest, size_t items, const char * src)
 {
     int rc = SQLITE_ERROR;
 
-    (void)strncpy(dest, (placer_schema_TEXT_t *)src, items);
+    (void)strncpy(dest, (placer_TEXT_t *)src, items);
     if (dest[items - 1] == '\0') {
         rc = SQLITE_OK;
     } else {
@@ -81,11 +81,11 @@ int placer_schema_TEXT_import(placer_schema_TEXT_t * dest, size_t items, const c
     return rc;
 }
 
-int placer_schema_TEXT16_import(placer_schema_TEXT16_t * dest, size_t items, const char * src)
+int placer_TEXT16_import(placer_TEXT16_t * dest, size_t items, const char * src)
 {
     int rc = SQLITE_ERROR;
 
-    (void)wcsncpy(dest, (placer_schema_TEXT16_t *)src, items);
+    (void)wcsncpy(dest, (placer_TEXT16_t *)src, items);
     if (dest[items - 1] == L'\0') {
         rc = SQLITE_OK;
     } else {

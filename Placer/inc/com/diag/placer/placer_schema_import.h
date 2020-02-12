@@ -13,37 +13,37 @@
 #include "placer_schema_undef.h"
 
 #define PLACER_BEGIN(_STRUCTURE_) \
-struct _STRUCTURE_ * com_placer_##_STRUCTURE_##_import(struct _STRUCTURE_ * pp, int nn, char ** vv, char ** kk) { \
+struct _STRUCTURE_ * placer_struct_##_STRUCTURE_##_import(struct _STRUCTURE_ * pp, int nn, char ** vv, char ** kk) { \
     int ii = 0; \
 
 #define PLACER_BLOB(_NAME_, _ITEMS_) \
     if (ii < nn) { \
-        placer_schema_BLOB_import(pp->_NAME_, _ITEMS_, vv[ii++]); \
+        placer_BLOB_import(pp->_NAME_, _ITEMS_, vv[ii++]); \
     } \
 
 #define PLACER_FLOAT(_NAME_) \
     if (ii < nn) { \
-        placer_schema_FLOAT_import(&(pp->_NAME_), vv[ii++]); \
+        placer_FLOAT_import(&(pp->_NAME_), vv[ii++]); \
     } \
 
 #define PLACER_INTEGER(_NAME_) \
     if (ii < nn) { \
-        placer_schema_INTEGER_import(&(pp->_NAME_), vv[ii++]); \
+        placer_INTEGER_import(&(pp->_NAME_), vv[ii++]); \
     } \
 
 #define PLACER_INTEGER64(_NAME_) \
     if (ii < nn) { \
-        placer_schema_INTEGER64_import(&(pp->_NAME_), vv[ii++]); \
+        placer_INTEGER64_import(&(pp->_NAME_), vv[ii++]); \
     } \
 
 #define PLACER_TEXT(_NAME_, _ITEMS_) \
     if (ii < nn) { \
-        placer_schema_TEXT_import(pp->_NAME_, _ITEMS_, vv[ii++]); \
+        placer_TEXT_import(pp->_NAME_, _ITEMS_, vv[ii++]); \
     } \
 
 #define PLACER_TEXT16(_NAME_, _ITEMS_) \
     if (ii < nn) { \
-        placer_schema_TEXT16_import(pp->_NAME_, _ITEMS_, vv[ii++]); \
+        placer_TEXT16_import(pp->_NAME_, _ITEMS_, vv[ii++]); \
     } \
 
 #define PLACER_FIELD(_CONSTRAINTS_)
