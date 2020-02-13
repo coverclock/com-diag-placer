@@ -7,6 +7,7 @@
  * Licensed under the terms in README.h<BR>
  * Chip Overclock (coverclock@diag.com)<BR>
  * https://github.com/coverclock/com-diag-placer<BR>
+ * This header file undefines the X macros for a schema.
  * N.B. THIS HEADER FILE CAN BE INCLUDED MORE THAN ONCE.
  */
 
