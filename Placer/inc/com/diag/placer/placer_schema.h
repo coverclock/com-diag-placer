@@ -27,7 +27,7 @@ typedef int32_t placer_INTEGER_t;
 
 typedef int64_t placer_INTEGER64_t;
 
-typedef char placer_TEXT_t;
+typedef unsigned char placer_TEXT_t;
 
 typedef wchar_t placer_TEXT16_t;
 

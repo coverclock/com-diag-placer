@@ -10,8 +10,8 @@
  * N.B. THIS HEADER FILE CAN BE INCLUDED MORE THAN ONCE.
  */
 
-#if defined(PLACER_BEGIN)
-#undef PLACER_BEGIN
+#if defined(PLACER_SCHEMA)
+#undef PLACER_SCHEMA
 #endif
 
 #if defined(PLACER_BLOB)

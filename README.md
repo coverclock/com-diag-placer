@@ -1,6 +1,6 @@
 # com-diag-placer
 
-Musings with SQLite (WORK IN PROGRESS).
+Musings with SQLite and X Macros (WORK IN PROGRESS).
 
 # Copyright
 
@@ -23,7 +23,9 @@ Wheat Ridge CO 80033 USA
 
 Placer is a small collection of helper and convenience functions to assist
 in the use of SQLite in the C programming language.  It is also my excuse
-to re-learn SQLite after having been away from it for a few years.
+to re-learn SQLite after having been away from it for a few years. It has
+also given me the opportunity to revisit X Macros which I've used in
+C and C++ based projects in the past.
 
 SQLite is a server-less relational database system that is featured in
 Android and Apple phones and tablets, Windows 10 (so it is rumored),
@@ -139,3 +141,7 @@ SQLite Tutorial, <https://www.sqlitetutorial.net>
 sqlite3.h Comments, <https://www.sqlite.org/cgi/src/artifact/572ea78b08ee9052>
 
 X Macro, <https://en.wikipedia.org/wiki/X_Macro>
+
+# Soundtrack
+
+<https://www.youtube.com/playlist?list=PLd7Yo1333iA8enrRacXyINR3oUbKBWDSH>

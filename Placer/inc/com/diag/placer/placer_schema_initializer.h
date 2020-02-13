@@ -12,7 +12,7 @@
 
 #include "placer_schema_undef.h"
 
-#define PLACER_BEGIN(_STRUCTURE_) \
+#define PLACER_SCHEMA(_STRUCTURE_) \
     {
 
 #define PLACER_BLOB(_NAME_, _ITEMS_) \
@@ -36,7 +36,8 @@
 #define PLACER_FIELD(_CONSTRAINTS_) \
     ,
 
-#define PLACER_FINAL(_CONSTRAINTS_)
+#define PLACER_FINAL(_CONSTRAINTS_) \
+    ,
 
 #define PLACER_END(_CONSTRAINTS_) \
     };
