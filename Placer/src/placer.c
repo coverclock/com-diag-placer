@@ -367,6 +367,8 @@ int placer_FLOAT_import(placer_FLOAT_t * dest, const char * src)
     *dest = strtod(src, &end);
     if ((end != (char *)0) && (*end == '\0')) {
         rc = SQLITE_OK;
+    } else {
+        placer_error(rc);
     }
 
     return rc;
@@ -380,6 +382,8 @@ int placer_INTEGER_import(placer_INTEGER_t * dest, const char * src)
     *dest = strtol(src, &end, 10);
     if ((end != (char *)0) && (*end == '\0')) {
         rc = SQLITE_OK;
+    } else {
+        placer_error(rc);
     }
 
     return rc;
@@ -393,6 +397,8 @@ int placer_INTEGER64_import(placer_INTEGER64_t * dest, const char * src)
     *dest = strtoll(src, &end, 10);
     if ((end != (char *)0) && (*end == '\0')) {
         rc = SQLITE_OK;
+    } else {
+        placer_error(rc);
     }
 
     return rc;
@@ -407,6 +413,7 @@ int placer_TEXT_import(placer_TEXT_t * dest, size_t items, const char * src)
         rc = SQLITE_OK;
     } else {
         dest[items - 1] = '\0';
+        placer_error(rc);
     }
 
     return rc;
@@ -421,6 +428,7 @@ int placer_TEXT16_import(placer_TEXT16_t * dest, size_t items, const char * src)
         rc = SQLITE_OK;
     } else {
         dest[items - 1] = L'\0';
+        placer_error(rc);
     }
 
     return rc;

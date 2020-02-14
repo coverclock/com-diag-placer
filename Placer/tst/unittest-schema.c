@@ -272,6 +272,7 @@ int main(void)
         sqlite3 * db = (sqlite3 *)0;
         sqlite3_stmt * stmt = (sqlite3_stmt *)0;;
         int rc = 0;
+        int ii = 0;
         FILE * debug = (FILE *)0;
         TEST();
         debug = placer_debug(stderr);
@@ -285,6 +286,16 @@ int main(void)
         stmt = placer_db_prepare(db, CREATE);
         ASSERT(stmt != (sqlite3_stmt *)0);
         rc = placer_db_steps(stmt, (placer_step_t *)0, (void *)0);
+        ASSERT(rc == SQLITE_OK);
+        for (ii = 0; ii < countof(data); ++ii) {
+            COMMENT("insert");
+            stmt = placer_db_prepare(db, INSERT);
+            ASSERT(stmt != (sqlite3_stmt *)0);
+            rc = placer_struct_UnitTestSchema_bind(stmt, &data[ii]);
+            ASSERT(rc == SQLITE_OK);
+            rc = placer_db_steps(stmt, (placer_step_t *)0, (void *)0);
+            ASSERT(rc == SQLITE_OK);
+        }
         COMMENT("close");
         rc = sqlite3_close(db);
         ASSERT(rc == SQLITE_OK);

@@ -9,6 +9,7 @@
  * https://github.com/coverclock/com-diag-placer<BR>
  * These X macros generate a step function for a schema.
  * N.B. THIS HEADER FILE CAN BE INCLUDED MORE THAN ONCE.
+ * Note that the column index is ZERO based.
  */
 
 #include <string.h>
@@ -37,7 +38,7 @@ int placer_struct_##_STRUCTURE_##_step(sqlite3_stmt * sp, void * vp) { \
         { \
             if (ii >= nn) { break; } \
             tt = sqlite3_column_type(sp, ii); \
-            if (tt != SQLITE_BLOB) { break; } \
+            if (tt != SQLITE_BLOB) {  break; } \
             name = sqlite3_column_name(sp, ii); \
             if (strcmp(name, #_NAME_) != 0) { break; } \
             memcpy(pp->_NAME_, sqlite3_column_blob(sp, ii), _ITEMS_); \
@@ -109,5 +110,8 @@ int placer_struct_##_STRUCTURE_##_step(sqlite3_stmt * sp, void * vp) { \
         (*ip) += 1; \
         rc = SQLITE_OK; \
     } while (0); \
+    if (rc != SQLITE_OK) { \
+        placer_error(rc); \
+    } \
     return rc; \
 }
