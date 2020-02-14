@@ -108,7 +108,7 @@ int main(void)
         ASSERT(to != (char *)0);
         COMMENT("from=\"%s\" to=\"%s\"\n", from, to);
         EXPECT(strncmp(to, "''''AA''''BB''''CC''''", sizeof(to)) == 0);
-        free(to);
+        sqlite3_free(to);
         STATUS();
     }
     {
@@ -119,7 +119,7 @@ int main(void)
         ASSERT(to != (char *)0);
         COMMENT("from=\"%s\" to=\"%s\"\n", from, to);
         EXPECT(strncmp(to, "''''''''''''''''", sizeof(to)) == 0);
-        free(to);
+        sqlite3_free(to);
         STATUS();
     }
 

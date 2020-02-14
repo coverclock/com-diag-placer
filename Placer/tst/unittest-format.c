@@ -35,7 +35,7 @@ int main(void)
         pp = placer_sql_formata(1, "SELECT * FROM %s;", "table");
         ASSERT(pp != (char *)0);
         EXPECT(strcmp("SELECT * FROM table;", pp) == 0);;
-        free(pp);
+        sqlite3_free(pp);
         STATUS();
     }
     {
@@ -44,7 +44,7 @@ int main(void)
         pp = placer_sql_formata(2, "SELECT * FROM %s;", "table");
         ASSERT(pp != (char *)0);
         EXPECT(strcmp("SELECT * FROM table;", pp) == 0);;
-        free(pp);
+        sqlite3_free(pp);
         STATUS();
     }
     {
@@ -53,7 +53,7 @@ int main(void)
         pp = placer_sql_formata(512, "SELECT * FROM %s;", "table");
         ASSERT(pp != (char *)0);
         EXPECT(strcmp("SELECT * FROM table;", pp) == 0);;
-        free(pp);
+        sqlite3_free(pp);
         STATUS();
     }
 

@@ -33,6 +33,30 @@ extern FILE * placer_debug(FILE * now);
  *
  ******************************************************************************/
 
+typedef uint8_t placer_BLOB_t;
+
+typedef double placer_FLOAT_t;
+
+typedef int32_t placer_INTEGER_t;
+
+typedef int64_t placer_INTEGER64_t;
+
+typedef unsigned char placer_TEXT_t;
+
+typedef wchar_t placer_TEXT16_t;
+
+/*******************************************************************************
+ *
+ ******************************************************************************/
+
+typedef int (placer_callback_t)(void * vp, int ncols, char ** value, char ** keyword);
+
+typedef void (placer_free_t)(void * vp);
+
+/*******************************************************************************
+ *
+ ******************************************************************************/
+
 /**
  * Emit the SQLite error message to standard error if it is
  * non-NULL and then free it.
@@ -90,7 +114,7 @@ extern size_t placer_str_expand(char * to, const char * from, size_t size);
  * Copy characters from one buffer to a dynamically allocated buffer changing
  * each single quote into two single quotes. The dynamically allocated buffer
  * is guaranteed to be NUL terminated. The dynamically allocated buffer must
- * be freed using free(3).
+ * be freed using sqlite3_free().
  * @param  from points to the source buffer.
  * @return the dynamically acquired buffer or NULL if failure.
  */
@@ -104,7 +128,7 @@ extern char * placer_str_expanda(const char * from);
  * Format arguments in an vsnprintf(3) manner into a dynamically acquired
  * buffer, enarging the buffer to guarantee that the results fit. Initially
  * allocate the buffer to the specified size. The dynamically allocated
- * buffer must be freed using free(3).
+ * buffer must be freed using sqlite3_free().
  * @param size is the initial allocation size of the buffer in bytes.
  * @param format is the snprintf(3) format string.
  * @param op is the variable length argument list.
@@ -116,7 +140,7 @@ extern char * placer_sql_vformata(size_t size, const char * format, va_list op);
  * Format arguments in an snprintf(3) manner into a dynamically acquired
  * buffer, enarging the buffer to guarantee that the results fit. Initially
  * allocate the buffer to the specified size. The dynamically allocated
- * buffer must be freed using free(3).
+ * buffer must be freed using sqlite3_free().
  * @param size is the initial allocation size of the buffer in bytes.
  * @param format is the snprintf(3) format string.
  * @return the dynamically acquired buffer or NULL if failure.
@@ -137,30 +161,6 @@ extern char * placer_sql_formata(size_t size, const char * format, ...);
  * @return the SQLite3 return code.
  */
 extern int placer_db_exec(sqlite3 * db, const char * sql, int (*cp)(void *, int, char **, char **), void * vp);
-
-/*******************************************************************************
- *
- ******************************************************************************/
-
-typedef uint8_t placer_BLOB_t;
-
-typedef double placer_FLOAT_t;
-
-typedef int32_t placer_INTEGER_t;
-
-typedef int64_t placer_INTEGER64_t;
-
-typedef unsigned char placer_TEXT_t;
-
-typedef wchar_t placer_TEXT16_t;
-
-/*******************************************************************************
- *
- ******************************************************************************/
-
-typedef int (placer_callback_t)(void * vp, int ncols, char ** value, char ** keyword);
-
-typedef void (placer_free_t)(void * vp);
 
 /*******************************************************************************
  *

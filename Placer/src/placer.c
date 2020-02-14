@@ -157,8 +157,10 @@ char * placer_str_expanda(const char * from)
     }
 
     size = strlen(from) + count + 1;
-    to = malloc(size);
-    if (to != (char *)0) {
+    to = (char *)sqlite3_malloc(size);
+    if (to == (char *)0) {
+        perror("sqlite3_malloc");
+    } else  {
         placer_str_expand(to, from, size);
     }
 
@@ -195,9 +197,9 @@ char * placer_sql_vformata(size_t size, const char * format, va_list op)
                 fprintf(Debug, "%s@%d: size=%zu ss=%zu f0=%zu f1=%zu f2=%zu\n", __FILE__, __LINE__, size, ss, f0, f1, f2);
             }
 
-            buffer = malloc(ss);
+            buffer = (char *)sqlite3_malloc(ss);
             if (buffer == (char *)0) {
-                perror("malloc");
+                perror("sqlite3_malloc");
                 break;
             }
 
@@ -208,7 +210,7 @@ char * placer_sql_vformata(size_t size, const char * format, va_list op)
                 break; 
             }
 
-            free(buffer);
+            sqlite3_free(buffer);
             buffer = (char *)0;
 
             /*
@@ -257,9 +259,9 @@ char * placer_sql_formata(size_t size, const char * format, ...)
  *
  ******************************************************************************/
 
-int placer_db_exec(sqlite3 * db, const char * sql, int (*cp)(void *, int, char **, char **), void * vp)
+int placer_db_exec(sqlite3 * db, const char * sql, placer_callback_t * cp, void * vp)
 {
-    int rc = 0;
+    int rc = SQLITE_ERROR;
     char * sqlmessage = (char *)0;
 
     rc = sqlite3_exec(db, sql, cp, vp, &sqlmessage);
@@ -267,6 +269,55 @@ int placer_db_exec(sqlite3 * db, const char * sql, int (*cp)(void *, int, char *
         placer_message(sqlmessage);
         placer_error(rc);
     }
+
+    return rc;
+}
+
+sqlite3_stmt * placer_db_prepare(sqlite3 * db, const char * sql)
+{
+    sqlite3_stmt * sp = (sqlite3_stmt *)0;
+    int rc = SQLITE_ERROR;
+
+    rc = sqlite3_prepare_v2(db, sql, -1, &sp, (const char **)0);
+    if (rc != SQLITE_OK) {
+        placer_error(rc);
+        if (sp != (sqlite3_stmt *)0) {
+            rc = sqlite3_finalize(sp);
+            if (rc != SQLITE_OK) {
+                placer_error(rc);
+            }
+            sp = (sqlite3_stmt *)0;
+        }
+    }
+
+    return sp;
+}
+
+int placer_db_steps(sqlite3_stmt * sp, placer_callback_t * cp, void * vp)
+{
+    int rc = SQLITE_ERROR;
+
+    while (!0) {
+
+        rc = sqlite3_step(sp);
+
+        if (rc == SQLITE_OK) {
+            rc = SQLITE_ERROR;
+            break;
+        }
+
+        if (rc == SQLITE_DONE) {
+            rc = SQLITE_OK;
+            break;
+        }
+
+        if (rc != SQLITE_ROW) {
+            break;
+        }
+
+        
+
+    } 
 
     return rc;
 }

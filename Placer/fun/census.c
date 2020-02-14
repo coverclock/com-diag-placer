@@ -82,7 +82,7 @@ static int clean(sqlite3 * db)
         }
 
         rc = placer_db_exec(db, sql, placer_callback_generic, &state);
-        free(sql);
+        sqlite3_free(sql);
         if (rc != SQLITE_OK) {
             xc = -13;
             break;
@@ -106,7 +106,7 @@ static int clean(sqlite3 * db)
         }
 
         rc = placer_db_exec(db, sql, placer_callback_generic, &state);
-        free(sql);
+        sqlite3_free(sql);
         if (rc != SQLITE_OK) {
             xc = -13;
             break;
@@ -130,7 +130,7 @@ static int clean(sqlite3 * db)
         }
 
         rc = placer_db_exec(db, sql, placer_callback_generic, &state);
-        free(sql);
+        sqlite3_free(sql);
         if (rc != SQLITE_OK) {
             xc = -13;
             break;
@@ -179,7 +179,7 @@ static int mark(sqlite3 * db)
         }
 
         rc = placer_db_exec(db, sql, placer_callback_generic, &state);
-        free(sql);
+        sqlite3_free(sql);
         if (rc != SQLITE_OK) {
             xc = -13;
             break;
@@ -203,7 +203,7 @@ static int mark(sqlite3 * db)
         }
 
         rc = placer_db_exec(db, sql, placer_callback_generic, &state);
-        free(sql);
+        sqlite3_free(sql);
         if (rc != SQLITE_OK) {
             xc = -13;
             break;
@@ -227,7 +227,7 @@ static int mark(sqlite3 * db)
         }
 
         rc = placer_db_exec(db, sql, placer_callback_generic, &state);
-        free(sql);
+        sqlite3_free(sql);
         if (rc != SQLITE_OK) {
             xc = -13;
             break;
@@ -251,7 +251,7 @@ static int mark(sqlite3 * db)
         }
 
         rc = placer_db_exec(db, sql, placer_callback_generic, &state);
-        free(sql);
+        sqlite3_free(sql);
         if (rc != SQLITE_OK) {
             xc = -13;
             break;
@@ -275,7 +275,7 @@ static int mark(sqlite3 * db)
         }
 
         rc = placer_db_exec(db, sql, placer_callback_generic, &state);
-        free(sql);
+        sqlite3_free(sql);
         if (rc != SQLITE_OK) {
             xc = -13;
             break;
@@ -299,7 +299,7 @@ static int mark(sqlite3 * db)
         }
 
         rc = placer_db_exec(db, sql, placer_callback_generic, &state);
-        free(sql);
+        sqlite3_free(sql);
         if (rc != SQLITE_OK) {
             xc = -13;
             break;
@@ -377,7 +377,7 @@ static int identify(void * vp, const char * name, const char * path, size_t dept
         }
 
         rc = placer_db_exec(db, sql, identifier, (char *)path);
-        free(sql);
+        sqlite3_free(sql);
         if (rc != SQLITE_OK) {
             xc = -13;
             break;
@@ -420,7 +420,7 @@ static int enumerate(void * vp, const char * name, const char * path, size_t dep
             "SELECT * FROM census WHERE (path = '%s');"
             , to
         );
-        free(to);
+        sqlite3_free(to);
         if (sql == (char *)0) {
             xc = -12;
             break;
@@ -433,7 +433,7 @@ static int enumerate(void * vp, const char * name, const char * path, size_t dep
 
         state.count = 0;
         rc = placer_db_exec(db, sql, placer_callback_generic, &state);
-        free(sql);
+        sqlite3_free(sql);
         if (rc != SQLITE_OK) {
             xc = -13;
             break;
@@ -483,7 +483,7 @@ static int extract(sqlite3 * db, diminuto_fs_type_t type)
             , to
             , 0777U
         );
-        free(to);
+        sqlite3_free(to);
         if (sql == (char *)0) {
             xc = -20;
             break;
@@ -495,7 +495,7 @@ static int extract(sqlite3 * db, diminuto_fs_type_t type)
         }
 
         rc = placer_db_exec(db, sql, placer_callback_generic, &state);
-        free(sql);
+        sqlite3_free(sql);
         if (rc != SQLITE_OK) {
             xc = -21;
             break;
@@ -552,7 +552,7 @@ static int replace(void * vp, const char * name, const char * path, size_t depth
             , (unsigned long long)((1000000000ULL * statp->st_ctim.tv_sec) + statp->st_ctim.tv_nsec)
             , 1
         );
-        free(to);
+        sqlite3_free(to);
         if (sql == (char *)0) {
             xc = -12;
             break;
@@ -564,7 +564,7 @@ static int replace(void * vp, const char * name, const char * path, size_t depth
         }
 
         rc = placer_db_exec(db, sql, placer_callback_generic, &state);
-        free(sql);
+        sqlite3_free(sql);
         if (rc != SQLITE_OK) {
             xc = -13;
             break;
@@ -622,7 +622,7 @@ static int insert(void * vp, const char * name, const char * path, size_t depth,
             , (unsigned long long)((1000000000ULL * statp->st_ctim.tv_sec) + statp->st_ctim.tv_nsec)
             , 0
         );
-        free(to);
+        sqlite3_free(to);
         if (sql == (char *)0) {
             xc = -12;
             break;
@@ -634,7 +634,7 @@ static int insert(void * vp, const char * name, const char * path, size_t depth,
         }
 
         rc = placer_db_exec(db, sql, placer_callback_generic, &state);
-        free(sql);
+        sqlite3_free(sql);
         if (rc != SQLITE_OK) {
             xc = -13;
             break;
@@ -678,7 +678,7 @@ static int show(sqlite3 * db)
         }
 
         rc = placer_db_exec(db, sql, placer_callback_generic, &state);
-        free(sql);
+        sqlite3_free(sql);
         if (rc != SQLITE_OK) {
             xc = -13;
             break;
