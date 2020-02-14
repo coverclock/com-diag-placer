@@ -24,29 +24,37 @@ int main(void)
 
     {
         char * pp = (char *)0;
+        TEST();
         pp = placer_sql_formata(0, "SELECT * FROM %s;", "table");
         EXPECT(pp == (char *)0);
+        STATUS();
     }
     {
         char * pp = (char *)0;
+        TEST();
         pp = placer_sql_formata(1, "SELECT * FROM %s;", "table");
         ASSERT(pp != (char *)0);
         EXPECT(strcmp("SELECT * FROM table;", pp) == 0);;
         free(pp);
+        STATUS();
     }
     {
         char * pp = (char *)0;
+        TEST();
         pp = placer_sql_formata(2, "SELECT * FROM %s;", "table");
         ASSERT(pp != (char *)0);
         EXPECT(strcmp("SELECT * FROM table;", pp) == 0);;
         free(pp);
+        STATUS();
     }
     {
         char * pp = (char *)0;
+        TEST();
         pp = placer_sql_formata(512, "SELECT * FROM %s;", "table");
         ASSERT(pp != (char *)0);
         EXPECT(strcmp("SELECT * FROM table;", pp) == 0);;
         free(pp);
+        STATUS();
     }
 
     (void)placer_debug(debug);

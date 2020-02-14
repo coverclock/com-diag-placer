@@ -29,6 +29,7 @@ int main(void)
     SETLOGMASK();
 
     {
+        TEST();
         ERRORTEST(SQLITE_OK);
         ERRORTEST(SQLITE_ERROR);
         ERRORTEST(SQLITE_INTERNAL);
@@ -60,9 +61,11 @@ int main(void)
         ERRORTEST(SQLITE_WARNING);
         ERRORTEST(SQLITE_ROW);
         ERRORTEST(SQLITE_DONE);
+        STATUS();
     }
 
     {
+        TEST();
         ERRORTEST(SQLITE_ERROR_MISSING_COLLSEQ);
         ERRORTEST(SQLITE_ERROR_RETRY);
 #if defined(SQLITE_ERROR_SNAPSHOT)
@@ -138,28 +141,33 @@ int main(void)
         ERRORTEST(SQLITE_WARNING_AUTOINDEX);
         ERRORTEST(SQLITE_AUTH_USER);
         ERRORTEST(SQLITE_OK_LOAD_PERMANENTLY);
+        STATUS();
     }
 
     {
-        COMMENT();
+        TEST();
         placer_error(-1);
+        STATUS();
     }
     {
-        COMMENT();
+        TEST();
         placer_error(0);
+        STATUS();
     }
     {
-        COMMENT();
+        TEST();
         placer_message((char *)0);
+        STATUS();
     }
     {
-        COMMENT();
+        TEST();
         char * pp;
         pp = sqlite3_malloc(sizeof("Message!"));
         ASSERT(pp != (char *)0);
         strcpy(pp, "Message!");
         placer_message(pp);
         pp = (char *)0;
+        STATUS();
     }
 
     EXIT();

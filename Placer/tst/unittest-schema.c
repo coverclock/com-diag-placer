@@ -39,8 +39,10 @@ int main(void)
     SETLOGMASK();
 
     {
+        TEST();
         COMMENT("sizeof(struct UnitTestSchema)=%zu\n", sizeof(struct UnitTestSchema));
         EXPECT(sizeof(struct UnitTestSchema) == 4392);
+        STATUS();
     }
 
     {
@@ -48,6 +50,7 @@ int main(void)
 #include "com/diag/placer/placer_structure_initializer.h"
 #include "unittest-schema.h"
 #include "com/diag/placer/placer_end.h"
+        TEST();
         COMMENT("sizeof(record)=%zu\n", sizeof(record));
         EXPECT(sizeof(record) == 4392);
         EXPECT(record.id == (int32_t)0);
@@ -56,6 +59,7 @@ int main(void)
         EXPECT(record.image[0] == (uint8_t)0);
         EXPECT(record.sn == (int64_t)0);
         EXPECT(record.ssn[0] == '\0');
+        STATUS();
     }
 
     {
@@ -64,8 +68,10 @@ int main(void)
 #include "com/diag/placer/placer_create.h"
 #include "unittest-schema.h"
 #include "com/diag/placer/placer_end.h"
+        TEST();
         COMMENT("create=\"%s\"\n", create);
         EXPECT(strcmp(create, CREATE) == 0);
+        STATUS();
     }
 
     {
@@ -74,8 +80,10 @@ int main(void)
 #include "com/diag/placer/placer_insert.h"
 #include "unittest-schema.h"
 #include "com/diag/placer/placer_end.h"
+        TEST();
         COMMENT("insert=\"%s\"\n", insert);
         EXPECT(strcmp(insert, INSERT) == 0);
+        STATUS();
     }
 
     {
@@ -84,12 +92,15 @@ int main(void)
 #include "com/diag/placer/placer_replace.h"
 #include "unittest-schema.h"
 #include "com/diag/placer/placer_end.h"
+        TEST();
         COMMENT("replace=\"%s\"\n", replace);
         EXPECT(strcmp(replace, REPLACE) == 0);
+        STATUS();
     }
 
     {
         placer_INTEGER_t result = 0xa5a5a5a5;
+        TEST();
         EXPECT(placer_INTEGER_import(&result, "INVALID") == SQLITE_ERROR);
         EXPECT(placer_INTEGER_import(&result, "1NV8L1D") == SQLITE_ERROR);
         EXPECT(placer_INTEGER_import(&result, "0") == SQLITE_OK);
@@ -98,10 +109,12 @@ int main(void)
         EXPECT(result == 2147483647);
         EXPECT(placer_INTEGER_import(&result, "-1") == SQLITE_OK);
         EXPECT(result == -1);
+        STATUS();
     }
 
     {
         placer_INTEGER64_t result = 0xa5a5a5a5a5a5a5a5LL;
+        TEST();
         EXPECT(placer_INTEGER64_import(&result, "INVALID") == SQLITE_ERROR);
         EXPECT(placer_INTEGER64_import(&result, "1NV8L1D") == SQLITE_ERROR);
         EXPECT(placer_INTEGER64_import(&result, "0") == SQLITE_OK);
@@ -110,10 +123,12 @@ int main(void)
         EXPECT(result == 9223372036854775807LL);
         EXPECT(placer_INTEGER64_import(&result, "-1") == SQLITE_OK);
         EXPECT(result == -1);
+        STATUS();
     }
 
     {
         placer_FLOAT_t result = 165.165;
+        TEST();
         EXPECT(placer_FLOAT_import(&result, "INVALID") == SQLITE_ERROR);
         EXPECT(placer_FLOAT_import(&result, "1NV8L1D") == SQLITE_ERROR);
         EXPECT(placer_FLOAT_import(&result, "0") == SQLITE_OK);
@@ -124,10 +139,12 @@ int main(void)
         EXPECT(result == 526.625);
         EXPECT(placer_FLOAT_import(&result, "-1.0") == SQLITE_OK);
         EXPECT(result == -1.0);
+        STATUS();
     }
 
     {
         placer_TEXT_t result[9] = { '0', '1', '2', '3', '4', '5', '6', '7', '\0', };
+        TEST();
         EXPECT(placer_TEXT_import(result, 9, "") == SQLITE_OK);
         EXPECT(result[0] == '\0');
         EXPECT(placer_TEXT_import(result, 9, "A") == SQLITE_OK);
@@ -136,10 +153,12 @@ int main(void)
         EXPECT(strcmp(result, "BCDEFGHI") == 0);
         EXPECT(placer_TEXT_import(result, 9, "JKLMNOPQR") == SQLITE_ERROR);
         EXPECT(strcmp(result, "JKLMNOPQ") == 0);
+        STATUS();
     }
 
     {
         placer_TEXT16_t result[9] = { L'0', L'1', L'2', L'3', L'4', L'5', L'6', L'7', L'\0', };
+        TEST();
         EXPECT(placer_TEXT16_import(result, 9, (char *)L"") == SQLITE_OK);
         EXPECT(result[0] == L'\0');
         EXPECT(placer_TEXT16_import(result, 9, (char *)L"A") == SQLITE_OK);
@@ -148,6 +167,7 @@ int main(void)
         EXPECT(wcscmp(result, L"BCDEFGHI") == 0);
         EXPECT(placer_TEXT16_import(result, 9, (char *)L"JKLMNOPQR") == SQLITE_ERROR);
         EXPECT(wcscmp(result, L"JKLMNOPQ") == 0);
+        STATUS();
     }
 
     {
@@ -156,10 +176,12 @@ int main(void)
             { 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, },
             { 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff, 0x00, },
         };
+        TEST();
         EXPECT(placer_BLOB_import(result, sizeof(result), value[0]) == SQLITE_OK);
         EXPECT(memcmp(result, value[0], sizeof(result)) == 0);
         EXPECT(placer_BLOB_import(result, sizeof(result), value[1]) == SQLITE_OK);
         EXPECT(memcmp(result, value[1], sizeof(result)) == 0);
+        STATUS();
     }
 
     {
@@ -175,7 +197,7 @@ int main(void)
         };
         char * keyword[] = { "id", "name", "age", "image", "sn", "ssn", };
         int rc;
-
+        TEST();
         COMMENT("1");        
         rc = placer_UnitTestSchema_callback((void *)&here, 6, value[0], keyword);
         ASSERT(rc == SQLITE_OK);
@@ -186,7 +208,6 @@ int main(void)
         EXPECT(results[0].image[0] == (uint8_t)0x11);
         EXPECT(results[0].sn == (int64_t)42);
         EXPECT(strcmp(results[0].ssn, "123456789") == 0);
-
         COMMENT("2");        
         rc = placer_UnitTestSchema_callback((void *)&here, 6, value[1], keyword);
         ASSERT(rc == SQLITE_OK);
@@ -197,7 +218,6 @@ int main(void)
         EXPECT(results[1].image[0] == (uint8_t)0x22);
         EXPECT(results[1].sn == (int64_t)86);
         EXPECT(strcmp(results[1].ssn, "234567890") == 0);
-
         COMMENT("3");        
         rc = placer_UnitTestSchema_callback((void *)&here, 6, value[2], keyword);
         ASSERT(rc == SQLITE_OK);
@@ -208,11 +228,11 @@ int main(void)
         EXPECT(results[2].image[0] == (uint8_t)0x33);
         EXPECT(results[2].sn == (int64_t)99);
         EXPECT(strcmp(results[2].ssn, "345678901") == 0);
-
         COMMENT("4");        
         rc = placer_UnitTestSchema_callback((void *)&here, 6, value[3], keyword);
         ASSERT(rc == SQLITE_ERROR);
         EXPECT(here = &(gather[3]));
+        STATUS();
     }
 
     EXIT();
