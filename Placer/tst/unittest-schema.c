@@ -267,8 +267,8 @@ int main(void)
             { 4, L"Dread Pirate Roberts", 31,     { 0x44, },  1LL, "456789012", },
         };
         struct UnitTestSchema row[4];
-        struct UnitTestSchema * rows[] = { &row[0], &row[1], &row[2], &row[3], };
-        struct UnitTestSchema ** state = rows;
+        struct UnitTestSchema * rows[] = { &row[0], &row[1], &row[2], &row[3], (struct UnitTestSchema *)0, };
+        struct UnitTestSchema ** state = &rows[0];
         sqlite3 * db = (sqlite3 *)0;
         sqlite3_stmt * stmt = (sqlite3_stmt *)0;;
         int rc = 0;
@@ -296,6 +296,12 @@ int main(void)
             rc = placer_db_steps(stmt, (placer_step_t *)0, (void *)0);
             ASSERT(rc == SQLITE_OK);
         }
+        COMMENT("select");
+        stmt = placer_db_prepare(db, SELECT);
+        ASSERT(stmt != (sqlite3_stmt *)0);
+        rc = placer_db_steps(stmt, placer_struct_UnitTestSchema_step, &state);
+        ASSERT(rc == SQLITE_OK);
+        EXPECT(state == &(rows[4]));
         COMMENT("close");
         rc = sqlite3_close(db);
         ASSERT(rc == SQLITE_OK);
