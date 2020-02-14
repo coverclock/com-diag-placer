@@ -69,6 +69,26 @@ int main(void)
     }
 
     {
+        const char INSERT[] = "INSERT INTO UnitTestSchema VALUES (:id, :name, :age, :image, :sn, :ssn );";
+        const char * insert =
+#include "com/diag/placer/placer_insert.h"
+#include "unittest-schema.h"
+#include "com/diag/placer/placer_end.h"
+        COMMENT("insert=\"%s\"\n", insert);
+        EXPECT(strcmp(insert, INSERT) == 0);
+    }
+
+    {
+        const char REPLACE[] = "REPLACE INTO UnitTestSchema VALUES (:id, :name, :age, :image, :sn, :ssn );";
+        const char * replace =
+#include "com/diag/placer/placer_replace.h"
+#include "unittest-schema.h"
+#include "com/diag/placer/placer_end.h"
+        COMMENT("replace=\"%s\"\n", replace);
+        EXPECT(strcmp(replace, REPLACE) == 0);
+    }
+
+    {
         placer_INTEGER_t result = 0xa5a5a5a5;
         EXPECT(placer_INTEGER_import(&result, "INVALID") == SQLITE_ERROR);
         EXPECT(placer_INTEGER_import(&result, "1NV8L1D") == SQLITE_ERROR);
