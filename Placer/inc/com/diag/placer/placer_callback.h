@@ -9,11 +9,6 @@
  * https://github.com/coverclock/com-diag-placer<BR>
  * These X macros generate a callback function for a schema.
  * N.B. THIS HEADER FILE CAN BE INCLUDED MORE THAN ONCE.
- */
-
-#include "placer_schema_undef.h"
-
-/*
  * The prototype for this function matches that of an SQLite3 callback
  * function, so that it can be used directly as a callback, or just called
  * from within a callback. Casting the void pointer to a triple indirect
@@ -31,51 +26,69 @@
  * and for the data type imports failing.
  */
 
+#include "placer.h"
+
 #define PLACER_SCHEMA(_STRUCTURE_) \
 int placer_##_STRUCTURE_##_callback(void * vp, int ncols, char ** value, char ** keyword) { \
     int rc = SQLITE_ERROR; \
-    struct _STRUCTURE_ *** pp = (struct _STRUCTURE_ ***)0; \
+    struct _STRUCTURE_ *** ip = (struct _STRUCTURE_ ***)0; \
+    struct _STRUCTURE_ ** ap = (struct _STRUCTURE_ **)0; \
+    struct _STRUCTURE_ * pp = (struct _STRUCTURE_ *)0; \
     int ii = 0; \
-    pp = (struct _STRUCTURE_ ***)vp; \
+    ip = (struct _STRUCTURE_ ***)vp; \
+    ap = *ip; \
+    pp = *ap; \
     do { \
-        if (**pp == (struct _STRUCTURE_ *)0) { break; }
+        if (pp == (struct _STRUCTURE_ *)0) { break; }
 
 #define PLACER_BLOB(_NAME_, _ITEMS_) \
-        if (ii >= ncols) { break; } \
-        if (strcmp(keyword[ii], #_NAME_) != 0) { break; } \
-        if (placer_BLOB_import((**pp)->_NAME_, _ITEMS_, value[ii++]) != SQLITE_OK) { break; }
+        { \
+            if (ii >= ncols) { break; } \
+            if (strcmp(keyword[ii], #_NAME_) != 0) { break; } \
+            if (placer_BLOB_import(pp->_NAME_, (_ITEMS_), value[ii++]) != SQLITE_OK) { break; } \
+        }
 
 #define PLACER_FLOAT(_NAME_) \
-        if (ii >= ncols) { break; } \
-        if (strcmp(keyword[ii], #_NAME_) != 0) { break; } \
-        if (placer_FLOAT_import(&((**pp)->_NAME_), value[ii++]) != SQLITE_OK) { break; }
+        { \
+            if (ii >= ncols) { break; } \
+            if (strcmp(keyword[ii], #_NAME_) != 0) { break; } \
+            if (placer_FLOAT_import(&(pp->_NAME_), value[ii++]) != SQLITE_OK) { break; } \
+        }
 
 #define PLACER_INTEGER(_NAME_) \
-        if (ii >= ncols) { break; } \
-        if (strcmp(keyword[ii], #_NAME_) != 0) { break; } \
-        if (placer_INTEGER_import(&((**pp)->_NAME_), value[ii++]) != SQLITE_OK) { break; }
+        { \
+            if (ii >= ncols) { break; } \
+            if (strcmp(keyword[ii], #_NAME_) != 0) { break; } \
+            if (placer_INTEGER_import(&(pp->_NAME_), value[ii++]) != SQLITE_OK) { break; } \
+        }
 
 #define PLACER_INTEGER64(_NAME_) \
-        if (ii >= ncols) { break; } \
-        if (strcmp(keyword[ii], #_NAME_) != 0) { break; } \
-        if (placer_INTEGER64_import(&((**pp)->_NAME_), value[ii++]) != SQLITE_OK) { break; }
+        { \
+            if (ii >= ncols) { break; } \
+            if (strcmp(keyword[ii], #_NAME_) != 0) { break; } \
+            if (placer_INTEGER64_import(&(pp->_NAME_), value[ii++]) != SQLITE_OK) { break; } \
+        }
 
 #define PLACER_TEXT(_NAME_, _ITEMS_) \
-        if (ii >= ncols) { break; } \
-        if (strcmp(keyword[ii], #_NAME_) != 0) { break; } \
-        if (placer_TEXT_import((**pp)->_NAME_, _ITEMS_, value[ii++]) != SQLITE_OK) { break; }
+        { \
+            if (ii >= ncols) { break; } \
+            if (strcmp(keyword[ii], #_NAME_) != 0) { break; } \
+            if (placer_TEXT_import(pp->_NAME_, (_ITEMS_), value[ii++]) != SQLITE_OK) { break; } \
+        }
 
 #define PLACER_TEXT16(_NAME_, _ITEMS_) \
-        if (ii >= ncols) { break; } \
-        if (strcmp(keyword[ii], #_NAME_) != 0) { break; } \
-        if (placer_TEXT16_import((**pp)->_NAME_, _ITEMS_, value[ii++]) != SQLITE_OK) { break; }
+        { \
+            if (ii >= ncols) { break; } \
+            if (strcmp(keyword[ii], #_NAME_) != 0) { break; } \
+            if (placer_TEXT16_import(pp->_NAME_, (_ITEMS_), value[ii++]) != SQLITE_OK) { break; } \
+        }
 
 #define PLACER_FIELD(_CONSTRAINTS_)
 
 #define PLACER_FINAL(_CONSTRAINTS_)
 
 #define PLACER_END(_CONSTRAINTS_) \
-        (*pp) += 1; \
+        (*ip) += 1; \
         rc = SQLITE_OK; \
     } while (0); \
     return rc; \

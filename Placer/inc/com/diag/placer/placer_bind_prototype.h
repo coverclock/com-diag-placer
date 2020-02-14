@@ -7,14 +7,14 @@
  * Licensed under the terms in README.h<BR>
  * Chip Overclock (coverclock@diag.com)<BR>
  * https://github.com/coverclock/com-diag-placer<BR>
- * These X macros generate the prototype for a schema callback function.
+ * These X macros generate the prototype for a schema bind function.
  * N.B. THIS HEADER FILE CAN BE INCLUDED MORE THAN ONCE.
  */
 
-#include "placer_schema_undef.h"
+#include <sqlite3.h>
 
 #define PLACER_SCHEMA(_STRUCTURE_) \
-extern int placer_##_STRUCTURE_##_callback(void * vp, int ncols, char ** value, char ** keyword);
+extern int placer_##_STRUCTURE_##_bind(sqlite3_stmt * sp, const struct _STRUCTURE_ * pp);
 
 #define PLACER_BLOB(_NAME_, _ITEMS_)
 

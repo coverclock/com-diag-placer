@@ -11,8 +11,10 @@
  * https://github.com/coverclock/com-diag-placer<BR>
  */
 
-#include <sys/types.h>
+#include <stdint.h>
 #include <stdio.h>
+#include <wchar.h>
+#include <sys/types.h>
 #include "sqlite3.h"
 
 /*******************************************************************************
@@ -135,5 +137,49 @@ extern char * placer_sql_formata(size_t size, const char * format, ...);
  * @return the SQLite3 return code.
  */
 extern int placer_db_exec(sqlite3 * db, const char * sql, int (*cp)(void *, int, char **, char **), void * vp);
+
+/*******************************************************************************
+ *
+ ******************************************************************************/
+
+typedef uint8_t placer_BLOB_t;
+
+typedef double placer_FLOAT_t;
+
+typedef int32_t placer_INTEGER_t;
+
+typedef int64_t placer_INTEGER64_t;
+
+typedef unsigned char placer_TEXT_t;
+
+typedef wchar_t placer_TEXT16_t;
+
+/*******************************************************************************
+ *
+ ******************************************************************************/
+
+typedef int (placer_callback_t)(void * vp, int ncols, char ** value, char ** keyword);
+
+typedef void (placer_free_t)(void * vp);
+
+/*******************************************************************************
+ *
+ ******************************************************************************/
+
+extern int placer_BLOB_import(placer_BLOB_t * dest, size_t items, const char * src);
+
+extern int placer_FLOAT_import(placer_FLOAT_t * dest, const char * src);
+
+extern int placer_INTEGER_import(placer_INTEGER_t * dest, const char * src);
+
+extern int placer_INTEGER64_import(placer_INTEGER64_t * dest, const char * src);
+
+extern int placer_TEXT_import(placer_TEXT_t * dest, size_t items, const char * src);
+
+extern int placer_TEXT16_import(placer_TEXT16_t * dest, size_t items, const char * src);
+
+/*******************************************************************************
+ *
+ ******************************************************************************/
 
 #endif

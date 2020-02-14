@@ -10,19 +10,29 @@
 
 #include "com/diag/diminuto/diminuto_unittest.h"
 #include "com/diag/placer/placer.h"
-#include "com/diag/placer/placer_schema.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include "com/diag/placer/placer_schema_structure.h"
+#include "com/diag/placer/placer_structure.h"
 #include "unittest-schema.h"
+#include "com/diag/placer/placer_end.h"
 
-#include "com/diag/placer/placer_schema_prototype.h"
+#include "com/diag/placer/placer_callback_prototype.h"
 #include "unittest-schema.h"
+#include "com/diag/placer/placer_end.h"
 
-#include "com/diag/placer/placer_schema_callback.h"
+#include "com/diag/placer/placer_callback.h"
 #include "unittest-schema.h"
+#include "com/diag/placer/placer_end.h"
+
+#include "com/diag/placer/placer_bind_prototype.h"
+#include "unittest-schema.h"
+#include "com/diag/placer/placer_end.h"
+
+#include "com/diag/placer/placer_bind.h"
+#include "unittest-schema.h"
+#include "com/diag/placer/placer_end.h"
 
 int main(void)
 {
@@ -35,8 +45,9 @@ int main(void)
 
     {
         struct UnitTestSchema record =
-#include "com/diag/placer/placer_schema_initializer.h"
+#include "com/diag/placer/placer_structure_initializer.h"
 #include "unittest-schema.h"
+#include "com/diag/placer/placer_end.h"
         COMMENT("sizeof(record)=%zu\n", sizeof(record));
         EXPECT(sizeof(record) == 4392);
         EXPECT(record.id == (int32_t)0);
@@ -50,8 +61,9 @@ int main(void)
     {
         const char CREATE[] = "CREATE TABLE UnitTestSchema (id INTEGER PRIMARY KEY, name TEXT , age FLOAT , image BLOB , sn INTEGER , ssn TEXT  );";
         const char * create =
-#include "com/diag/placer/placer_schema_create.h"
+#include "com/diag/placer/placer_create.h"
 #include "unittest-schema.h"
+#include "com/diag/placer/placer_end.h"
         COMMENT("create=\"%s\"\n", create);
         EXPECT(strcmp(create, CREATE) == 0);
     }

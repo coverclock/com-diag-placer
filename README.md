@@ -55,7 +55,7 @@ Linux 4.13.0
 gcc 5.4.0    
 sqlite 3.22.0    
 
-# Notes
+# Remarks
 
 On Rhodium, I installed SQLite3 3.30 manually by downloading and
 building it and installing the build artifacts in the default root

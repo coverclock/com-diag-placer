@@ -13,7 +13,6 @@
 #include <string.h>
 #include "sqlite3.h"
 #include "com/diag/placer/placer.h"
-#include "com/diag/placer/placer_schema.h"
 
 /*******************************************************************************
  *
