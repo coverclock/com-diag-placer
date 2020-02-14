@@ -293,16 +293,27 @@ sqlite3_stmt * placer_db_prepare(sqlite3 * db, const char * sql)
     return sp;
 }
 
-int placer_db_steps(sqlite3_stmt * sp, placer_callback_t * cp, void * vp)
+int placer_db_steps(sqlite3_stmt * sp, placer_step_t * cp, void * vp)
 {
     int rc = SQLITE_ERROR;
+    int tc = SQLITE_ERROR;
+    int ii = 0;
 
     while (!0) {
 
+        if (Debug != (FILE *)0) {
+            fprintf(Debug, "%s@%d: step=%d\n", __FILE__, __LINE__, ii);
+        }
+
         rc = sqlite3_step(sp);
+
+        if (Debug != (FILE *)0) {
+            fprintf(Debug, "%s@%d: step=%d rc=%d=\"%s\"\n", __FILE__, __LINE__, ii, rc, sqlite3_errstr(rc));
+        }
 
         if (rc == SQLITE_OK) {
             rc = SQLITE_ERROR;
+            placer_error(rc);
             break;
         }
 
@@ -312,12 +323,25 @@ int placer_db_steps(sqlite3_stmt * sp, placer_callback_t * cp, void * vp)
         }
 
         if (rc != SQLITE_ROW) {
+            placer_error(rc);
             break;
         }
 
-        
+        if (cp != (placer_step_t *)0) {
+            rc = (*cp)(sp, vp);
+            if (rc != SQLITE_OK) {
+                placer_error(rc);
+                break;
+            }
+        }
 
     } 
+
+    tc = sqlite3_finalize(sp);
+    if (tc != SQLITE_OK) {
+        placer_error(tc);
+        rc = tc;
+    }
 
     return rc;
 }

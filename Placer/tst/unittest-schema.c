@@ -8,11 +8,13 @@
  * https://github.com/coverclock/com-diag-placer<BR>
  */
 
-#include "com/diag/diminuto/diminuto_unittest.h"
-#include "com/diag/placer/placer.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
+#include "com/diag/diminuto/diminuto_unittest.h"
+#include "com/diag/diminuto/diminuto_countof.h"
+#include "com/diag/placer/placer.h"
 
 #include "com/diag/placer/placer_structure.h"
 #include "unittest-schema.h"
@@ -22,7 +24,15 @@
 #include "unittest-schema.h"
 #include "com/diag/placer/placer_end.h"
 
+#include "com/diag/placer/placer_step_prototype.h"
+#include "unittest-schema.h"
+#include "com/diag/placer/placer_end.h"
+
 #include "com/diag/placer/placer_callback.h"
+#include "unittest-schema.h"
+#include "com/diag/placer/placer_end.h"
+
+#include "com/diag/placer/placer_step.h"
 #include "unittest-schema.h"
 #include "com/diag/placer/placer_end.h"
 
@@ -199,7 +209,7 @@ int main(void)
         int rc;
         TEST();
         COMMENT("1");        
-        rc = placer_UnitTestSchema_callback((void *)&here, 6, value[0], keyword);
+        rc = placer_struct_UnitTestSchema_callback((void *)&here, 6, value[0], keyword);
         ASSERT(rc == SQLITE_OK);
         EXPECT(here = &(gather[1]));
         EXPECT(results[0].id == (int32_t)1);
@@ -209,7 +219,7 @@ int main(void)
         EXPECT(results[0].sn == (int64_t)42);
         EXPECT(strcmp(results[0].ssn, "123456789") == 0);
         COMMENT("2");        
-        rc = placer_UnitTestSchema_callback((void *)&here, 6, value[1], keyword);
+        rc = placer_struct_UnitTestSchema_callback((void *)&here, 6, value[1], keyword);
         ASSERT(rc == SQLITE_OK);
         EXPECT(here = &(gather[2]));
         EXPECT(results[1].id == (int32_t)2);
@@ -219,7 +229,7 @@ int main(void)
         EXPECT(results[1].sn == (int64_t)86);
         EXPECT(strcmp(results[1].ssn, "234567890") == 0);
         COMMENT("3");        
-        rc = placer_UnitTestSchema_callback((void *)&here, 6, value[2], keyword);
+        rc = placer_struct_UnitTestSchema_callback((void *)&here, 6, value[2], keyword);
         ASSERT(rc == SQLITE_OK);
         EXPECT(here = &(gather[3]));
         EXPECT(results[2].id == (int32_t)3);
@@ -229,9 +239,56 @@ int main(void)
         EXPECT(results[2].sn == (int64_t)99);
         EXPECT(strcmp(results[2].ssn, "345678901") == 0);
         COMMENT("4");        
-        rc = placer_UnitTestSchema_callback((void *)&here, 6, value[3], keyword);
+        rc = placer_struct_UnitTestSchema_callback((void *)&here, 6, value[3], keyword);
         ASSERT(rc == SQLITE_ERROR);
         EXPECT(here = &(gather[3]));
+        STATUS();
+    }
+
+    {
+        static const char PATH[] = "out/host/sql/unitest-schema.db";
+        static const char CREATE[] =
+#include "com/diag/placer/placer_create.h"
+#include "unittest-schema.h"
+#include "com/diag/placer/placer_end.h"
+        static const char INSERT[] =
+#include "com/diag/placer/placer_insert.h"
+#include "unittest-schema.h"
+#include "com/diag/placer/placer_end.h"
+        static const char REPLACE[] =
+#include "com/diag/placer/placer_replace.h"
+#include "unittest-schema.h"
+#include "com/diag/placer/placer_end.h"
+        static const char SELECT[] = "SELECT * FROM UnitTestSchema;";
+        struct UnitTestSchema data[4] = {
+            { 1, L"Chip Overclock",       63.625, { 0x11, }, 42LL, "123456789", },
+            { 2, L"Red Black",            51.,    { 0x22, }, 86LL, "234567890", },
+            { 3, L"The French Woman",     62,     { 0x33, }, 99LL, "345678901", },
+            { 4, L"Dread Pirate Roberts", 31,     { 0x44, },  1LL, "456789012", },
+        };
+        struct UnitTestSchema row[4];
+        struct UnitTestSchema * rows[] = { &row[0], &row[1], &row[2], &row[3], };
+        struct UnitTestSchema ** state = rows;
+        sqlite3 * db = (sqlite3 *)0;
+        sqlite3_stmt * stmt = (sqlite3_stmt *)0;;
+        int rc = 0;
+        FILE * debug = (FILE *)0;
+        TEST();
+        debug = placer_debug(stderr);
+        COMMENT("setup");
+        memset(row, 0, sizeof(row));
+        (void)unlink(PATH);
+        COMMENT("open");
+        rc = sqlite3_open(PATH, &db);
+        ASSERT(rc == SQLITE_OK);
+        COMMENT("create");
+        stmt = placer_db_prepare(db, CREATE);
+        ASSERT(stmt != (sqlite3_stmt *)0);
+        rc = placer_db_steps(stmt, (placer_step_t *)0, (void *)0);
+        COMMENT("close");
+        rc = sqlite3_close(db);
+        ASSERT(rc == SQLITE_OK);
+        placer_debug(debug);
         STATUS();
     }
 

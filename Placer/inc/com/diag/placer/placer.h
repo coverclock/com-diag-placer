@@ -49,9 +49,11 @@ typedef wchar_t placer_TEXT16_t;
  *
  ******************************************************************************/
 
-typedef int (placer_callback_t)(void * vp, int ncols, char ** value, char ** keyword);
+typedef int (placer_callback_t)(void *, int, char **, char **);
 
-typedef void (placer_free_t)(void * vp);
+typedef void (placer_free_t)(void *);
+
+typedef int (placer_step_t)(sqlite3_stmt *, void *);
 
 /*******************************************************************************
  *
@@ -161,6 +163,10 @@ extern char * placer_sql_formata(size_t size, const char * format, ...);
  * @return the SQLite3 return code.
  */
 extern int placer_db_exec(sqlite3 * db, const char * sql, int (*cp)(void *, int, char **, char **), void * vp);
+
+extern sqlite3_stmt * placer_db_prepare(sqlite3 * db, const char * sql);
+
+extern int placer_db_steps(sqlite3_stmt * sp, placer_step_t * cp, void * vp);
 
 /*******************************************************************************
  *
