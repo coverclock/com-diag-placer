@@ -43,7 +43,11 @@ typedef int64_t placer_INTEGER64_t;
 
 typedef unsigned char placer_TEXT_t;
 
+#if !0
 typedef wchar_t placer_TEXT16_t;
+#else
+typedef uint16_t placer_TEXT16_t;
+#endif
 
 /*******************************************************************************
  *

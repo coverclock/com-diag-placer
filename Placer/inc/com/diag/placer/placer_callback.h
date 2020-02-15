@@ -9,21 +9,7 @@
  * https://github.com/coverclock/com-diag-placer<BR>
  * These X macros generate a callback function for a schema.
  * N.B. THIS HEADER FILE CAN BE INCLUDED MORE THAN ONCE.
- * The prototype for this function matches that of an SQLite3 callback
- * function, so that it can be used directly as a callback, or just called
- * from within a callback. Casting the void pointer to a triple indirect
- * variable makes even my brain hurt. The void pointer points to a variable
- * whose value is a pointer to an array that contains pointers to the
- * structure. So the first dereference gets to the variable that points to
- * the array; incrementing that variable indexs through the array. The
- * second dereference accesses a pointer to a structure. The list of pointers
- * to structures in the awway is terminated by a null structure pointer.
- * This allows this callback to be used in an operation that selects rows
- * from a table table, import the  columns from each row, and populate
- * several structures. The generated function is paranoid: it not only
- * checks for the array not having enough entries, but for the number of
- * of columns not matching, for the names of the columns not matching,
- * and for the data type imports failing.
+ * Note that the keyword and value index is ZERO based.
  */
 
 #include "placer.h"
