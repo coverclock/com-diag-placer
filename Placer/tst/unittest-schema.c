@@ -260,7 +260,7 @@ int main(void)
 #include "unittest-schema.h"
 #include "com/diag/placer/placer_end.h"
         static const char SELECT[] = "SELECT * FROM UnitTestSchema;";
-        struct UnitTestSchema data[4] = {
+        static const struct UnitTestSchema ROW[4] = {
             { 1, L"Chip Overclock",       63.625, { 0x11, }, 42LL, "123456789", },
             { 2, L"Red Black",            51.,    { 0x22, }, 86LL, "234567890", },
             { 3, L"The French Woman",     62,     { 0x33, }, 99LL, "345678901", },
@@ -287,11 +287,11 @@ int main(void)
         ASSERT(stmt != (sqlite3_stmt *)0);
         rc = placer_db_steps(stmt, (placer_step_t *)0, (void *)0);
         ASSERT(rc == SQLITE_OK);
-        for (ii = 0; ii < countof(data); ++ii) {
+        for (ii = 0; ii < countof(ROW); ++ii) {
             COMMENT("insert");
             stmt = placer_db_prepare(db, INSERT);
             ASSERT(stmt != (sqlite3_stmt *)0);
-            rc = placer_struct_UnitTestSchema_bind(stmt, &data[ii]);
+            rc = placer_struct_UnitTestSchema_bind(stmt, &ROW[ii]);
             ASSERT(rc == SQLITE_OK);
             rc = placer_db_steps(stmt, (placer_step_t *)0, (void *)0);
             ASSERT(rc == SQLITE_OK);
@@ -303,33 +303,33 @@ int main(void)
         ASSERT(rc == SQLITE_OK);
         EXPECT(state == &(rows[4]));
         COMMENT("0");
-        EXPECT(row[0].id == (int32_t)1);
-        EXPECT(wcscmp(row[0].name,  L"Chip Overclock") == 0);
-        EXPECT(row[0].age == (double)63.625);
-        EXPECT(row[0].image[0] == (uint8_t)0x11);
-        EXPECT(row[0].sn == (int64_t)42);
-        EXPECT(strcmp(row[0].ssn, "123456789") == 0);
+        EXPECT(row[0].id == ROW[0].id);
+        EXPECT(wcscmp(row[0].name,  ROW[0].name) == 0);
+        EXPECT(row[0].age == ROW[0].age);
+        EXPECT(row[0].image[0] == ROW[0].image[0]);
+        EXPECT(row[0].sn == ROW[0].sn);
+        EXPECT(strcmp(row[0].ssn, ROW[0].ssn) == 0);
         COMMENT("1");
-        EXPECT(row[1].id == (int32_t)2);
-        EXPECT(wcscmp(row[1].name,  L"Red Black") == 0);
-        EXPECT(row[1].age == (double)51.0);
-        EXPECT(row[1].image[0] == (uint8_t)0x22);
-        EXPECT(row[1].sn == (int64_t)86);
-        EXPECT(strcmp(row[1].ssn, "234567890") == 0);
+        EXPECT(row[1].id == ROW[1].id);
+        EXPECT(wcscmp(row[1].name,  ROW[1].name) == 0);
+        EXPECT(row[1].age == ROW[1].age);
+        EXPECT(row[1].image[0] == ROW[1].image[0]);
+        EXPECT(row[1].sn == ROW[1].sn);
+        EXPECT(strcmp(row[1].ssn, ROW[1].ssn) == 0);
         COMMENT("2");
-        EXPECT(row[2].id == (int32_t)3);
-        EXPECT(wcscmp(row[2].name,  L"The French Woman") == 0);
-        EXPECT(row[2].age == (double)62);
-        EXPECT(row[2].image[0] == (uint8_t)0x33);
-        EXPECT(row[2].sn == (int64_t)99);
-        EXPECT(strcmp(row[2].ssn, "345678901") == 0);
+        EXPECT(row[2].id == ROW[2].id);
+        EXPECT(wcscmp(row[2].name,  ROW[2].name) == 0);
+        EXPECT(row[2].age == ROW[2].age);
+        EXPECT(row[2].image[0] == ROW[2].image[0]);
+        EXPECT(row[2].sn == ROW[2].sn);
+        EXPECT(strcmp(row[2].ssn, ROW[2].ssn) == 0);
         COMMENT("3");
-        EXPECT(row[3].id == (int32_t)4);
-        EXPECT(wcscmp(row[3].name,  L"Dread Pirate Roberts") == 0);
-        EXPECT(row[3].age == (double)31);
-        EXPECT(row[3].image[0] == (uint8_t)0x44);
-        EXPECT(row[3].sn == (int64_t)1);
-        EXPECT(strcmp(row[3].ssn, "456789012") == 0);
+        EXPECT(row[3].id == ROW[3].id);
+        EXPECT(wcscmp(row[3].name,  ROW[3].name) == 0);
+        EXPECT(row[3].age == ROW[3].age);
+        EXPECT(row[3].image[0] == ROW[3].image[0]);
+        EXPECT(row[3].sn == ROW[3].sn);
+        EXPECT(strcmp(row[3].ssn, ROW[3].ssn) == 0);
         COMMENT("close");
         rc = sqlite3_close(db);
         ASSERT(rc == SQLITE_OK);
