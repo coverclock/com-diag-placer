@@ -14,6 +14,7 @@
 #include <unistd.h>
 #include "com/diag/diminuto/diminuto_unittest.h"
 #include "com/diag/diminuto/diminuto_countof.h"
+#include "com/diag/diminuto/diminuto_dump.h"
 #include "com/diag/placer/placer.h"
 
 #include "com/diag/placer/placer_structure.h"
@@ -195,26 +196,6 @@ int main(void)
         static const placer_TEXT16_t DATA2[] = { 'A', 0 };
         static const placer_TEXT16_t DATA3[] = { 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 0 };
         static const placer_TEXT16_t DATA4[] = { 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 0 };
-        static const placer_TEXT16_t DATA5[] = { 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 0 };
-        placer_TEXT16_t result[] = { '0', '1', '2', '3', '4', '5', '6', '7', 0, };
-
-        TEST();
-        EXPECT(placer_TEXT16_copy(result, DATA1, countof(result)) == result);
-        EXPECT(result[0] == 0);
-        EXPECT(placer_TEXT16_copy(result, DATA2, countof(result)) == result);
-        EXPECT(memcmp(result, DATA2, sizeof(DATA2)) == 0);
-        EXPECT(placer_TEXT16_copy(result, DATA3, countof(result)) == result);
-        EXPECT(memcmp(result, DATA3, sizeof(DATA3)) == 0);
-        EXPECT(placer_TEXT16_copy(result, DATA4, countof(result)) == result);
-        EXPECT(memcmp(result, DATA5, sizeof(result)) == 0);
-        STATUS();
-    }
-
-    {
-        static const placer_TEXT16_t DATA1[] = { 0 };
-        static const placer_TEXT16_t DATA2[] = { 'A', 0 };
-        static const placer_TEXT16_t DATA3[] = { 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 0 };
-        static const placer_TEXT16_t DATA4[] = { 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 0 };
         static const placer_TEXT16_t DATA5[] = { 'B', 0 };
 
         TEST();
@@ -251,6 +232,30 @@ int main(void)
         EXPECT(placer_TEXT16_compare(DATA4, DATA5, 1) == 1);
         EXPECT(placer_TEXT16_compare(DATA4, DATA5, 0) == 0);
 
+        STATUS();
+    }
+
+    {
+        static const placer_TEXT16_t DATA1[] = { 0 };
+        static const placer_TEXT16_t DATA2[] = { 'A', 0 };
+        static const placer_TEXT16_t DATA3[] = { 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 0 };
+        static const placer_TEXT16_t DATA4[] = { 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 0 };
+        static const placer_TEXT16_t DATA5[] = { 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 0 };
+        placer_TEXT16_t result[] = { '0', '1', '2', '3', '4', '5', '6', '7', 0, };
+
+        TEST();
+        EXPECT(placer_TEXT16_copy(result, DATA1, countof(result)) == result);
+        EXPECT(placer_TEXT16_compare(result, DATA1, countof(result)) == 0);
+        EXPECT(result[countof(result) - 1] == 0);
+        EXPECT(placer_TEXT16_copy(result, DATA2, countof(result)) == result);
+        EXPECT(placer_TEXT16_compare(result, DATA2, countof(result)) == 0);
+        EXPECT(result[countof(result) - 1] == 0);
+        EXPECT(placer_TEXT16_copy(result, DATA3, countof(result)) == result);
+        EXPECT(placer_TEXT16_compare(result, DATA3, countof(result)) == 0);
+        EXPECT(result[countof(result) - 1] == 0);
+        EXPECT(placer_TEXT16_copy(result, DATA4, countof(result)) == result);
+        EXPECT(placer_TEXT16_compare(result, DATA4, countof(result)) == 0);
+        EXPECT(result[countof(result) - 1] == 'R');
         STATUS();
     }
 
@@ -351,7 +356,7 @@ int main(void)
 #endif
 
     {
-        static const char PATH[] = "out/host/sql/unitest-schema.db";
+        static const char PATH[] = "out/host/sql/unittest-schema.db";
         static const char CREATE[] =
 #include "com/diag/placer/placer_create.h"
 #include "unittest-schema.h"
@@ -421,6 +426,8 @@ int main(void)
 
         COMMENT("0");
         EXPECT(row[0].id == ROW[0].id);
+        diminuto_dump(stderr, row[0].name, sizeof(row[0].name));
+        diminuto_dump(stderr, ROW[0].name, sizeof(ROW[0].name));
         EXPECT(placer_TEXT16_compare(row[0].name,  ROW[0].name, countof(row[0].name)) == 0);
         EXPECT(row[0].age == ROW[0].age);
         EXPECT(row[0].image[0] == ROW[0].image[0]);
@@ -429,6 +436,8 @@ int main(void)
 
         COMMENT("1");
         EXPECT(row[1].id == ROW[1].id);
+        diminuto_dump(stderr, row[1].name, sizeof(row[1].name));
+        diminuto_dump(stderr, ROW[1].name, sizeof(ROW[1].name));
         EXPECT(placer_TEXT16_compare(row[1].name,  ROW[1].name, countof(row[1].name)) == 0);
         EXPECT(row[1].age == ROW[1].age);
         EXPECT(row[1].image[0] == ROW[1].image[0]);
@@ -437,6 +446,8 @@ int main(void)
 
         COMMENT("2");
         EXPECT(row[2].id == ROW[2].id);
+        diminuto_dump(stderr, row[2].name, sizeof(row[2].name));
+        diminuto_dump(stderr, ROW[2].name, sizeof(ROW[2].name));
         EXPECT(placer_TEXT16_compare(row[2].name,  ROW[2].name, countof(row[2].name)) == 0);
         EXPECT(row[2].age == ROW[2].age);
         EXPECT(row[2].image[0] == ROW[2].image[0]);
@@ -445,6 +456,8 @@ int main(void)
 
         COMMENT("3");
         EXPECT(row[3].id == ROW[3].id);
+        diminuto_dump(stderr, row[3].name, sizeof(row[3].name));
+        diminuto_dump(stderr, ROW[3].name, sizeof(ROW[3].name));
         EXPECT(placer_TEXT16_compare(row[3].name,  ROW[3].name, countof(row[3].name)) == 0);
         EXPECT(row[3].age == ROW[3].age);
         EXPECT(row[3].image[0] == ROW[3].image[0]);

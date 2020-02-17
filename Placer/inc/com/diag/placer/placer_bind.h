@@ -12,6 +12,7 @@
  * Note that the parameter index is ONE based.
  */
 
+#include <string.h>
 #include <sqlite3.h>
 #include "placer.h"
 
@@ -55,14 +56,14 @@ int placer_struct_##_STRUCTURE_##_bind(sqlite3_stmt * sp, const struct _STRUCTUR
         { \
             if (ii >= ll) { rc = SQLITE_ERROR; break; } \
             ii += 1; \
-            if ((rc = sqlite3_bind_text(sp, ii, pp->_NAME_, (_ITEMS_) * sizeof(placer_TEXT_t), (placer_free_t *)0)) != SQLITE_OK) { break; } \
+            if ((rc = sqlite3_bind_text(sp, ii, pp->_NAME_, strnlen(pp->_NAME_, (_ITEMS_)), (placer_free_t *)0)) != SQLITE_OK) { break; } \
         }
 
 #define PLACER_TEXT16(_NAME_, _ITEMS_) \
         { \
             if (ii >= ll) { rc = SQLITE_ERROR; break; } \
             ii += 1; \
-            if ((rc = sqlite3_bind_text16(sp, ii, pp->_NAME_, (_ITEMS_) * sizeof(placer_TEXT16_t), (placer_free_t *)0)) != SQLITE_OK) { break; } \
+            if ((rc = sqlite3_bind_text16(sp, ii, pp->_NAME_, placer_TEXT16_length(pp->_NAME_, (_ITEMS_)) * sizeof(placer_TEXT16_t), (placer_free_t *)0)) != SQLITE_OK) { break; } \
         }
 
 #define PLACER_FIELD(_CONSTRAINTS_)
