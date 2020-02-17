@@ -291,6 +291,65 @@ int main(void)
         STATUS();
     }
 
+#if 0
+    {
+        struct UnitTestSchema results[3] = { { 0, } };
+        struct UnitTestSchema * gather[] = { &(results[0]), &(results[1]), &(results[2]), (struct UnitTestSchema *)0 };
+        struct UnitTestSchema ** here = &(gather[0]);
+        placer_BLOB_t image[4][4096] = { { 0x11, }, { 0x22, }, { 0x33, }, { 0x44 }, };
+        char * value[4][6] = {
+            { "1", (char *)L"Chip Overclock", "63.625", (char *)&(image[0]), "42", "123456789", },
+            { "2", (char *)L"Red Black", "51.", (char *)&(image[1]), "86", "234567890", },
+            { "3", (char *)L"The French Woman", "62", (char *)&(image[2]), "99", "345678901", },
+            { "4", (char *)L"Dread Pirate Roberts", "31", (char *)&(image[3]), "1", "456789012", },
+        };
+        char * keyword[] = { "id", "name", "age", "image", "sn", "ssn", };
+        int rc;
+
+        TEST();
+
+        COMMENT("1");        
+        rc = placer_struct_UnitTestSchema_callback((void *)&here, 6, value[0], keyword);
+        ASSERT(rc == SQLITE_OK);
+        EXPECT(here = &(gather[1]));
+        EXPECT(results[0].id == (int32_t)1);
+        EXPECT(wcscmp(results[0].name,  L"Chip Overclock") == 0);
+        EXPECT(results[0].age == (double)63.625);
+        EXPECT(results[0].image[0] == (uint8_t)0x11);
+        EXPECT(results[0].sn == (int64_t)42);
+        EXPECT(strcmp(results[0].ssn, "123456789") == 0);
+
+        COMMENT("2");        
+        rc = placer_struct_UnitTestSchema_callback((void *)&here, 6, value[1], keyword);
+        ASSERT(rc == SQLITE_OK);
+        EXPECT(here = &(gather[2]));
+        EXPECT(results[1].id == (int32_t)2);
+        EXPECT(wcscmp(results[1].name,  L"Red Black") == 0);
+        EXPECT(results[1].age == (double)51.0);
+        EXPECT(results[1].image[0] == (uint8_t)0x22);
+        EXPECT(results[1].sn == (int64_t)86);
+        EXPECT(strcmp(results[1].ssn, "234567890") == 0);
+
+        COMMENT("3");        
+        rc = placer_struct_UnitTestSchema_callback((void *)&here, 6, value[2], keyword);
+        ASSERT(rc == SQLITE_OK);
+        EXPECT(here = &(gather[3]));
+        EXPECT(results[2].id == (int32_t)3);
+        EXPECT(wcscmp(results[2].name,  L"The French Woman") == 0);
+        EXPECT(results[2].age == (double)62);
+        EXPECT(results[2].image[0] == (uint8_t)0x33);
+        EXPECT(results[2].sn == (int64_t)99);
+        EXPECT(strcmp(results[2].ssn, "345678901") == 0);
+
+        COMMENT("4");        
+        rc = placer_struct_UnitTestSchema_callback((void *)&here, 6, value[3], keyword);
+        ASSERT(rc == SQLITE_ERROR);
+        EXPECT(here = &(gather[3]));
+
+        STATUS();
+    }
+#endif
+
     {
         static const char PATH[] = "out/host/sql/unitest-schema.db";
         static const char CREATE[] =
@@ -306,6 +365,12 @@ int main(void)
 #include "unittest-schema.h"
 #include "com/diag/placer/placer_end.h"
         static const char SELECT[] = "SELECT * FROM UnitTestSchema;";
+        /*
+         * Note that the name field is decared to be TEXT16. Since C (AFAIK)
+         * has no direct literal support for UTF-16, we have to fake it.
+         * Fortunately (also AFAIK) the code points in UTF-8 that correspond
+         * to standard ASCII overlaps with UTF-16.
+         */
         static const struct UnitTestSchema ROW[4] = {
             { 1, { 'C', 'h', 'i', 'p', ' ', 'O', 'v', 'e', 'r', 'c', 'l', 'o', 'c', 'k', 0 },                               63.625, { 0x11, }, 42LL, "123456789", }, 
             { 2, { 'R', 'e', 'd', ' ', 'B', 'l', 'a', 'c', 'k', 0 },                                                        51.,    { 0x22, }, 86LL, "234567890", },
@@ -431,65 +496,6 @@ int main(void)
         placer_debug(debug);
         STATUS();
     }
-
-#if 0
-    {
-        struct UnitTestSchema results[3] = { { 0, } };
-        struct UnitTestSchema * gather[] = { &(results[0]), &(results[1]), &(results[2]), (struct UnitTestSchema *)0 };
-        struct UnitTestSchema ** here = &(gather[0]);
-        placer_BLOB_t image[4][4096] = { { 0x11, }, { 0x22, }, { 0x33, }, { 0x44 }, };
-        char * value[4][6] = {
-            { "1", (char *)L"Chip Overclock", "63.625", (char *)&(image[0]), "42", "123456789", },
-            { "2", (char *)L"Red Black", "51.", (char *)&(image[1]), "86", "234567890", },
-            { "3", (char *)L"The French Woman", "62", (char *)&(image[2]), "99", "345678901", },
-            { "4", (char *)L"Dread Pirate Roberts", "31", (char *)&(image[3]), "1", "456789012", },
-        };
-        char * keyword[] = { "id", "name", "age", "image", "sn", "ssn", };
-        int rc;
-
-        TEST();
-
-        COMMENT("1");        
-        rc = placer_struct_UnitTestSchema_callback((void *)&here, 6, value[0], keyword);
-        ASSERT(rc == SQLITE_OK);
-        EXPECT(here = &(gather[1]));
-        EXPECT(results[0].id == (int32_t)1);
-        EXPECT(wcscmp(results[0].name,  L"Chip Overclock") == 0);
-        EXPECT(results[0].age == (double)63.625);
-        EXPECT(results[0].image[0] == (uint8_t)0x11);
-        EXPECT(results[0].sn == (int64_t)42);
-        EXPECT(strcmp(results[0].ssn, "123456789") == 0);
-
-        COMMENT("2");        
-        rc = placer_struct_UnitTestSchema_callback((void *)&here, 6, value[1], keyword);
-        ASSERT(rc == SQLITE_OK);
-        EXPECT(here = &(gather[2]));
-        EXPECT(results[1].id == (int32_t)2);
-        EXPECT(wcscmp(results[1].name,  L"Red Black") == 0);
-        EXPECT(results[1].age == (double)51.0);
-        EXPECT(results[1].image[0] == (uint8_t)0x22);
-        EXPECT(results[1].sn == (int64_t)86);
-        EXPECT(strcmp(results[1].ssn, "234567890") == 0);
-
-        COMMENT("3");        
-        rc = placer_struct_UnitTestSchema_callback((void *)&here, 6, value[2], keyword);
-        ASSERT(rc == SQLITE_OK);
-        EXPECT(here = &(gather[3]));
-        EXPECT(results[2].id == (int32_t)3);
-        EXPECT(wcscmp(results[2].name,  L"The French Woman") == 0);
-        EXPECT(results[2].age == (double)62);
-        EXPECT(results[2].image[0] == (uint8_t)0x33);
-        EXPECT(results[2].sn == (int64_t)99);
-        EXPECT(strcmp(results[2].ssn, "345678901") == 0);
-
-        COMMENT("4");        
-        rc = placer_struct_UnitTestSchema_callback((void *)&here, 6, value[3], keyword);
-        ASSERT(rc == SQLITE_ERROR);
-        EXPECT(here = &(gather[3]));
-
-        STATUS();
-    }
-#endif
 
     EXIT();
 }
