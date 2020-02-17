@@ -71,20 +71,24 @@ though most of my development remains on Rhodium.
 
 # Dependencies
 
-Placer depends on SQLite3, and on Diminuto, my C-based systems programming library.
-
-# Repositories
-
 <https://github.com/coverclock/com-diag-placer>
 
 <https://github.com/coverclock/com-diag-diminuto>
 
+<https://www.sqlite.org/2020/sqlite-autoconf-3310100.tar.gz>
+
+<https://ftp.gnu.org/gnu/libunistring/libunistring-0.9.10.tar.gz>
+
 # Build
 
-Install SQLite.
+Install SQLite 3 (or build from source).
 
     sudo apt-get install sqlite3
     sudo apt-get install libsqlite3-dev
+
+Install GNU linunistring (or build from source).
+
+    sudo apt-get install libunistring-dev
 
 Clone and build Diminuto.
 
@@ -129,17 +133,18 @@ Run the functional test.
 Grant Allen, Mike Owens, *The Definitive Guide to SQLite*, 2nd ed.,
 Apress, 2010
 
+P. Hoffman, F. Yergeau, "UTF-16, an encoding of ISO 10646", *RFC 2781*, 2000-02,
+<https://www.rfc-editor.org/rfc/pdfrfc/rfc2781.txt.pdf>
+
 Jay A. Kreibich, *Using SQLite*, O'Reilly, 2010
 
 Anthony Molinaro, *SQL Cookbook*, O'Reilly, 2006
-
-# Documentation
 
 SQLite Documentation, <https://www.sqlite.org/docs.html>
 
 SQLite Tutorial, <https://www.sqlitetutorial.net>
 
-sqlite3.h Comments, <https://www.sqlite.org/cgi/src/artifact/572ea78b08ee9052>
+sqlite3.h (embedded comments), <https://www.sqlite.org/cgi/src/artifact/572ea78b08ee9052>
 
 Wikipedia, "X-Macro", <https://en.wikipedia.org/wiki/X_Macro>
 
@@ -148,6 +153,9 @@ Wikibooks, "C Programming/Preprocessor directives and macros",
 
 Wikibooks, "C Programming/Serialization",
 <https://en.wikibooks.org/wiki/C_Programming/Serialization>
+
+F. Yergeau, "UTF-8, a transformation format of ISO 10646", *RFC 3629*, 2003-11,
+<https://www.rfc-editor.org/rfc/pdfrfc/rfc3629.txt.pdf>
 
 # Soundtrack
 

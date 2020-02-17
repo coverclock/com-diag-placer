@@ -13,7 +13,6 @@
 
 #include <stdint.h>
 #include <stdio.h>
-#include <wchar.h>
 #include <sys/types.h>
 #include "sqlite3.h"
 
@@ -43,11 +42,7 @@ typedef int64_t placer_INTEGER64_t;
 
 typedef unsigned char placer_TEXT_t;
 
-#if !0
-typedef wchar_t placer_TEXT16_t;
-#else
-typedef uint16_t placer_TEXT16_t;
-#endif
+typedef unsigned short placer_TEXT16_t;
 
 /*******************************************************************************
  *
@@ -176,7 +171,7 @@ extern int placer_db_steps(sqlite3_stmt * sp, placer_step_t * cp, void * vp);
  *
  ******************************************************************************/
 
-extern int placer_BLOB_import(placer_BLOB_t * dest, size_t items, const char * src);
+extern int placer_BLOB_import(placer_BLOB_t * dest, const char * src, size_t items);
 
 extern int placer_FLOAT_import(placer_FLOAT_t * dest, const char * src);
 
@@ -184,12 +179,18 @@ extern int placer_INTEGER_import(placer_INTEGER_t * dest, const char * src);
 
 extern int placer_INTEGER64_import(placer_INTEGER64_t * dest, const char * src);
 
-extern int placer_TEXT_import(placer_TEXT_t * dest, size_t items, const char * src);
+extern int placer_TEXT_import(placer_TEXT_t * dest, const char * src, size_t items);
 
-extern int placer_TEXT16_import(placer_TEXT16_t * dest, size_t items, const char * src);
+extern int placer_TEXT16_import(placer_TEXT16_t * dest, const char * src, size_t items);
 
 /*******************************************************************************
  *
  ******************************************************************************/
+
+extern placer_TEXT16_t * placer_TEXT16_copy(placer_TEXT16_t * dest, const placer_TEXT16_t * src, size_t items);
+
+extern int placer_TEXT16_compare(const placer_TEXT16_t * src1, const placer_TEXT16_t * src2, size_t items);
+
+extern size_t placer_TEXT16_length(const placer_TEXT16_t * src, size_t items);
 
 #endif

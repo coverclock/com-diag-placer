@@ -14,6 +14,10 @@
 #include <stdarg.h>
 #include <string.h>
 #include <errno.h>
+#if !defined(_BSD_SOURCE)
+#define _BSD_SOURCE
+#endif
+#include <endian.h>
 #include "sqlite3.h"
 #include "com/diag/diminuto/diminuto_types.h"
 #include "com/diag/placer/placer.h"
@@ -350,7 +354,7 @@ int placer_db_steps(sqlite3_stmt * sp, placer_step_t * cp, void * vp)
  *
  ******************************************************************************/
 
-int placer_BLOB_import(placer_BLOB_t * dest, size_t items, const char * src)
+int placer_BLOB_import(placer_BLOB_t * dest, const char * src, size_t items)
 {
     int rc = SQLITE_OK;
 
@@ -404,7 +408,7 @@ int placer_INTEGER64_import(placer_INTEGER64_t * dest, const char * src)
     return rc;
 }
 
-int placer_TEXT_import(placer_TEXT_t * dest, size_t items, const char * src)
+int placer_TEXT_import(placer_TEXT_t * dest, const char * src, size_t items)
 {
     int rc = SQLITE_ERROR;
 
@@ -419,15 +423,26 @@ int placer_TEXT_import(placer_TEXT_t * dest, size_t items, const char * src)
     return rc;
 }
 
-int placer_TEXT16_import(placer_TEXT16_t * dest, size_t items, const char * src)
+int placer_TEXT16_import(placer_TEXT16_t * dest, const char * src, size_t items)
 {
     int rc = SQLITE_ERROR;
+    placer_TEXT16_t * dp = (placer_TEXT16_t *)0;
+    const char * sp = (const char *)0;
+    size_t nn = 0;
 
-    (void)wcsncpy(dest, (placer_TEXT16_t *)src, items);
-    if (dest[items - 1] == L'\0') {
+    for (dp = dest, sp = src, nn = items; nn > 0; nn -= 1) {
+        *dp = *sp;
+        if (*sp == '\0') {
+            break;
+        }
+        dp += 1;
+        sp += 1;
+    }
+
+    if (*dp == 0) {
         rc = SQLITE_OK;
     } else {
-        dest[items - 1] = L'\0';
+        dest[items - 1] = 0;
         placer_error(rc);
     }
 
@@ -437,3 +452,63 @@ int placer_TEXT16_import(placer_TEXT16_t * dest, size_t items, const char * src)
 /*******************************************************************************
  *
  ******************************************************************************/
+
+placer_TEXT16_t * placer_TEXT16_copy(placer_TEXT16_t * dest, const placer_TEXT16_t * src, size_t items)
+{
+    placer_TEXT16_t * dp = (placer_TEXT16_t *)0;
+    const placer_TEXT16_t * sp = (const placer_TEXT16_t *)0;
+    size_t ii = 0;
+
+    dp = dest;
+    sp = src;
+    ii = items;
+
+    while ((ii--) > 0) {
+        *(dp++) = *sp;
+        if (*(sp++) == 0) {
+            break;
+        }
+    }
+
+    dest[items - 1] = 0;
+
+    return dest;
+}
+
+int placer_TEXT16_compare(const placer_TEXT16_t * src1, const placer_TEXT16_t * src2, size_t items)
+{
+    int result = 0;
+
+    while ((items--) > 0) {
+        if (*src1 < *src2) {
+            result = -1;
+            break;
+        } else if (*src1 > *src2) {
+            result = 1;
+            break;
+        } else if (*src1 == 0) {
+            break;
+        } else if (*src2 == 0) {
+            break; /* Redundant. */
+        } else {
+            src1 += 1;
+            src2 += 1;
+        }
+    }
+
+    return result;
+}
+
+size_t placer_TEXT16_length(const placer_TEXT16_t * src, size_t items)
+{
+    size_t result = 0;
+
+    while ((items--) > 0) {
+        if (*(src++) == 0) {
+            break;
+        }
+        result += 1;
+    }
+
+    return result;
+}
