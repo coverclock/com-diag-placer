@@ -181,6 +181,7 @@ int main(void)
         placer_TEXT_t result[] = { '0', '1', '2', '3', '4', '5', '6', '7', '\0', };
 
         TEST();
+        EXPECT(placer_schema_TEXT_import((placer_TEXT_t *)0, (const char *)0, 0) == SQLITE_OK);
         EXPECT(placer_schema_TEXT_import(result, "", countof(result)) == SQLITE_OK);
         EXPECT(result[0] == '\0');
         EXPECT(placer_schema_TEXT_import(result, "A", countof(result)) == SQLITE_OK);
@@ -303,6 +304,9 @@ int main(void)
         placer_TEXT16_t result[]  = { '0', '1', '2', '3', '4', '5', '6', '7', '\0' };
 
         TEST();
+
+        COMMENT("0");
+        EXPECT(placer_schema_TEXT16_import((placer_TEXT16_t *)0, (const char *)0, 0) == SQLITE_OK);
  
         COMMENT("1");
         EXPECT(placer_schema_TEXT16_import(result, (char *)DATA1, countof(result)) == SQLITE_OK);
@@ -344,6 +348,8 @@ int main(void)
         };
 
         TEST();
+
+        EXPECT(placer_schema_BLOB_import((placer_BLOB_t *)0, (const char *)0, 0) == SQLITE_OK);
 
         EXPECT(placer_schema_BLOB_import(result, value[0], countof(result)) == SQLITE_OK);
         EXPECT(memcmp(result, value[0], sizeof(result)) == 0);
