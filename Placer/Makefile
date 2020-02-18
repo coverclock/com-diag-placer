@@ -173,7 +173,7 @@ AR					:=	$(CROSS_COMPILE)ar
 RANLIB				:=	$(CROSS_COMPILE)ranlib
 STRIP				:=	$(CROSS_COMPILE)strip
 
-CDEFINES			:=
+CDEFINES			:=	
 
 ARFLAGS				:=	crsv
 CPPFLAGS			:=	$(CDEFINES) -iquote $(SRC_DIR) -iquote $(INC_DIR) -iquote $(OUT)/$(INC_DIR) $(SQLITE_CPPFLAGS) $(DIMINUTO_CPPFLAGS) $(CPPARCH)

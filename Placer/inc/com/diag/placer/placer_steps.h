@@ -7,7 +7,7 @@
  * Licensed under the terms in README.h<BR>
  * Chip Overclock (coverclock@diag.com)<BR>
  * https://github.com/coverclock/com-diag-placer<BR>
- * These X macros generate a step function for a schema.
+ * These X macros generate a step callback for a schema.
  * N.B. THIS HEADER FILE CAN BE INCLUDED MORE THAN ONCE.
  * Note that the column index is ZERO based.
  */

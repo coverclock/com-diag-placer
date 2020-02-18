@@ -1,6 +1,6 @@
 # com-diag-placer
 
-Musings with SQLite,  X-Macros, and UTF-16. (WORK IN PROGRESS).
+Musings with SQLite,  X-Macros, and UTF-16 (A WORK IN PROGRESS).
 
 # Copyright
 
@@ -26,7 +26,8 @@ in the use of SQLite in the C programming language.  It is my excuse to
 re-learn SQLite after having been away from it for a few years. It has
 also given me the opportunity to revisit X-Macros which I've used in C
 and C++ based projects in the past (where we referred to them - not
-entirely incorrectly - has "magic macros").
+entirely incorrectly - has "magic macros"). I've applied them here to
+generate C code to implement a database schema.
 
 SQLite is a server-less relational database system that is featured in
 Android and Apple phones and tablets, Windows 10 (so it is rumored),
@@ -77,18 +78,12 @@ though most of my development remains on Rhodium.
 
 <https://www.sqlite.org/2020/sqlite-autoconf-3310100.tar.gz>
 
-<https://ftp.gnu.org/gnu/libunistring/libunistring-0.9.10.tar.gz>
-
 # Build
 
 Install SQLite 3 (or build from source).
 
     sudo apt-get install sqlite3
     sudo apt-get install libsqlite3-dev
-
-Install GNU linunistring (or build from source).
-
-    sudo apt-get install libunistring-dev
 
 Clone and build Diminuto.
 
