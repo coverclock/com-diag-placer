@@ -68,7 +68,19 @@ in the standard locations. Your mileage may vary.
 
 ARMv8 valgrind(1) seems to be broken in the Debian package that installs
 on Rhodium. I've been successfully running it instead on Nickel, even
-though most of my development remains on Rhodium.
+though most of my development remains on Rhodium. This has caused me to
+miss one pointer off by one bug while developing on the Raspberry Pi.
+
+I've never had to personally deal that much with internationalization,
+Unicode, and the mysteries of UTF-8 (more or less standard ASCII,
+although multi-byte sequences are possible) versus UTF-16 (supported
+directly in Java and used in many other database systems) versus UTF-32
+(supported directly in the GNU C compiler and library as L"" literals
+and the wchar_t type), although I've worked in lots of systems that had
+to support it for business reasons. But here I am. SQLite3 supports both
+UTF-8 and UTF-16. I've written some code for this project to do basic
+TEXT16 stuff as implemented by SQLite3, but I haven't yet given up on
+using existing libraries like libunistring which GNU provides.
 
 # Dependencies
 
