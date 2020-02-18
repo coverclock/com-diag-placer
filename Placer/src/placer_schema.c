@@ -100,6 +100,8 @@ int placer_schema_TEXT16_import(placer_TEXT16_t * dest, const char * src, size_t
     const char * sp = (const char *)0;
     size_t ii = 0;
 
+    dest[items - 1] = 0;
+
     dp = dest;
     sp = src;
     ii = items;
@@ -115,7 +117,7 @@ int placer_schema_TEXT16_import(placer_TEXT16_t * dest, const char * src, size_t
 
     if (items < 1) {
         rc = SQLITE_OK;
-    } else if (*dp == 0) {
+    } else if (dest[items - 1] == 0) {
         rc = SQLITE_OK;
     } else {
         dest[items - 1] = 0;
