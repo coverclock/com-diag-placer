@@ -9,6 +9,7 @@
  * Licensed under the terms in README.h<BR>
  * Chip Overclock (coverclock@diag.com)<BR>
  * https://github.com/coverclock/com-diag-placer<BR>
+ * This defines the public API for Placer.
  */
 
 #include <stdint.h>
@@ -48,11 +49,11 @@ typedef unsigned short placer_TEXT16_t;
  *
  ******************************************************************************/
 
-typedef int (placer_callback_t)(void *, int, char **, char **);
+typedef int (placer_exec_callback_t)(void *, int, char **, char **);
 
-typedef void (placer_free_t)(void *);
+typedef void (placer_bind_callback_t)(void *);
 
-typedef int (placer_step_t)(sqlite3_stmt *, void *);
+typedef int (placer_steps_callback_t)(sqlite3_stmt *, void *);
 
 /*******************************************************************************
  *
@@ -81,10 +82,10 @@ extern void placer_error(int error);
  * emit a message for each call and (if initially zeroed) count the
  * number of entries.
  */
-typedef struct PlacerCallbackGeneric {
+typedef struct PlacerGenericExecCallback {
     FILE * fp;
     size_t count;
-} placer_callback_generic_t;
+} placer_generic_exec_callback_t;
 
 /**
  * Implement a generic SQLite callback useful for debugging.
@@ -94,7 +95,7 @@ typedef struct PlacerCallbackGeneric {
  * @param keyword is the array of column names provided by SQLite.
  * @return always SQLITE_OK (0).
  */
-extern int placer_callback_generic(void * vp, int ncols, char ** value, char ** keyword);
+extern int placer_generic_exec_callback(void * vp, int ncols, char ** value, char ** keyword);
 
 /*******************************************************************************
  *
@@ -161,11 +162,11 @@ extern char * placer_sql_formata(size_t size, const char * format, ...);
  * @param vp points to the callback state object or NULL.
  * @return the SQLite3 return code.
  */
-extern int placer_db_exec(sqlite3 * db, const char * sql, int (*cp)(void *, int, char **, char **), void * vp);
+extern int placer_db_exec(sqlite3 * db, const char * sql, placer_exec_callback_t * cp, void * vp);
 
 extern sqlite3_stmt * placer_db_prepare(sqlite3 * db, const char * sql);
 
-extern int placer_db_steps(sqlite3_stmt * sp, placer_step_t * cp, void * vp);
+extern int placer_db_steps(sqlite3_stmt * sp, placer_steps_callback_t * cp, void * vp);
 
 /*******************************************************************************
  *

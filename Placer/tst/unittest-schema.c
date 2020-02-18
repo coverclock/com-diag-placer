@@ -459,7 +459,7 @@ int main(void)
         COMMENT("create");
         stmt = placer_db_prepare(db, CREATE);
         ASSERT(stmt != (sqlite3_stmt *)0);
-        rc = placer_db_steps(stmt, (placer_step_t *)0, (void *)0);
+        rc = placer_db_steps(stmt, (placer_steps_callback_t *)0, (void *)0);
         ASSERT(rc == SQLITE_OK);
 
         for (ii = 0; ii < countof(ROW); ++ii) {
@@ -468,7 +468,7 @@ int main(void)
             ASSERT(stmt != (sqlite3_stmt *)0);
             rc = placer_struct_UnitTestSchema_bind(stmt, &ROW[ii]);
             ASSERT(rc == SQLITE_OK);
-            rc = placer_db_steps(stmt, (placer_step_t *)0, (void *)0);
+            rc = placer_db_steps(stmt, (placer_steps_callback_t *)0, (void *)0);
             ASSERT(rc == SQLITE_OK);
         }
 

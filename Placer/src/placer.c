@@ -20,20 +20,21 @@
 #include <endian.h>
 #include "sqlite3.h"
 #include "com/diag/diminuto/diminuto_types.h"
+#include "placer.h"
 #include "com/diag/placer/placer.h"
 
 /*******************************************************************************
  *
  ******************************************************************************/
 
-static FILE * Debug = (FILE *)0;
+FILE * placer_Debug = (FILE *)0;
 
 FILE * placer_debug(FILE * now)
 {
     FILE * was;
 
-    was = Debug;
-    Debug = now;
+    was = placer_Debug;
+    placer_Debug = now;
 
     return was;
 }
@@ -65,15 +66,15 @@ void placer_error(int error)
  *
  ******************************************************************************/
 
-int placer_callback_generic(void * vp, int ncols, char ** value, char ** keyword)
+int placer_generic_exec_callback(void * vp, int ncols, char ** value, char ** keyword)
 {
     static const char SEPERATOR = '|';
-    placer_callback_generic_t * pp = (placer_callback_generic_t *)0;
+    placer_generic_exec_callback_t * pp = (placer_generic_exec_callback_t *)0;
     int ii = 0;
 
     if (vp != (void *)0) {
 
-        pp = (placer_callback_generic_t *)vp;
+        pp = (placer_generic_exec_callback_t *)vp;
 
         ++(pp->count);
 
@@ -112,8 +113,8 @@ int placer_callback_generic(void * vp, int ncols, char ** value, char ** keyword
 size_t placer_str_expand(char * to, const char * from, size_t size) {
     size_t length = 0;
 
-    if (Debug != (FILE *)0) {
-        fprintf(Debug, "%s@%d: size=%zu\n", __FILE__, __LINE__, size);
+    if (placer_Debug != (FILE *)0) {
+        fprintf(placer_Debug, "%s@%d: size=%zu\n", __FILE__, __LINE__, size);
     }
 
     while ((size > 1) && (*from != '\0')) {
@@ -136,8 +137,8 @@ size_t placer_str_expand(char * to, const char * from, size_t size) {
         length += 1;
     }
 
-    if (Debug != (FILE *)0) {
-        fprintf(Debug, "%s@%d: length=%zu\n", __FILE__, __LINE__, length);
+    if (placer_Debug != (FILE *)0) {
+        fprintf(placer_Debug, "%s@%d: length=%zu\n", __FILE__, __LINE__, length);
     }
 
     return length;
@@ -156,8 +157,8 @@ char * placer_str_expanda(const char * from)
         }
     }
 
-    if (Debug != (FILE *)0) {
-        fprintf(Debug, "%s@%d: count=%zu\n", __FILE__, __LINE__, count);
+    if (placer_Debug != (FILE *)0) {
+        fprintf(placer_Debug, "%s@%d: count=%zu\n", __FILE__, __LINE__, count);
     }
 
     size = strlen(from) + count + 1;
@@ -197,8 +198,8 @@ char * placer_sql_vformata(size_t size, const char * format, va_list op)
 
         while (!0) {
 
-            if (Debug != (FILE *)0) {
-                fprintf(Debug, "%s@%d: size=%zu ss=%zu f0=%zu f1=%zu f2=%zu\n", __FILE__, __LINE__, size, ss, f0, f1, f2);
+            if (placer_Debug != (FILE *)0) {
+                fprintf(placer_Debug, "%s@%d: size=%zu ss=%zu f0=%zu f1=%zu f2=%zu\n", __FILE__, __LINE__, size, ss, f0, f1, f2);
             }
 
             buffer = (char *)sqlite3_malloc(ss);
@@ -263,7 +264,7 @@ char * placer_sql_formata(size_t size, const char * format, ...)
  *
  ******************************************************************************/
 
-int placer_db_exec(sqlite3 * db, const char * sql, placer_callback_t * cp, void * vp)
+int placer_db_exec(sqlite3 * db, const char * sql, placer_exec_callback_t * cp, void * vp)
 {
     int rc = SQLITE_ERROR;
     char * sqlmessage = (char *)0;
@@ -297,7 +298,7 @@ sqlite3_stmt * placer_db_prepare(sqlite3 * db, const char * sql)
     return sp;
 }
 
-int placer_db_steps(sqlite3_stmt * sp, placer_step_t * cp, void * vp)
+int placer_db_steps(sqlite3_stmt * sp, placer_steps_callback_t * cp, void * vp)
 {
     int rc = SQLITE_ERROR;
     int tc = SQLITE_ERROR;
@@ -305,14 +306,14 @@ int placer_db_steps(sqlite3_stmt * sp, placer_step_t * cp, void * vp)
 
     while (!0) {
 
-        if (Debug != (FILE *)0) {
-            fprintf(Debug, "%s@%d: step=%d\n", __FILE__, __LINE__, ii);
+        if (placer_Debug != (FILE *)0) {
+            fprintf(placer_Debug, "%s@%d: step=%d\n", __FILE__, __LINE__, ii);
         }
 
         rc = sqlite3_step(sp);
 
-        if (Debug != (FILE *)0) {
-            fprintf(Debug, "%s@%d: step=%d rc=%d=\"%s\"\n", __FILE__, __LINE__, ii, rc, sqlite3_errstr(rc));
+        if (placer_Debug != (FILE *)0) {
+            fprintf(placer_Debug, "%s@%d: step=%d rc=%d=\"%s\"\n", __FILE__, __LINE__, ii, rc, sqlite3_errstr(rc));
         }
 
         if (rc == SQLITE_OK) {
@@ -331,7 +332,7 @@ int placer_db_steps(sqlite3_stmt * sp, placer_step_t * cp, void * vp)
             break;
         }
 
-        if (cp != (placer_step_t *)0) {
+        if (cp != (placer_steps_callback_t *)0) {
             rc = (*cp)(sp, vp);
             if (rc != SQLITE_OK) {
                 placer_error(rc);
