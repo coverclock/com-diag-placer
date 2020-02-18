@@ -21,19 +21,19 @@
 #include "unittest-schema.h"
 #include "com/diag/placer/placer_end.h"
 
-#include "com/diag/placer/placer_callback_prototype.h"
+#include "com/diag/placer/placer_exec_prototype.h"
 #include "unittest-schema.h"
 #include "com/diag/placer/placer_end.h"
 
-#include "com/diag/placer/placer_step_prototype.h"
+#include "com/diag/placer/placer_exec.h"
 #include "unittest-schema.h"
 #include "com/diag/placer/placer_end.h"
 
-#include "com/diag/placer/placer_callback.h"
+#include "com/diag/placer/placer_steps_prototype.h"
 #include "unittest-schema.h"
 #include "com/diag/placer/placer_end.h"
 
-#include "com/diag/placer/placer_step.h"
+#include "com/diag/placer/placer_steps.h"
 #include "unittest-schema.h"
 #include "com/diag/placer/placer_end.h"
 
@@ -314,7 +314,7 @@ int main(void)
         TEST();
 
         COMMENT("1");        
-        rc = placer_struct_UnitTestSchema_callback((void *)&here, 6, value[0], keyword);
+        rc = placer_struct_UnitTestSchema_exec_callback((void *)&here, 6, value[0], keyword);
         ASSERT(rc == SQLITE_OK);
         EXPECT(here = &(gather[1]));
         EXPECT(results[0].id == (int32_t)1);
@@ -325,7 +325,7 @@ int main(void)
         EXPECT(strcmp(results[0].ssn, "123456789") == 0);
 
         COMMENT("2");        
-        rc = placer_struct_UnitTestSchema_callback((void *)&here, 6, value[1], keyword);
+        rc = placer_struct_UnitTestSchema__exec_callback((void *)&here, 6, value[1], keyword);
         ASSERT(rc == SQLITE_OK);
         EXPECT(here = &(gather[2]));
         EXPECT(results[1].id == (int32_t)2);
@@ -336,7 +336,7 @@ int main(void)
         EXPECT(strcmp(results[1].ssn, "234567890") == 0);
 
         COMMENT("3");        
-        rc = placer_struct_UnitTestSchema_callback((void *)&here, 6, value[2], keyword);
+        rc = placer_struct_UnitTestSchema__exec_callback((void *)&here, 6, value[2], keyword);
         ASSERT(rc == SQLITE_OK);
         EXPECT(here = &(gather[3]));
         EXPECT(results[2].id == (int32_t)3);
@@ -347,7 +347,7 @@ int main(void)
         EXPECT(strcmp(results[2].ssn, "345678901") == 0);
 
         COMMENT("4");        
-        rc = placer_struct_UnitTestSchema_callback((void *)&here, 6, value[3], keyword);
+        rc = placer_struct_UnitTestSchema__exec_callback((void *)&here, 6, value[3], keyword);
         ASSERT(rc == SQLITE_ERROR);
         EXPECT(here = &(gather[3]));
 
@@ -420,7 +420,7 @@ int main(void)
         here = &rows[0];
         stmt = placer_db_prepare(db, SELECT);
         ASSERT(stmt != (sqlite3_stmt *)0);
-        rc = placer_db_steps(stmt, placer_struct_UnitTestSchema_step, &here);
+        rc = placer_db_steps(stmt, placer_struct_UnitTestSchema_steps_callback, &here);
         ASSERT(rc == SQLITE_OK);
         EXPECT(here == &(rows[4]));
 
@@ -467,7 +467,7 @@ int main(void)
         COMMENT("callback");
         memset(row, 0, sizeof(row));
         here = &rows[0];
-        rc = placer_db_exec(db, SELECT, placer_struct_UnitTestSchema_callback, &here);
+        rc = placer_db_exec(db, SELECT, placer_struct_UnitTestSchema_exec_callback, &here);
         ASSERT(rc == SQLITE_OK);
         EXPECT(here == &(rows[4]));
 

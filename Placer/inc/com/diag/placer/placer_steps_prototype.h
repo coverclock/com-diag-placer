@@ -12,7 +12,7 @@
  */
 
 #define PLACER_SCHEMA(_STRUCTURE_) \
-extern int placer_struct_##_STRUCTURE_##_step(sqlite3_stmt * sp, void * vp);
+extern int placer_struct_##_STRUCTURE_##_steps_callback(sqlite3_stmt * sp, void * vp);
 
 #define PLACER_BLOB(_NAME_, _ITEMS_)
 
