@@ -6,6 +6,20 @@
  * Licensed under the terms in LICENSE.txt<BR>
  * Chip Overclock <coverclock@diag.com><BR>
  * https://github.com/coverclock/com-diag-placer<BR>
+ *
+ * Note that the name field is decared to be TEXT16. Since C (AFAIK)
+ * has no direct support for UTF-16 literals, we have to fake it.
+ * Fortunately (also AFAIK) the code points in UTF-8 that correspond
+ * to standard ASCII overlaps with UTF-16. UTF-16 is durectly supported
+ * in Java and is used in a lot of database systems for
+ * internationalization.
+ *
+ * The sqlite3_exec() callback returns all fields except blobs as TEXT
+ * (UTF-8). I haven't quite figured out what this means for TEXT16
+ * (UTF-16) fields. But it probably means you should use sqlite3_exec()
+ * (or placer_db_exec()) if you are using TEXT16 fields. The
+ * sqlite3_step() (or placer_db_steps()) approach seems to work just
+ * fine.
  */
 
 #include <stdio.h>
@@ -200,6 +214,7 @@ int main(void)
 
         TEST();
 
+        COMMENT("1");
         EXPECT(placer_TEXT16_compare(DATA1, DATA1, countof(DATA1)) == 0);
         EXPECT(placer_TEXT16_compare(DATA1, DATA2, countof(DATA1)) == -1);
         EXPECT(placer_TEXT16_compare(DATA1, DATA3, countof(DATA1)) == -1);
@@ -208,6 +223,7 @@ int main(void)
         EXPECT(placer_TEXT16_compare(DATA1, DATA5, 1) == -1);
         EXPECT(placer_TEXT16_compare(DATA1, DATA5, 0) == 0);
 
+        COMMENT("2");
         EXPECT(placer_TEXT16_compare(DATA2, DATA1, countof(DATA2)) == 1);
         EXPECT(placer_TEXT16_compare(DATA2, DATA2, countof(DATA2)) == 0);
         EXPECT(placer_TEXT16_compare(DATA2, DATA3, countof(DATA2)) == -1);
@@ -216,6 +232,7 @@ int main(void)
         EXPECT(placer_TEXT16_compare(DATA2, DATA5, 1) == -1);
         EXPECT(placer_TEXT16_compare(DATA2, DATA5, 0) == 0);
 
+        COMMENT("3");
         EXPECT(placer_TEXT16_compare(DATA3, DATA1, countof(DATA3)) == 1);
         EXPECT(placer_TEXT16_compare(DATA3, DATA2, countof(DATA3)) == 1);
         EXPECT(placer_TEXT16_compare(DATA3, DATA3, countof(DATA3)) == 0);
@@ -224,6 +241,7 @@ int main(void)
         EXPECT(placer_TEXT16_compare(DATA3, DATA5, 1) == 0);
         EXPECT(placer_TEXT16_compare(DATA3, DATA5, 0) == 0);
 
+        COMMENT("4");
         EXPECT(placer_TEXT16_compare(DATA4, DATA1, countof(DATA4)) == 1);
         EXPECT(placer_TEXT16_compare(DATA4, DATA2, countof(DATA4)) == 1);
         EXPECT(placer_TEXT16_compare(DATA4, DATA3, countof(DATA4)) == 1);
@@ -244,42 +262,76 @@ int main(void)
         placer_TEXT16_t result[] = { '0', '1', '2', '3', '4', '5', '6', '7', 0, };
 
         TEST();
+
+        COMMENT("1");
         EXPECT(placer_TEXT16_copy(result, DATA1, countof(result)) == result);
         EXPECT(placer_TEXT16_compare(result, DATA1, countof(result)) == 0);
         EXPECT(result[countof(result) - 1] == 0);
+
+        COMMENT("2");
         EXPECT(placer_TEXT16_copy(result, DATA2, countof(result)) == result);
         EXPECT(placer_TEXT16_compare(result, DATA2, countof(result)) == 0);
         EXPECT(result[countof(result) - 1] == 0);
+
+        COMMENT("3");
         EXPECT(placer_TEXT16_copy(result, DATA3, countof(result)) == result);
         EXPECT(placer_TEXT16_compare(result, DATA3, countof(result)) == 0);
         EXPECT(result[countof(result) - 1] == 0);
+
+        COMMENT("4");
         EXPECT(placer_TEXT16_copy(result, DATA4, countof(result)) == result);
         EXPECT(placer_TEXT16_compare(result, DATA4, countof(result)) == 0);
         EXPECT(result[countof(result) - 1] == 'R');
+
         STATUS();
     }
 
-#if 0
     {
-        static const placer_TEXT16_t DATA1[] = { '\0' };
-        static const placer_TEXT16_t DATA2[] = { 'A', '\0' };
-        static const placer_TEXT16_t DATA3[] = { 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', '\0' };
-        static const placer_TEXT16_t DATA4[] = { 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', '\0' };
-        static const placer_TEXT16_t DATA5[] = { 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', '\0' };
-        placer_TEXT16_t result[] = { '0', '1', '2', '3', '4', '5', '6', '7', '\0', };
+        static const char DATA1[] = "";
+        static const char DATA2[] = "A";
+        static const char DATA3[] = "BCDEFGHI";
+        static const char DATA4[] = "JKLMNOPQR";
+        static const char DATA5[] = "JLLMNOPQ";
+        static const placer_TEXT16_t RESULT1[] = { '\0' };
+        static const placer_TEXT16_t RESULT2[] = { 'A', '\0' };
+        static const placer_TEXT16_t RESULT3[] = { 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', '\0' };
+        static const placer_TEXT16_t RESULT4[] = { 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', '\0' };
+        static const placer_TEXT16_t RESULT5[] = { 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', '\0' };
+        placer_TEXT16_t result[]  = { '0', '1', '2', '3', '4', '5', '6', '7', '\0' };
 
         TEST();
+ 
+        COMMENT("1");
         EXPECT(placer_TEXT16_import(result, (char *)DATA1, countof(result)) == SQLITE_OK);
+        diminuto_dump(stderr, DATA1, sizeof(DATA1));
+        diminuto_dump(stderr, RESULT1, sizeof(RESULT1));
+        diminuto_dump(stderr, result, sizeof(result));
         EXPECT(result[0] == '\0');
+ 
+        COMMENT("2");
         EXPECT(placer_TEXT16_import(result, (char *)DATA2, countof(result)) == SQLITE_OK);
-        EXPECT(memcmp(result, DATA2, sizeof(DATA2)) == 0);
+        diminuto_dump(stderr, DATA2, sizeof(DATA2));
+        diminuto_dump(stderr, RESULT2, sizeof(RESULT2));
+        diminuto_dump(stderr, result, sizeof(result));
+        EXPECT(placer_TEXT16_compare(result, RESULT2, countof(result)) == 0);
+ 
+        COMMENT("3");
         EXPECT(placer_TEXT16_import(result, (char *)DATA3, countof(result)) == SQLITE_OK);
-        EXPECT(memcmp(result, DATA3, sizeof(DATA3)) == 0);
+        diminuto_dump(stderr, DATA3, sizeof(DATA3));
+        diminuto_dump(stderr, RESULT3, sizeof(RESULT3));
+        diminuto_dump(stderr, result, sizeof(result));
+        EXPECT(placer_TEXT16_compare(result, RESULT3, countof(result)) == 0);
+ 
+        COMMENT("4");
         EXPECT(placer_TEXT16_import(result, (char *)DATA4, countof(result)) == SQLITE_ERROR);
-        EXPECT(memcmp(result, DATA5, sizeof(DATA5)) == 0);
+        diminuto_dump(stderr, DATA4, sizeof(DATA4));
+        diminuto_dump(stderr, RESULT4, sizeof(RESULT4));
+        diminuto_dump(stderr, RESULT5, sizeof(RESULT5));
+        diminuto_dump(stderr, result, sizeof(result));
+        EXPECT(placer_TEXT16_compare(result, RESULT5, countof(result)) == 0);
+
         STATUS();
     }
-#endif
 
     {
         placer_BLOB_t result[]  = { 0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef, };
@@ -289,24 +341,30 @@ int main(void)
         };
 
         TEST();
+
         EXPECT(placer_BLOB_import(result, value[0], countof(result)) == SQLITE_OK);
         EXPECT(memcmp(result, value[0], sizeof(result)) == 0);
+
         EXPECT(placer_BLOB_import(result, value[1], countof(result)) == SQLITE_OK);
         EXPECT(memcmp(result, value[1], sizeof(result)) == 0);
+
         STATUS();
     }
 
-#if 0
     {
+        static const placer_TEXT16_t RESULT1[] = { 'C', 'h', 'i', 'p', ' ', 'O', 'v', 'e', 'r', 'c', 'l', 'o', 'c', 'k', 0 };
+        static const placer_TEXT16_t RESULT2[] = { 'R', 'e', 'd', ' ', 'B', 'l', 'a', 'c', 'k', 0 };
+        static const placer_TEXT16_t RESULT3[] = { 'T', 'h', 'e', ' ', 'F', 'r', 'e', 'n', 'c', 'h', ' ', 'W', 'o', 'm', 'a', 'n', 0 };
+        static const placer_TEXT16_t RESULT4[] = { 'D', 'r', 'e', 'a', 'd', ' ', 'P', 'i', 'r', 'a', 't', 'e', ' ', 'R', 'o', 'b', 'e', 'r', 't', 's', 0 }; /* Not used. */
         struct UnitTestSchema results[3] = { { 0, } };
         struct UnitTestSchema * gather[] = { &(results[0]), &(results[1]), &(results[2]), (struct UnitTestSchema *)0 };
         struct UnitTestSchema ** here = &(gather[0]);
         placer_BLOB_t image[4][4096] = { { 0x11, }, { 0x22, }, { 0x33, }, { 0x44 }, };
         char * value[4][6] = {
-            { "1", (char *)L"Chip Overclock", "63.625", (char *)&(image[0]), "42", "123456789", },
-            { "2", (char *)L"Red Black", "51.", (char *)&(image[1]), "86", "234567890", },
-            { "3", (char *)L"The French Woman", "62", (char *)&(image[2]), "99", "345678901", },
-            { "4", (char *)L"Dread Pirate Roberts", "31", (char *)&(image[3]), "1", "456789012", },
+            { "1", "Chip Overclock", "63.625", (char *)&(image[0]), "42", "123456789", },
+            { "2", "Red Black", "51.", (char *)&(image[1]), "86", "234567890", },
+            { "3", "The French Woman", "62", (char *)&(image[2]), "99", "345678901", },
+            { "4", "Dread Pirate Roberts", "31", (char *)&(image[3]), "1", "456789012", },
         };
         char * keyword[] = { "id", "name", "age", "image", "sn", "ssn", };
         int rc;
@@ -318,42 +376,47 @@ int main(void)
         ASSERT(rc == SQLITE_OK);
         EXPECT(here = &(gather[1]));
         EXPECT(results[0].id == (int32_t)1);
-        EXPECT(wcscmp(results[0].name,  L"Chip Overclock") == 0);
+        diminuto_dump(stderr, RESULT1, sizeof(RESULT1));
+        diminuto_dump(stderr, results[0].name, sizeof(results[0].name));
+        EXPECT(placer_TEXT16_compare(results[0].name, RESULT1, countof(results[0].name)) == 0);
         EXPECT(results[0].age == (double)63.625);
         EXPECT(results[0].image[0] == (uint8_t)0x11);
         EXPECT(results[0].sn == (int64_t)42);
         EXPECT(strcmp(results[0].ssn, "123456789") == 0);
 
         COMMENT("2");        
-        rc = placer_struct_UnitTestSchema__exec_callback((void *)&here, 6, value[1], keyword);
+        rc = placer_struct_UnitTestSchema_exec_callback((void *)&here, 6, value[1], keyword);
         ASSERT(rc == SQLITE_OK);
         EXPECT(here = &(gather[2]));
         EXPECT(results[1].id == (int32_t)2);
-        EXPECT(wcscmp(results[1].name,  L"Red Black") == 0);
+        diminuto_dump(stderr, RESULT2, sizeof(RESULT2));
+        diminuto_dump(stderr, results[1].name, sizeof(results[1].name));
+        EXPECT(placer_TEXT16_compare(results[1].name, RESULT2, countof(results[1].name)) == 0);
         EXPECT(results[1].age == (double)51.0);
         EXPECT(results[1].image[0] == (uint8_t)0x22);
         EXPECT(results[1].sn == (int64_t)86);
         EXPECT(strcmp(results[1].ssn, "234567890") == 0);
 
         COMMENT("3");        
-        rc = placer_struct_UnitTestSchema__exec_callback((void *)&here, 6, value[2], keyword);
+        rc = placer_struct_UnitTestSchema_exec_callback((void *)&here, 6, value[2], keyword);
         ASSERT(rc == SQLITE_OK);
         EXPECT(here = &(gather[3]));
         EXPECT(results[2].id == (int32_t)3);
-        EXPECT(wcscmp(results[2].name,  L"The French Woman") == 0);
+        diminuto_dump(stderr, RESULT3, sizeof(RESULT3));
+        diminuto_dump(stderr, results[2].name, sizeof(results[2].name));
+        EXPECT(placer_TEXT16_compare(results[2].name, RESULT3, countof(results[2].name)) == 0);
         EXPECT(results[2].age == (double)62);
         EXPECT(results[2].image[0] == (uint8_t)0x33);
         EXPECT(results[2].sn == (int64_t)99);
         EXPECT(strcmp(results[2].ssn, "345678901") == 0);
 
         COMMENT("4");        
-        rc = placer_struct_UnitTestSchema__exec_callback((void *)&here, 6, value[3], keyword);
+        rc = placer_struct_UnitTestSchema_exec_callback((void *)&here, 6, value[3], keyword);
         ASSERT(rc == SQLITE_ERROR);
         EXPECT(here = &(gather[3]));
 
         STATUS();
     }
-#endif
 
     {
         static const char PATH[] = "out/host/sql/unittest-schema.db";
@@ -370,12 +433,6 @@ int main(void)
 #include "unittest-schema.h"
 #include "com/diag/placer/placer_end.h"
         static const char SELECT[] = "SELECT * FROM UnitTestSchema;";
-        /*
-         * Note that the name field is decared to be TEXT16. Since C (AFAIK)
-         * has no direct literal support for UTF-16, we have to fake it.
-         * Fortunately (also AFAIK) the code points in UTF-8 that correspond
-         * to standard ASCII overlaps with UTF-16.
-         */
         static const struct UnitTestSchema ROW[4] = {
             { 1, { 'C', 'h', 'i', 'p', ' ', 'O', 'v', 'e', 'r', 'c', 'l', 'o', 'c', 'k', 0 },                               63.625, { 0x11, }, 42LL, "123456789", }, 
             { 2, { 'R', 'e', 'd', ' ', 'B', 'l', 'a', 'c', 'k', 0 },                                                        51.,    { 0x22, }, 86LL, "234567890", },
