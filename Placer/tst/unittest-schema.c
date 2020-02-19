@@ -94,40 +94,37 @@ int main(void)
 
     {
         const char CREATE[] = "CREATE TABLE UnitTestSchema (id INTEGER PRIMARY KEY, name TEXT , age FLOAT , image BLOB , sn INTEGER , ssn TEXT  );";
-        const char * create =
 #include "com/diag/placer/placer_create.h"
 #include "unittest-schema.h"
 #include "com/diag/placer/placer_end.h"
 
         TEST();
-        COMMENT("create=\"%s\"\n", create);
-        EXPECT(strcmp(create, CREATE) == 0);
+        COMMENT("create=\"%s\"\n", PLACER_STRUCT_UnitTestSchema_SQL_CREATE);
+        EXPECT(strcmp(PLACER_STRUCT_UnitTestSchema_SQL_CREATE, CREATE) == 0);
         STATUS();
     }
 
     {
         const char INSERT[] = "INSERT INTO UnitTestSchema VALUES (:id, :name, :age, :image, :sn, :ssn );";
-        const char * insert =
 #include "com/diag/placer/placer_insert.h"
 #include "unittest-schema.h"
 #include "com/diag/placer/placer_end.h"
 
         TEST();
-        COMMENT("insert=\"%s\"\n", insert);
-        EXPECT(strcmp(insert, INSERT) == 0);
+        COMMENT("insert=\"%s\"\n", PLACER_STRUCT_UnitTestSchema_SQL_INSERT);
+        EXPECT(strcmp(PLACER_STRUCT_UnitTestSchema_SQL_INSERT, INSERT) == 0);
         STATUS();
     }
 
     {
         const char REPLACE[] = "REPLACE INTO UnitTestSchema VALUES (:id, :name, :age, :image, :sn, :ssn );";
-        const char * replace =
 #include "com/diag/placer/placer_replace.h"
 #include "unittest-schema.h"
 #include "com/diag/placer/placer_end.h"
 
         TEST();
-        COMMENT("replace=\"%s\"\n", replace);
-        EXPECT(strcmp(replace, REPLACE) == 0);
+        COMMENT("replace=\"%s\"\n", PLACER_STRUCT_UnitTestSchema_SQL_REPLACE);
+        EXPECT(strcmp(PLACER_STRUCT_UnitTestSchema_SQL_REPLACE, REPLACE) == 0);
         STATUS();
     }
 
@@ -430,24 +427,27 @@ int main(void)
 
     {
         static const char PATH[] = "out/host/sql/unittest-schema.db";
-        static const char CREATE[] =
 #include "com/diag/placer/placer_create.h"
 #include "unittest-schema.h"
 #include "com/diag/placer/placer_end.h"
-        static const char INSERT[] =
 #include "com/diag/placer/placer_insert.h"
 #include "unittest-schema.h"
 #include "com/diag/placer/placer_end.h"
-        static const char REPLACE[] =
 #include "com/diag/placer/placer_replace.h"
 #include "unittest-schema.h"
 #include "com/diag/placer/placer_end.h"
         static const char SELECT[] = "SELECT * FROM UnitTestSchema;";
-        static const struct UnitTestSchema ROW[4] = {
+        static const struct UnitTestSchema INSERTED[4] = {
             { 1, { 'C', 'h', 'i', 'p', ' ', 'O', 'v', 'e', 'r', 'c', 'l', 'o', 'c', 'k', 0 },                               63.625, { 0x11, }, 42LL, "123456789", }, 
             { 2, { 'R', 'e', 'd', ' ', 'B', 'l', 'a', 'c', 'k', 0 },                                                        51.,    { 0x22, }, 86LL, "234567890", },
             { 3, { 'T', 'h', 'e', ' ', 'F', 'r', 'e', 'n', 'c', 'h', ' ', 'W', 'o', 'm', 'a', 'n', 0 },                     62,     { 0x33, }, 99LL, "345678901", },
             { 4, { 'D', 'r', 'e', 'a', 'd', ' ', 'P', 'i', 'r', 'a', 't', 'e', ' ', 'R', 'o', 'b', 'e', 'r', 't', 's', 0 }, 31,     { 0x44, },  1LL, "456789012", },
+        };
+        static const struct UnitTestSchema REPLACED[4] = {
+            { 1, { 'C', 'h', 'i', 'p', ' ', 'O', 'v', 'e', 'r', 'c', 'l', 'o', 'c', 'k', 0 },                               63.625, { 0x55, }, 2,    "567890123", }, 
+            { 2, { 'R', 'e', 'd', ' ', 'B', 'l', 'a', 'c', 'k', 0 },                                                        51.,    { 0x66, }, 4LL,  "456789012", },
+            { 3, { 'T', 'h', 'e', ' ', 'F', 'r', 'e', 'n', 'c', 'h', ' ', 'W', 'o', 'm', 'a', 'n', 0 },                     62,     { 0x77, }, 6LL,  "345678901", },
+            { 4, { 'D', 'r', 'e', 'a', 'd', ' ', 'P', 'i', 'r', 'a', 't', 'e', ' ', 'R', 'o', 'b', 'e', 'r', 't', 's', 0 }, 31,     { 0x88, }, 10LL, "234567890", },
         };
         struct UnitTestSchema row[4];
         struct UnitTestSchema * rows[] = { &row[0], &row[1], &row[2], &row[3], (struct UnitTestSchema *)0, };
@@ -472,16 +472,16 @@ int main(void)
         ASSERT(rc == SQLITE_OK);
 
         COMMENT("create");
-        stmt = placer_db_prepare(db, CREATE);
+        stmt = placer_db_prepare(db, PLACER_STRUCT_UnitTestSchema_SQL_CREATE);
         ASSERT(stmt != (sqlite3_stmt *)0);
         rc = placer_db_steps(stmt, (placer_steps_callback_t *)0, (void *)0);
         ASSERT(rc == SQLITE_OK);
 
-        for (ii = 0; ii < countof(ROW); ++ii) {
+        for (ii = 0; ii < countof(INSERTED); ++ii) {
             COMMENT("insert");
-            stmt = placer_db_prepare(db, INSERT);
+            stmt = placer_db_prepare(db, PLACER_STRUCT_UnitTestSchema_SQL_INSERT);
             ASSERT(stmt != (sqlite3_stmt *)0);
-            rc = placer_struct_UnitTestSchema_bind(stmt, &ROW[ii]);
+            rc = placer_struct_UnitTestSchema_bind(stmt, &INSERTED[ii]);
             ASSERT(rc == SQLITE_OK);
             rc = placer_db_steps(stmt, (placer_steps_callback_t *)0, (void *)0);
             ASSERT(rc == SQLITE_OK);
@@ -497,44 +497,54 @@ int main(void)
         EXPECT(here == &(rows[4]));
 
         COMMENT("0");
-        EXPECT(row[0].id == ROW[0].id);
+        EXPECT(row[0].id == INSERTED[0].id);
         diminuto_dump(stderr, row[0].name, sizeof(row[0].name));
-        diminuto_dump(stderr, ROW[0].name, sizeof(ROW[0].name));
-        EXPECT(placer_TEXT16_compare(row[0].name,  ROW[0].name, countof(row[0].name)) == 0);
-        EXPECT(row[0].age == ROW[0].age);
-        EXPECT(row[0].image[0] == ROW[0].image[0]);
-        EXPECT(row[0].sn == ROW[0].sn);
-        EXPECT(strcmp(row[0].ssn, ROW[0].ssn) == 0);
+        diminuto_dump(stderr, INSERTED[0].name, sizeof(INSERTED[0].name));
+        EXPECT(placer_TEXT16_compare(row[0].name,  INSERTED[0].name, countof(row[0].name)) == 0);
+        EXPECT(row[0].age == INSERTED[0].age);
+        EXPECT(row[0].image[0] == INSERTED[0].image[0]);
+        EXPECT(row[0].sn == INSERTED[0].sn);
+        EXPECT(strcmp(row[0].ssn, INSERTED[0].ssn) == 0);
 
         COMMENT("1");
-        EXPECT(row[1].id == ROW[1].id);
+        EXPECT(row[1].id == INSERTED[1].id);
         diminuto_dump(stderr, row[1].name, sizeof(row[1].name));
-        diminuto_dump(stderr, ROW[1].name, sizeof(ROW[1].name));
-        EXPECT(placer_TEXT16_compare(row[1].name,  ROW[1].name, countof(row[1].name)) == 0);
-        EXPECT(row[1].age == ROW[1].age);
-        EXPECT(row[1].image[0] == ROW[1].image[0]);
-        EXPECT(row[1].sn == ROW[1].sn);
-        EXPECT(strcmp(row[1].ssn, ROW[1].ssn) == 0);
+        diminuto_dump(stderr, INSERTED[1].name, sizeof(INSERTED[1].name));
+        EXPECT(placer_TEXT16_compare(row[1].name,  INSERTED[1].name, countof(row[1].name)) == 0);
+        EXPECT(row[1].age == INSERTED[1].age);
+        EXPECT(row[1].image[0] == INSERTED[1].image[0]);
+        EXPECT(row[1].sn == INSERTED[1].sn);
+        EXPECT(strcmp(row[1].ssn, INSERTED[1].ssn) == 0);
 
         COMMENT("2");
-        EXPECT(row[2].id == ROW[2].id);
+        EXPECT(row[2].id == INSERTED[2].id);
         diminuto_dump(stderr, row[2].name, sizeof(row[2].name));
-        diminuto_dump(stderr, ROW[2].name, sizeof(ROW[2].name));
-        EXPECT(placer_TEXT16_compare(row[2].name,  ROW[2].name, countof(row[2].name)) == 0);
-        EXPECT(row[2].age == ROW[2].age);
-        EXPECT(row[2].image[0] == ROW[2].image[0]);
-        EXPECT(row[2].sn == ROW[2].sn);
-        EXPECT(strcmp(row[2].ssn, ROW[2].ssn) == 0);
+        diminuto_dump(stderr, INSERTED[2].name, sizeof(INSERTED[2].name));
+        EXPECT(placer_TEXT16_compare(row[2].name,  INSERTED[2].name, countof(row[2].name)) == 0);
+        EXPECT(row[2].age == INSERTED[2].age);
+        EXPECT(row[2].image[0] == INSERTED[2].image[0]);
+        EXPECT(row[2].sn == INSERTED[2].sn);
+        EXPECT(strcmp(row[2].ssn, INSERTED[2].ssn) == 0);
 
         COMMENT("3");
-        EXPECT(row[3].id == ROW[3].id);
+        EXPECT(row[3].id == INSERTED[3].id);
         diminuto_dump(stderr, row[3].name, sizeof(row[3].name));
-        diminuto_dump(stderr, ROW[3].name, sizeof(ROW[3].name));
-        EXPECT(placer_TEXT16_compare(row[3].name,  ROW[3].name, countof(row[3].name)) == 0);
-        EXPECT(row[3].age == ROW[3].age);
-        EXPECT(row[3].image[0] == ROW[3].image[0]);
-        EXPECT(row[3].sn == ROW[3].sn);
-        EXPECT(strcmp(row[3].ssn, ROW[3].ssn) == 0);
+        diminuto_dump(stderr, INSERTED[3].name, sizeof(INSERTED[3].name));
+        EXPECT(placer_TEXT16_compare(row[3].name,  INSERTED[3].name, countof(row[3].name)) == 0);
+        EXPECT(row[3].age == INSERTED[3].age);
+        EXPECT(row[3].image[0] == INSERTED[3].image[0]);
+        EXPECT(row[3].sn == INSERTED[3].sn);
+        EXPECT(strcmp(row[3].ssn, INSERTED[3].ssn) == 0);
+
+        for (ii = 0; ii < countof(REPLACED); ++ii) {
+            COMMENT("replace");
+            stmt = placer_db_prepare(db, PLACER_STRUCT_UnitTestSchema_SQL_REPLACE);
+            ASSERT(stmt != (sqlite3_stmt *)0);
+            rc = placer_struct_UnitTestSchema_bind(stmt, &REPLACED[ii]);
+            ASSERT(rc == SQLITE_OK);
+            rc = placer_db_steps(stmt, (placer_steps_callback_t *)0, (void *)0);
+            ASSERT(rc == SQLITE_OK);
+        }
 
         COMMENT("callback");
         memset(row, 0, sizeof(row));
@@ -544,36 +554,36 @@ int main(void)
         EXPECT(here == &(rows[4]));
 
         COMMENT("0");
-        EXPECT(row[0].id == ROW[0].id);
-        EXPECT(placer_TEXT16_compare(row[0].name,  ROW[0].name, countof(row[0].name)) == 0);
-        EXPECT(row[0].age == ROW[0].age);
-        EXPECT(row[0].image[0] == ROW[0].image[0]);
-        EXPECT(row[0].sn == ROW[0].sn);
-        EXPECT(strcmp(row[0].ssn, ROW[0].ssn) == 0);
+        EXPECT(row[0].id == REPLACED[0].id);
+        EXPECT(placer_TEXT16_compare(row[0].name,  REPLACED[0].name, countof(row[0].name)) == 0);
+        EXPECT(row[0].age == REPLACED[0].age);
+        EXPECT(row[0].image[0] == REPLACED[0].image[0]);
+        EXPECT(row[0].sn == REPLACED[0].sn);
+        EXPECT(strcmp(row[0].ssn, REPLACED[0].ssn) == 0);
 
         COMMENT("1");
-        EXPECT(row[1].id == ROW[1].id);
-        EXPECT(placer_TEXT16_compare(row[1].name,  ROW[1].name, countof(row[1].name)) == 0);
-        EXPECT(row[1].age == ROW[1].age);
-        EXPECT(row[1].image[0] == ROW[1].image[0]);
-        EXPECT(row[1].sn == ROW[1].sn);
-        EXPECT(strcmp(row[1].ssn, ROW[1].ssn) == 0);
+        EXPECT(row[1].id == REPLACED[1].id);
+        EXPECT(placer_TEXT16_compare(row[1].name,  REPLACED[1].name, countof(row[1].name)) == 0);
+        EXPECT(row[1].age == REPLACED[1].age);
+        EXPECT(row[1].image[0] == REPLACED[1].image[0]);
+        EXPECT(row[1].sn == REPLACED[1].sn);
+        EXPECT(strcmp(row[1].ssn, REPLACED[1].ssn) == 0);
 
         COMMENT("2");
-        EXPECT(row[2].id == ROW[2].id);
-        EXPECT(placer_TEXT16_compare(row[2].name,  ROW[2].name, countof(row[2].name)) == 0);
-        EXPECT(row[2].age == ROW[2].age);
-        EXPECT(row[2].image[0] == ROW[2].image[0]);
-        EXPECT(row[2].sn == ROW[2].sn);
-        EXPECT(strcmp(row[2].ssn, ROW[2].ssn) == 0);
+        EXPECT(row[2].id == REPLACED[2].id);
+        EXPECT(placer_TEXT16_compare(row[2].name,  REPLACED[2].name, countof(row[2].name)) == 0);
+        EXPECT(row[2].age == REPLACED[2].age);
+        EXPECT(row[2].image[0] == REPLACED[2].image[0]);
+        EXPECT(row[2].sn == REPLACED[2].sn);
+        EXPECT(strcmp(row[2].ssn, REPLACED[2].ssn) == 0);
 
         COMMENT("3");
-        EXPECT(row[3].id == ROW[3].id);
-        EXPECT(placer_TEXT16_compare(row[3].name,  ROW[3].name, countof(row[3].name)) == 0);
-        EXPECT(row[3].age == ROW[3].age);
-        EXPECT(row[3].image[0] == ROW[3].image[0]);
-        EXPECT(row[3].sn == ROW[3].sn);
-        EXPECT(strcmp(row[3].ssn, ROW[3].ssn) == 0);
+        EXPECT(row[3].id == REPLACED[3].id);
+        EXPECT(placer_TEXT16_compare(row[3].name,  REPLACED[3].name, countof(row[3].name)) == 0);
+        EXPECT(row[3].age == REPLACED[3].age);
+        EXPECT(row[3].image[0] == REPLACED[3].image[0]);
+        EXPECT(row[3].sn == REPLACED[3].sn);
+        EXPECT(strcmp(row[3].ssn, REPLACED[3].ssn) == 0);
 
         COMMENT("close");
         rc = sqlite3_close(db);

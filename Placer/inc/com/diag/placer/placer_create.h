@@ -12,31 +12,32 @@
  */
 
 #define PLACER_SCHEMA(_STRUCTURE_) \
-    "CREATE TABLE " #_STRUCTURE_ " ("
+    static const char PLACER_STRUCT_##_STRUCTURE_##_SQL_CREATE[] = \
+        "CREATE TABLE " #_STRUCTURE_ " ("
 
 #define PLACER_BLOB(_NAME_, _ITEMS_) \
-	#_NAME_ " BLOB "
+	        #_NAME_ " BLOB "
 
 #define PLACER_FLOAT(_NAME_) \
-	#_NAME_ " FLOAT "
+	        #_NAME_ " FLOAT "
 
 #define PLACER_INTEGER(_NAME_) \
-	#_NAME_ " INTEGER "
+	        #_NAME_ " INTEGER "
 
 #define PLACER_INTEGER64(_NAME_) \
-	#_NAME_ " INTEGER "
+	        #_NAME_ " INTEGER "
 
 #define PLACER_TEXT(_NAME_, _ITEMS_) \
-	#_NAME_ " TEXT "
+	        #_NAME_ " TEXT "
 
 #define PLACER_TEXT16(_NAME_, _ITEMS_) \
-	#_NAME_ " TEXT "
+	        #_NAME_ " TEXT "
 
 #define PLACER_FIELD(_CONSTRAINTS_) \
-    #_CONSTRAINTS_ ", "
+            #_CONSTRAINTS_ ", "
 
 #define PLACER_FINAL(_CONSTRAINTS_) \
-    #_CONSTRAINTS_ " "
+            #_CONSTRAINTS_ " "
 
 #define PLACER_END(_CONSTRAINTS_) \
-    #_CONSTRAINTS_ ");";
+        #_CONSTRAINTS_ ");";
