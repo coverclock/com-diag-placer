@@ -128,12 +128,12 @@ Run the unit tests
     unittest-format
     unittest-message
 
-Run the functional test.
+Run the first functional test.
 
     cd ~/src/com-diag-placer/Placer
-    make out/host/sql/census.db
     . out/host/bin/setup
-    census -D out/host/sql/census.db -v -0 /
+    make out/host/sql/census.db
+    census -D out/host/sql/census.db -v -0 .
 
 # References
 
