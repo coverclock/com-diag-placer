@@ -477,8 +477,9 @@ int main(void)
         rc = placer_db_steps(stmt, (placer_steps_callback_t *)0, (void *)0);
         ASSERT(rc == SQLITE_OK);
 
+        COMMENT("insert");
         for (ii = 0; ii < countof(INSERTED); ++ii) {
-            COMMENT("insert");
+            COMMENT("%d\n", ii);
             stmt = placer_db_prepare(db, PLACER_STRUCT_UnitTestSchema_SQL_INSERT);
             ASSERT(stmt != (sqlite3_stmt *)0);
             rc = placer_struct_UnitTestSchema_bind(stmt, &INSERTED[ii]);
@@ -487,7 +488,7 @@ int main(void)
             ASSERT(rc == SQLITE_OK);
         }
 
-        COMMENT("step");
+        COMMENT("steps");
         memset(row, 0, sizeof(row));
         here = &rows[0];
         stmt = placer_db_prepare(db, SELECT);
@@ -536,8 +537,9 @@ int main(void)
         EXPECT(row[3].sn == INSERTED[3].sn);
         EXPECT(strcmp(row[3].ssn, INSERTED[3].ssn) == 0);
 
+        COMMENT("replace");
         for (ii = 0; ii < countof(REPLACED); ++ii) {
-            COMMENT("replace");
+            COMMENT("%d\n", ii);
             stmt = placer_db_prepare(db, PLACER_STRUCT_UnitTestSchema_SQL_REPLACE);
             ASSERT(stmt != (sqlite3_stmt *)0);
             rc = placer_struct_UnitTestSchema_bind(stmt, &REPLACED[ii]);
@@ -546,7 +548,7 @@ int main(void)
             ASSERT(rc == SQLITE_OK);
         }
 
-        COMMENT("callback");
+        COMMENT("exec");
         memset(row, 0, sizeof(row));
         here = &rows[0];
         rc = placer_db_exec(db, SELECT, placer_struct_UnitTestSchema_exec_callback, &here);
