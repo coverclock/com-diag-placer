@@ -16,10 +16,9 @@
 #include <errno.h>
 #include "sqlite3.h"
 #include "com/diag/diminuto/diminuto_types.h"
-#include "placer.h"
-#include "com/diag/placer/placer.h"
+#include "placer.h" /* Private API. */
 
-int placer_schema_BLOB_import(placer_BLOB_t * dest, const char * src, size_t items)
+int placer_exec_BLOB_import(placer_BLOB_t * dest, const char * src, size_t items)
 {
     int rc = SQLITE_OK;
 
@@ -28,7 +27,7 @@ int placer_schema_BLOB_import(placer_BLOB_t * dest, const char * src, size_t ite
     return rc;
 }
 
-int placer_schema_FLOAT_import(placer_FLOAT_t * dest, const char * src)
+int placer_exec_FLOAT_import(placer_FLOAT_t * dest, const char * src)
 {
     int rc = SQLITE_ERROR;
     char * end = (char *)0;
@@ -43,7 +42,7 @@ int placer_schema_FLOAT_import(placer_FLOAT_t * dest, const char * src)
     return rc;
 }
 
-int placer_schema_INTEGER_import(placer_INTEGER_t * dest, const char * src)
+int placer_exec_INTEGER_import(placer_INTEGER_t * dest, const char * src)
 {
     int rc = SQLITE_ERROR;
     char * end = (char *)0;
@@ -58,7 +57,7 @@ int placer_schema_INTEGER_import(placer_INTEGER_t * dest, const char * src)
     return rc;
 }
 
-int placer_schema_INTEGER64_import(placer_INTEGER64_t * dest, const char * src)
+int placer_exec_INTEGER64_import(placer_INTEGER64_t * dest, const char * src)
 {
     int rc = SQLITE_ERROR;
     char * end = (char *)0;
@@ -73,7 +72,7 @@ int placer_schema_INTEGER64_import(placer_INTEGER64_t * dest, const char * src)
     return rc;
 }
 
-int placer_schema_TEXT_import(placer_TEXT_t * dest, const char * src, size_t items)
+int placer_exec_TEXT_import(placer_TEXT_t * dest, const char * src, size_t items)
 {
     int rc = SQLITE_ERROR;
 
@@ -93,7 +92,7 @@ int placer_schema_TEXT_import(placer_TEXT_t * dest, const char * src, size_t ite
     return rc;
 }
 
-int placer_schema_TEXT16_import(placer_TEXT16_t * dest, const char * src, size_t items)
+int placer_exec_TEXT16_import(placer_TEXT16_t * dest, const char * src, size_t items)
 {
     int rc = SQLITE_ERROR;
     placer_TEXT16_t * dp = (placer_TEXT16_t *)0;

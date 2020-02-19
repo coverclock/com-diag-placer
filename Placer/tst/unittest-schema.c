@@ -32,6 +32,7 @@
 #include "com/diag/diminuto/diminuto_unittest.h"
 #include "com/diag/diminuto/diminuto_countof.h"
 #include "com/diag/diminuto/diminuto_dump.h"
+#include "../src/placer.h" /* Private API. */
 #include "com/diag/placer/placer.h"
 
 #include "com/diag/placer/placer_structure.h"
@@ -134,13 +135,13 @@ int main(void)
         placer_INTEGER_t result = 0xa5a5a5a5;
 
         TEST();
-        EXPECT(placer_schema_INTEGER_import(&result, "INVALID") == SQLITE_ERROR);
-        EXPECT(placer_schema_INTEGER_import(&result, "1NV8L1D") == SQLITE_ERROR);
-        EXPECT(placer_schema_INTEGER_import(&result, "0") == SQLITE_OK);
+        EXPECT(placer_exec_INTEGER_import(&result, "INVALID") == SQLITE_ERROR);
+        EXPECT(placer_exec_INTEGER_import(&result, "1NV8L1D") == SQLITE_ERROR);
+        EXPECT(placer_exec_INTEGER_import(&result, "0") == SQLITE_OK);
         EXPECT(result == 0);
-        EXPECT(placer_schema_INTEGER_import(&result, "2147483647") == SQLITE_OK);
+        EXPECT(placer_exec_INTEGER_import(&result, "2147483647") == SQLITE_OK);
         EXPECT(result == 2147483647);
-        EXPECT(placer_schema_INTEGER_import(&result, "-1") == SQLITE_OK);
+        EXPECT(placer_exec_INTEGER_import(&result, "-1") == SQLITE_OK);
         EXPECT(result == -1);
         STATUS();
     }
@@ -149,13 +150,13 @@ int main(void)
         placer_INTEGER64_t result = 0xa5a5a5a5a5a5a5a5LL;
 
         TEST();
-        EXPECT(placer_schema_INTEGER64_import(&result, "INVALID") == SQLITE_ERROR);
-        EXPECT(placer_schema_INTEGER64_import(&result, "1NV8L1D") == SQLITE_ERROR);
-        EXPECT(placer_schema_INTEGER64_import(&result, "0") == SQLITE_OK);
+        EXPECT(placer_exec_INTEGER64_import(&result, "INVALID") == SQLITE_ERROR);
+        EXPECT(placer_exec_INTEGER64_import(&result, "1NV8L1D") == SQLITE_ERROR);
+        EXPECT(placer_exec_INTEGER64_import(&result, "0") == SQLITE_OK);
         EXPECT(result == 0);
-        EXPECT(placer_schema_INTEGER64_import(&result, "9223372036854775807") == SQLITE_OK);
+        EXPECT(placer_exec_INTEGER64_import(&result, "9223372036854775807") == SQLITE_OK);
         EXPECT(result == 9223372036854775807LL);
-        EXPECT(placer_schema_INTEGER64_import(&result, "-1") == SQLITE_OK);
+        EXPECT(placer_exec_INTEGER64_import(&result, "-1") == SQLITE_OK);
         EXPECT(result == -1);
         STATUS();
     }
@@ -164,15 +165,15 @@ int main(void)
         placer_FLOAT_t result = 165.165;
 
         TEST();
-        EXPECT(placer_schema_FLOAT_import(&result, "INVALID") == SQLITE_ERROR);
-        EXPECT(placer_schema_FLOAT_import(&result, "1NV8L1D") == SQLITE_ERROR);
-        EXPECT(placer_schema_FLOAT_import(&result, "0") == SQLITE_OK);
+        EXPECT(placer_exec_FLOAT_import(&result, "INVALID") == SQLITE_ERROR);
+        EXPECT(placer_exec_FLOAT_import(&result, "1NV8L1D") == SQLITE_ERROR);
+        EXPECT(placer_exec_FLOAT_import(&result, "0") == SQLITE_OK);
         EXPECT(result == 0.0);
-        EXPECT(placer_schema_FLOAT_import(&result, "0.0") == SQLITE_OK);
+        EXPECT(placer_exec_FLOAT_import(&result, "0.0") == SQLITE_OK);
         EXPECT(result == 0.0);
-        EXPECT(placer_schema_FLOAT_import(&result, "526.625") == SQLITE_OK);
+        EXPECT(placer_exec_FLOAT_import(&result, "526.625") == SQLITE_OK);
         EXPECT(result == 526.625);
-        EXPECT(placer_schema_FLOAT_import(&result, "-1.0") == SQLITE_OK);
+        EXPECT(placer_exec_FLOAT_import(&result, "-1.0") == SQLITE_OK);
         EXPECT(result == -1.0);
         STATUS();
     }
@@ -181,14 +182,14 @@ int main(void)
         placer_TEXT_t result[] = { '0', '1', '2', '3', '4', '5', '6', '7', '\0', };
 
         TEST();
-        EXPECT(placer_schema_TEXT_import((placer_TEXT_t *)0, (const char *)0, 0) == SQLITE_OK);
-        EXPECT(placer_schema_TEXT_import(result, "", countof(result)) == SQLITE_OK);
+        EXPECT(placer_exec_TEXT_import((placer_TEXT_t *)0, (const char *)0, 0) == SQLITE_OK);
+        EXPECT(placer_exec_TEXT_import(result, "", countof(result)) == SQLITE_OK);
         EXPECT(result[0] == '\0');
-        EXPECT(placer_schema_TEXT_import(result, "A", countof(result)) == SQLITE_OK);
+        EXPECT(placer_exec_TEXT_import(result, "A", countof(result)) == SQLITE_OK);
         EXPECT(strcmp(result, "A") == 0);
-        EXPECT(placer_schema_TEXT_import(result, "BCDEFGHI", countof(result)) == SQLITE_OK);
+        EXPECT(placer_exec_TEXT_import(result, "BCDEFGHI", countof(result)) == SQLITE_OK);
         EXPECT(strcmp(result, "BCDEFGHI") == 0);
-        EXPECT(placer_schema_TEXT_import(result, "JKLMNOPQR", countof(result)) == SQLITE_ERROR);
+        EXPECT(placer_exec_TEXT_import(result, "JKLMNOPQR", countof(result)) == SQLITE_ERROR);
         EXPECT(strcmp(result, "JKLMNOPQ") == 0);
         STATUS();
     }
@@ -306,31 +307,31 @@ int main(void)
         TEST();
 
         COMMENT("0");
-        EXPECT(placer_schema_TEXT16_import((placer_TEXT16_t *)0, (const char *)0, 0) == SQLITE_OK);
+        EXPECT(placer_exec_TEXT16_import((placer_TEXT16_t *)0, (const char *)0, 0) == SQLITE_OK);
  
         COMMENT("1");
-        EXPECT(placer_schema_TEXT16_import(result, (char *)DATA1, countof(result)) == SQLITE_OK);
+        EXPECT(placer_exec_TEXT16_import(result, (char *)DATA1, countof(result)) == SQLITE_OK);
         diminuto_dump(stderr, DATA1, sizeof(DATA1));
         diminuto_dump(stderr, RESULT1, sizeof(RESULT1));
         diminuto_dump(stderr, result, sizeof(result));
         EXPECT(result[0] == '\0');
  
         COMMENT("2");
-        EXPECT(placer_schema_TEXT16_import(result, (char *)DATA2, countof(result)) == SQLITE_OK);
+        EXPECT(placer_exec_TEXT16_import(result, (char *)DATA2, countof(result)) == SQLITE_OK);
         diminuto_dump(stderr, DATA2, sizeof(DATA2));
         diminuto_dump(stderr, RESULT2, sizeof(RESULT2));
         diminuto_dump(stderr, result, sizeof(result));
         EXPECT(placer_TEXT16_compare(result, RESULT2, countof(result)) == 0);
  
         COMMENT("3");
-        EXPECT(placer_schema_TEXT16_import(result, (char *)DATA3, countof(result)) == SQLITE_OK);
+        EXPECT(placer_exec_TEXT16_import(result, (char *)DATA3, countof(result)) == SQLITE_OK);
         diminuto_dump(stderr, DATA3, sizeof(DATA3));
         diminuto_dump(stderr, RESULT3, sizeof(RESULT3));
         diminuto_dump(stderr, result, sizeof(result));
         EXPECT(placer_TEXT16_compare(result, RESULT3, countof(result)) == 0);
  
         COMMENT("4");
-        EXPECT(placer_schema_TEXT16_import(result, (char *)DATA4, countof(result)) == SQLITE_ERROR);
+        EXPECT(placer_exec_TEXT16_import(result, (char *)DATA4, countof(result)) == SQLITE_ERROR);
         diminuto_dump(stderr, DATA4, sizeof(DATA4));
         diminuto_dump(stderr, RESULT4, sizeof(RESULT4));
         diminuto_dump(stderr, RESULT5, sizeof(RESULT5));
@@ -349,12 +350,12 @@ int main(void)
 
         TEST();
 
-        EXPECT(placer_schema_BLOB_import((placer_BLOB_t *)0, (const char *)0, 0) == SQLITE_OK);
+        EXPECT(placer_exec_BLOB_import((placer_BLOB_t *)0, (const char *)0, 0) == SQLITE_OK);
 
-        EXPECT(placer_schema_BLOB_import(result, value[0], countof(result)) == SQLITE_OK);
+        EXPECT(placer_exec_BLOB_import(result, value[0], countof(result)) == SQLITE_OK);
         EXPECT(memcmp(result, value[0], sizeof(result)) == 0);
 
-        EXPECT(placer_schema_BLOB_import(result, value[1], countof(result)) == SQLITE_OK);
+        EXPECT(placer_exec_BLOB_import(result, value[1], countof(result)) == SQLITE_OK);
         EXPECT(memcmp(result, value[1], sizeof(result)) == 0);
 
         STATUS();

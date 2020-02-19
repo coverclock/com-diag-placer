@@ -31,7 +31,7 @@ int placer_struct_##_STRUCTURE_##_exec_callback(void * vp, int ncols, char ** va
         { \
             if (ii >= ncols) { rc = SQLITE_ERROR; break; } \
             if (strcmp(keyword[ii], #_NAME_) != 0) { rc = SQLITE_ERROR; break; } \
-            if ((rc = placer_schema_BLOB_import(pp->_NAME_, value[ii], (_ITEMS_))) != SQLITE_OK) { break; } \
+            if ((rc = placer_exec_BLOB_import(pp->_NAME_, value[ii], (_ITEMS_))) != SQLITE_OK) { break; } \
             ii += 1; \
         }
 
@@ -39,7 +39,7 @@ int placer_struct_##_STRUCTURE_##_exec_callback(void * vp, int ncols, char ** va
         { \
             if (ii >= ncols) { rc = SQLITE_ERROR; break; } \
             if (strcmp(keyword[ii], #_NAME_) != 0) { rc = SQLITE_ERROR; break; } \
-            if ((rc = placer_schema_FLOAT_import(&(pp->_NAME_), value[ii])) != SQLITE_OK) { break; } \
+            if ((rc = placer_exec_FLOAT_import(&(pp->_NAME_), value[ii])) != SQLITE_OK) { break; } \
             ii += 1; \
         }
 
@@ -47,7 +47,7 @@ int placer_struct_##_STRUCTURE_##_exec_callback(void * vp, int ncols, char ** va
         { \
             if (ii >= ncols) { rc = SQLITE_ERROR; break; } \
             if (strcmp(keyword[ii], #_NAME_) != 0) { rc = SQLITE_ERROR; break; } \
-            if ((rc = placer_schema_INTEGER_import(&(pp->_NAME_), value[ii])) != SQLITE_OK) { break; } \
+            if ((rc = placer_exec_INTEGER_import(&(pp->_NAME_), value[ii])) != SQLITE_OK) { break; } \
             ii += 1; \
         }
 
@@ -55,7 +55,7 @@ int placer_struct_##_STRUCTURE_##_exec_callback(void * vp, int ncols, char ** va
         { \
             if (ii >= ncols) { rc = SQLITE_ERROR; break; } \
             if (strcmp(keyword[ii], #_NAME_) != 0) { rc = SQLITE_ERROR; break; } \
-            if ((rc = placer_schema_INTEGER64_import(&(pp->_NAME_), value[ii])) != SQLITE_OK) { break; } \
+            if ((rc = placer_exec_INTEGER64_import(&(pp->_NAME_), value[ii])) != SQLITE_OK) { break; } \
             ii += 1; \
         }
 
@@ -63,7 +63,7 @@ int placer_struct_##_STRUCTURE_##_exec_callback(void * vp, int ncols, char ** va
         { \
             if (ii >= ncols) { rc = SQLITE_ERROR; break; } \
             if (strcmp(keyword[ii], #_NAME_) != 0) { rc = SQLITE_ERROR; break; } \
-            if ((rc = placer_schema_TEXT_import(pp->_NAME_, value[ii], (_ITEMS_))) != SQLITE_OK) { break; } \
+            if ((rc = placer_exec_TEXT_import(pp->_NAME_, value[ii], (_ITEMS_))) != SQLITE_OK) { break; } \
             ii += 1; \
         }
 
@@ -71,7 +71,7 @@ int placer_struct_##_STRUCTURE_##_exec_callback(void * vp, int ncols, char ** va
         { \
             if (ii >= ncols) { rc = SQLITE_ERROR; break; } \
             if (strcmp(keyword[ii], #_NAME_) != 0) { rc = SQLITE_ERROR; break; } \
-            if ((rc = placer_schema_TEXT16_import(pp->_NAME_, value[ii], (_ITEMS_))) != SQLITE_OK) { break; } \
+            if ((rc = placer_exec_TEXT16_import(pp->_NAME_, value[ii], (_ITEMS_))) != SQLITE_OK) { break; } \
             ii += 1; \
         }
 

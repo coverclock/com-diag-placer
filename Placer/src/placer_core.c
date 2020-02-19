@@ -15,8 +15,7 @@
 #include <errno.h>
 #include "sqlite3.h"
 #include "com/diag/diminuto/diminuto_types.h"
-#include "placer.h"
-#include "com/diag/placer/placer.h"
+#include "placer.h" /* Private API. */
 
 FILE * placer_Debug = (FILE *)0;
 

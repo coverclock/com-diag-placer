@@ -13,7 +13,28 @@
  */
 
 #include <stdio.h>
+#include "com/diag/placer/placer.h"
+
+/*******************************************************************************
+ * CORE
+ ******************************************************************************/
 
 extern FILE * placer_Debug;
+
+/*******************************************************************************
+ * EXEC
+ ******************************************************************************/
+
+extern int placer_exec_BLOB_import(placer_BLOB_t * dest, const char * src, size_t items);
+
+extern int placer_exec_FLOAT_import(placer_FLOAT_t * dest, const char * src);
+
+extern int placer_exec_INTEGER_import(placer_INTEGER_t * dest, const char * src);
+
+extern int placer_exec_INTEGER64_import(placer_INTEGER64_t * dest, const char * src);
+
+extern int placer_exec_TEXT_import(placer_TEXT_t * dest, const char * src, size_t items);
+
+extern int placer_exec_TEXT16_import(placer_TEXT16_t * dest, const char * src, size_t items);
 
 #endif
