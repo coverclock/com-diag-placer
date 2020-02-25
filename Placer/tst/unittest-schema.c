@@ -458,6 +458,7 @@ int main(void)
         int rc = 0;
         int ii = 0;
         FILE * debug = (FILE *)0;
+        char separator = '\0';
 
         TEST();
         debug = placer_debug(stderr);
@@ -589,6 +590,8 @@ int main(void)
         EXPECT(strcmp(row[3].ssn, REPLACED[3].ssn) == 0);
 
         COMMENT("generic");
+        separator = placer_separator(':');
+        EXPECT(separator == '|');
         stmt = placer_prepare(db, SELECT);
         ASSERT(stmt != (sqlite3_stmt *)0);
         rc = placer_steps(stmt, placer_steps_generic_callback, &generic);

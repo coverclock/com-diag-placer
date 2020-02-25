@@ -186,6 +186,15 @@ extern int placer_steps_generic_callback(sqlite3_stmt * sp, void * vp);
 extern FILE * placer_debug(FILE * now);
 
 /**
+ * Sets the single separator character that the generic call backs use when
+ * emitting a printable line. The default is the same as that used by
+ * SQLite3 itself, the vertical bar '|'.
+ * @param now is the new separator character (need not be printable).
+ * @return the prior separator character.
+ */
+extern char placer_separator(char now);
+
+/**
  * Emit the SQLite error message to standard error if it is
  * non-NULL and then free it.
  * @param message is the SQLite error message or nULL.

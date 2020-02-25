@@ -20,7 +20,6 @@
 #include "placer.h" /* Private API. */
 
 int placer_steps_generic_callback(sqlite3_stmt * sp, void * vp) {
-    static const char SEPARATOR = '|';
     placer_generic_callback_t * pp = (placer_generic_callback_t *)0;
     int ncols = 0;
     int ii = 0;
@@ -41,7 +40,7 @@ int placer_steps_generic_callback(sqlite3_stmt * sp, void * vp) {
             if (pp->count == 1) {
                 for (ii = 0; ii < ncols; ++ii) {
                     if (ii > 0) {
-                        fputc(SEPARATOR, pp->fp);
+                        fputc(placer_Separator, pp->fp);
                     }
                     kk = sqlite3_column_name(sp, ii);
                     fputs(kk, pp->fp);
@@ -51,7 +50,7 @@ int placer_steps_generic_callback(sqlite3_stmt * sp, void * vp) {
 
             for (ii = 0; ii < ncols; ++ii) {
                 if (ii > 0) {
-                    fputc(SEPARATOR, pp->fp);
+                    fputc(placer_Separator, pp->fp);
                 }
                 tt = sqlite3_column_type(sp, ii);
                 if (tt != SQLITE_BLOB) {
@@ -63,9 +62,9 @@ int placer_steps_generic_callback(sqlite3_stmt * sp, void * vp) {
                     ll = sqlite3_column_bytes(sp, ii);
                     vv = (const char *)sqlite3_column_blob(sp, ii);
                     while ((ll--) > 0) {
-                        if (*vv == SEPARATOR) {
+                        if (*vv == placer_Separator) {
                             fputc('\\', pp->fp);
-                            fputc(SEPARATOR, pp->fp);
+                            fputc(placer_Separator, pp->fp);
                         } else {
                             diminuto_phex_emit(pp->fp, *(vv++), ~(size_t)0, 0, 0, 0, &current, &end, 0);
                         }

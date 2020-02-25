@@ -20,12 +20,24 @@
 
 FILE * placer_Debug = (FILE *)0;
 
+char placer_Separator = '|';
+
 FILE * placer_debug(FILE * now)
 {
     FILE * was;
 
     was = placer_Debug;
     placer_Debug = now;
+
+    return was;
+}
+
+char placer_separator(char now)
+{
+    char was;
+
+    was = placer_Separator;
+    placer_Separator = now;
 
     return was;
 }
