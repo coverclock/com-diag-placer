@@ -12,7 +12,7 @@
  */
 
 #define PLACER_SCHEMA(_STRUCTURE_) \
-extern int placer_struct_##_STRUCTURE_##_exec_callback(void * vp, int ncols, char ** value, char ** keyword);
+extern int placer_exec_struct_##_STRUCTURE_##_callback(void * vp, int ncols, char ** value, char ** keyword);
 
 #define PLACER_BLOB(_NAME_, _ITEMS_)
 

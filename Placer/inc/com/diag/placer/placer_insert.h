@@ -12,7 +12,7 @@
  */
 
 #define PLACER_SCHEMA(_STRUCTURE_) \
-    static const char PLACER_STRUCT_##_STRUCTURE_##_SQL_INSERT[] = \
+    static const char PLACER_SQL_struct_##_STRUCTURE_##_INSERT[] = \
         "INSERT INTO " #_STRUCTURE_ " VALUES ("
 
 #define PLACER_BLOB(_NAME_, _ITEMS_) \

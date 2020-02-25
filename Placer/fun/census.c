@@ -60,7 +60,7 @@ static int clean(sqlite3 * db)
     int xc = 0;
     int rc = 0;
     char * sql = (char *)0;
-    placer_generic_exec_callback_t state = { stdout, 0 };
+    placer_generic_callback_t state = PLACER_GENERIC_CALLBACK_INITIALIZER;
    
     do {
 
@@ -81,7 +81,7 @@ static int clean(sqlite3 * db)
             fputc('\n', stderr);
         }
 
-        rc = placer_db_exec(db, sql, placer_generic_exec_callback, &state);
+        rc = placer_exec(db, sql, placer_exec_generic_callback, &state);
         sqlite3_free(sql);
         if (rc != SQLITE_OK) {
             xc = -13;
@@ -105,7 +105,7 @@ static int clean(sqlite3 * db)
             fputc('\n', stderr);
         }
 
-        rc = placer_db_exec(db, sql, placer_generic_exec_callback, &state);
+        rc = placer_exec(db, sql, placer_exec_generic_callback, &state);
         sqlite3_free(sql);
         if (rc != SQLITE_OK) {
             xc = -13;
@@ -129,7 +129,7 @@ static int clean(sqlite3 * db)
             fputc('\n', stderr);
         }
 
-        rc = placer_db_exec(db, sql, placer_generic_exec_callback, &state);
+        rc = placer_exec(db, sql, placer_exec_generic_callback, &state);
         sqlite3_free(sql);
         if (rc != SQLITE_OK) {
             xc = -13;
@@ -157,7 +157,7 @@ static int mark(sqlite3 * db)
     int xc = 0;
     int rc = 0;
     char * sql = (char *)0;
-    placer_generic_exec_callback_t state = { stdout, 0 };
+    placer_generic_callback_t state = PLACER_GENERIC_CALLBACK_INITIALIZER;
    
     do {
 
@@ -178,7 +178,7 @@ static int mark(sqlite3 * db)
             fputc('\n', stderr);
         }
 
-        rc = placer_db_exec(db, sql, placer_generic_exec_callback, &state);
+        rc = placer_exec(db, sql, placer_exec_generic_callback, &state);
         sqlite3_free(sql);
         if (rc != SQLITE_OK) {
             xc = -13;
@@ -202,7 +202,7 @@ static int mark(sqlite3 * db)
             fputc('\n', stderr);
         }
 
-        rc = placer_db_exec(db, sql, placer_generic_exec_callback, &state);
+        rc = placer_exec(db, sql, placer_exec_generic_callback, &state);
         sqlite3_free(sql);
         if (rc != SQLITE_OK) {
             xc = -13;
@@ -226,7 +226,7 @@ static int mark(sqlite3 * db)
             fputc('\n', stderr);
         }
 
-        rc = placer_db_exec(db, sql, placer_generic_exec_callback, &state);
+        rc = placer_exec(db, sql, placer_exec_generic_callback, &state);
         sqlite3_free(sql);
         if (rc != SQLITE_OK) {
             xc = -13;
@@ -250,7 +250,7 @@ static int mark(sqlite3 * db)
             fputc('\n', stderr);
         }
 
-        rc = placer_db_exec(db, sql, placer_generic_exec_callback, &state);
+        rc = placer_exec(db, sql, placer_exec_generic_callback, &state);
         sqlite3_free(sql);
         if (rc != SQLITE_OK) {
             xc = -13;
@@ -274,7 +274,7 @@ static int mark(sqlite3 * db)
             fputc('\n', stderr);
         }
 
-        rc = placer_db_exec(db, sql, placer_generic_exec_callback, &state);
+        rc = placer_exec(db, sql, placer_exec_generic_callback, &state);
         sqlite3_free(sql);
         if (rc != SQLITE_OK) {
             xc = -13;
@@ -298,7 +298,7 @@ static int mark(sqlite3 * db)
             fputc('\n', stderr);
         }
 
-        rc = placer_db_exec(db, sql, placer_generic_exec_callback, &state);
+        rc = placer_exec(db, sql, placer_exec_generic_callback, &state);
         sqlite3_free(sql);
         if (rc != SQLITE_OK) {
             xc = -13;
@@ -376,7 +376,7 @@ static int identify(void * vp, const char * name, const char * path, size_t dept
             fputc('\n', stderr);
         }
 
-        rc = placer_db_exec(db, sql, identifier, (char *)path);
+        rc = placer_exec(db, sql, identifier, (char *)path);
         sqlite3_free(sql);
         if (rc != SQLITE_OK) {
             xc = -13;
@@ -404,7 +404,7 @@ static int enumerate(void * vp, const char * name, const char * path, size_t dep
     int rc = 0;
     char * to = (char *)0;
     char * sql = (char *)0;
-    placer_generic_exec_callback_t state = { (FILE *)0, 0 };
+    placer_generic_callback_t state = { (FILE *)0, 0 };
    
     do {
 
@@ -432,7 +432,7 @@ static int enumerate(void * vp, const char * name, const char * path, size_t dep
         }
 
         state.count = 0;
-        rc = placer_db_exec(db, sql, placer_generic_exec_callback, &state);
+        rc = placer_exec(db, sql, placer_exec_generic_callback, &state);
         sqlite3_free(sql);
         if (rc != SQLITE_OK) {
             xc = -13;
@@ -471,7 +471,7 @@ static int extract(sqlite3 * db, diminuto_fs_type_t type)
     char tt[2] = { '\0', '\0' };
     char * to = (char *)0;
     char * sql = (char *)0;
-    placer_generic_exec_callback_t state = { stdout, 0 };
+    placer_generic_callback_t state = PLACER_GENERIC_CALLBACK_INITIALIZER;
 
     do {
 
@@ -494,7 +494,7 @@ static int extract(sqlite3 * db, diminuto_fs_type_t type)
             fputc('\n', stderr);
         }
 
-        rc = placer_db_exec(db, sql, placer_generic_exec_callback, &state);
+        rc = placer_exec(db, sql, placer_exec_generic_callback, &state);
         sqlite3_free(sql);
         if (rc != SQLITE_OK) {
             xc = -21;
@@ -518,7 +518,7 @@ static int replace(void * vp, const char * name, const char * path, size_t depth
     int rc = 0;
     char * to = (char *)0;
     char * sql = (char *)0;
-    placer_generic_exec_callback_t state = { stdout, 0 };
+    placer_generic_callback_t state = PLACER_GENERIC_CALLBACK_INITIALIZER;
 
     do {
 
@@ -563,7 +563,7 @@ static int replace(void * vp, const char * name, const char * path, size_t depth
             fputc('\n', stderr);
         }
 
-        rc = placer_db_exec(db, sql, placer_generic_exec_callback, &state);
+        rc = placer_exec(db, sql, placer_exec_generic_callback, &state);
         sqlite3_free(sql);
         if (rc != SQLITE_OK) {
             xc = -13;
@@ -588,7 +588,7 @@ static int insert(void * vp, const char * name, const char * path, size_t depth,
     int rc = 0;
     char * to = (char *)0;
     char * sql = (char *)0;
-    placer_generic_exec_callback_t state = { stdout, 0 };
+    placer_generic_callback_t state = PLACER_GENERIC_CALLBACK_INITIALIZER;
 
     do {
 
@@ -633,7 +633,7 @@ static int insert(void * vp, const char * name, const char * path, size_t depth,
             fputc('\n', stderr);
         }
 
-        rc = placer_db_exec(db, sql, placer_generic_exec_callback, &state);
+        rc = placer_exec(db, sql, placer_exec_generic_callback, &state);
         sqlite3_free(sql);
         if (rc != SQLITE_OK) {
             xc = -13;
@@ -656,7 +656,7 @@ static int show(sqlite3 * db)
     int xc = 0;
     int rc = 0;
     char * sql = (char *)0;
-    placer_generic_exec_callback_t state = { stdout, 0 };
+    placer_generic_callback_t state = PLACER_GENERIC_CALLBACK_INITIALIZER;
    
     do {
 
@@ -677,7 +677,7 @@ static int show(sqlite3 * db)
             fputc('\n', stderr);
         }
 
-        rc = placer_db_exec(db, sql, placer_generic_exec_callback, &state);
+        rc = placer_exec(db, sql, placer_exec_generic_callback, &state);
         sqlite3_free(sql);
         if (rc != SQLITE_OK) {
             xc = -13;

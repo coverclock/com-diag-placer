@@ -18,6 +18,46 @@
 #include "com/diag/diminuto/diminuto_types.h"
 #include "placer.h" /* Private API. */
 
+int placer_exec_generic_callback(void * vp, int ncols, char ** value, char ** keyword)
+{
+    static const char SEPERATOR = '|';
+    placer_generic_callback_t * pp = (placer_generic_callback_t *)0;
+    int ii = 0;
+
+    if (vp != (void *)0) {
+
+        pp = (placer_generic_callback_t *)vp;
+
+        ++(pp->count);
+
+        if (pp->fp == (FILE *)0) {
+            /* Do nothing. */
+        } else if (ncols <= 0) {
+            /* Do nothing. */
+        } else {
+            if (pp->count == 1) {
+                for (ii = 0; ii < ncols; ++ii) {
+                    if (ii > 0) {
+                        fputc(SEPERATOR, pp->fp);
+                    }
+                    fputs(keyword[ii], pp->fp);
+                }
+                fputc('\n', pp->fp);
+            }
+            for (ii = 0; ii < ncols; ++ii) {
+                if (ii > 0) {
+                    fputc(SEPERATOR, pp->fp);
+                }
+                fputs(value[ii], pp->fp);
+            }
+            fputc('\n', pp->fp);
+        }
+
+    }
+
+    return SQLITE_OK;
+}
+
 int placer_exec_BLOB_import(placer_BLOB_t * dest, const char * src, size_t items)
 {
     int rc = SQLITE_OK;

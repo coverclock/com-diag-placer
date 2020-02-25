@@ -223,6 +223,7 @@ dist:	distribution
 
 tidy:
 	rm -f $(OUT)/$(SQL_DIR)/census.db
+	rm -f $(OUT)/$(SQL_DIR)/schema.db
 
 clean:
 	rm -rf $(OUT)

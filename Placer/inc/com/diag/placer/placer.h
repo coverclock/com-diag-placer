@@ -52,6 +52,31 @@ typedef unsigned char placer_TEXT_t;
 typedef unsigned short placer_TEXT16_t;
 
 /*******************************************************************************
+ * STRUCTURES
+ ******************************************************************************/
+
+/**
+ * Defines a structure used by generic callbacks to (if not null)
+ * emit a message for each call and (if initially zeroed) count the
+ * number of entries. The file pointer should be initialized by the
+ * application to a standard I/O stream (e.g. stdout), and the count
+ * to zero.
+ */
+typedef struct PlacerGenericCallback {
+    FILE * fp;
+    size_t count;
+} placer_generic_callback_t;
+
+/**
+ * @def PLACER_GENERIC_CALLBACK_INITIALIZER
+ * Generates code for a completely optional convenience
+ * initializer for a generic callback structure. Mostly
+ * this just serves as an example.
+ */
+#define PLACER_GENERIC_CALLBACK_INITIALIZER \
+    { stdout, 0 }
+
+/*******************************************************************************
  * CALLBACKS
  ******************************************************************************/
 
@@ -69,32 +94,6 @@ typedef void (placer_bind_callback_t)(void *);
  * THis is the prototype for the callback function for the Placer steps feature.
  */
 typedef int (placer_steps_callback_t)(sqlite3_stmt *, void *);
-
-/*******************************************************************************
- * CORE
- ******************************************************************************/
-
-/**
- * Sets the debug file pointer. If the pointer is non-NULL, debugging
- * information is emitted to it. The prior debug file pointer is returned.
- * @param now is the new file pointer used for debugging, or NULL.
- * @return the prior debug file pointer (which may be NULL).
- */
-extern FILE * placer_debug(FILE * now);
-
-/**
- * Emit the SQLite error message to standard error if it is
- * non-NULL and then free it.
- * @param message is the SQLite error message or nULL.
- */
-extern void placer_message(char * message);
-
-/**
- * Turn the SQLite error number into a printable string and emit it
- * to standard error.
- * @param error is the SQLite error number.
- */
-extern void placer_error(int error);
 
 /*******************************************************************************
  * STRINGS
@@ -149,18 +148,8 @@ extern char * placer_sql_vformata(size_t size, const char * format, va_list op);
 extern char * placer_sql_formata(size_t size, const char * format, ...);
 
 /*******************************************************************************
- * DATABASE
+ * EXEC
  ******************************************************************************/
-
-/**
- * Defines a structure used by the generic callback to (if not null)
- * emit a message for each call and (if initially zeroed) count the
- * number of entries.
- */
-typedef struct PlacerGenericExecCallback {
-    FILE * fp;
-    size_t count;
-} placer_generic_exec_callback_t;
 
 /**
  * Implement a generic SQLite callback useful for debugging.
@@ -170,7 +159,39 @@ typedef struct PlacerGenericExecCallback {
  * @param keyword is the array of column names provided by SQLite.
  * @return always SQLITE_OK (0).
  */
-extern int placer_generic_exec_callback(void * vp, int ncols, char ** value, char ** keyword);
+extern int placer_exec_generic_callback(void * vp, int ncols, char ** value, char ** keyword);
+
+/*******************************************************************************
+ * STEPS
+ ******************************************************************************/
+
+typedef int (placer_steps_callback_t)(sqlite3_stmt *, void *);
+
+/*******************************************************************************
+ * CORE
+ ******************************************************************************/
+
+/**
+ * Sets the debug file pointer. If the pointer is non-NULL, debugging
+ * information is emitted to it. The prior debug file pointer is returned.
+ * @param now is the new file pointer used for debugging, or NULL.
+ * @return the prior debug file pointer (which may be NULL).
+ */
+extern FILE * placer_debug(FILE * now);
+
+/**
+ * Emit the SQLite error message to standard error if it is
+ * non-NULL and then free it.
+ * @param message is the SQLite error message or nULL.
+ */
+extern void placer_message(char * message);
+
+/**
+ * Turn the SQLite error number into a printable string and emit it
+ * to standard error.
+ * @param error is the SQLite error number.
+ */
+extern void placer_error(int error);
 
 /**
  * A convenience function that calls sqlite3_exec(), emits any error messages to standard
@@ -181,7 +202,7 @@ extern int placer_generic_exec_callback(void * vp, int ncols, char ** value, cha
  * @param vp points to the callback state object or NULL.
  * @return the SQLite3 return code.
  */
-extern int placer_db_exec(sqlite3 * db, const char * sql, placer_exec_callback_t * cp, void * vp);
+extern int placer_exec(sqlite3 * db, const char * sql, placer_exec_callback_t * cp, void * vp);
 
 /**
  * A convenience function that calls sqlite3_prepare() to compile an SQL string
@@ -191,7 +212,7 @@ extern int placer_db_exec(sqlite3 * db, const char * sql, placer_exec_callback_t
  * @param sql points to the SQL string.
  * @return a pointer to SQLite3 statement object.
  */
-extern sqlite3_stmt * placer_db_prepare(sqlite3 * db, const char * sql);
+extern sqlite3_stmt * placer_prepare(sqlite3 * db, const char * sql);
 
 /**
  * Incrementally runs the SQLite3 step function with the provided statement
@@ -205,7 +226,7 @@ extern sqlite3_stmt * placer_db_prepare(sqlite3 * db, const char * sql);
  * @param vp points to the callback state object or NULL.
  * @return an SQLite3 return code.
  */
-extern int placer_db_steps(sqlite3_stmt * sp, placer_steps_callback_t * cp, void * vp);
+extern int placer_steps(sqlite3_stmt * sp, placer_steps_callback_t * cp, void * vp);
 
 /*******************************************************************************
  * UTF-16

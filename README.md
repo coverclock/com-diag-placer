@@ -127,13 +127,25 @@ Run the unit tests
     unittest-expand
     unittest-format
     unittest-message
+    unittest-schema
 
-Run the first functional test.
+Run the functional test.
 
     cd ~/src/com-diag-placer/Placer
     . out/host/bin/setup
     make out/host/sql/census.db
     census -D out/host/sql/census.db -v -0 .
+
+# Directories
+ 
+* bin - utility source files.
+* cfg - configuration makefiles.
+* fun - functional test source files (may require special hardware).
+* inc - public header files.
+* out - build artifacts.
+* sql - Structured Query Language scripts.
+* src - feature implementation and private header source files.
+* tst - unit test source files.
 
 # References
 

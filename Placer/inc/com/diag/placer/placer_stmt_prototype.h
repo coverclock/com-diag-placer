@@ -14,7 +14,7 @@
 #include <sqlite3.h>
 
 #define PLACER_SCHEMA(_STRUCTURE_) \
-extern int placer_struct_##_STRUCTURE_##_bind(sqlite3_stmt * sp, const struct _STRUCTURE_ * pp);
+extern int placer_stmt_struct_##_STRUCTURE_##_bind(sqlite3_stmt * sp, const struct _STRUCTURE_ * pp);
 
 #define PLACER_BLOB(_NAME_, _ITEMS_)
 

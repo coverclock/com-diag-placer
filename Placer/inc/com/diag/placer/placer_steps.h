@@ -17,7 +17,7 @@
 #include "placer.h"
 
 #define PLACER_SCHEMA(_STRUCTURE_) \
-int placer_struct_##_STRUCTURE_##_steps_callback(sqlite3_stmt * sp, void * vp) { \
+int placer_steps_struct_##_STRUCTURE_##_callback(sqlite3_stmt * sp, void * vp) { \
     int rc = SQLITE_ERROR; \
     struct _STRUCTURE_ *** ip = (struct _STRUCTURE_ ***)0; \
     struct _STRUCTURE_ ** ap = (struct _STRUCTURE_ **)0; \

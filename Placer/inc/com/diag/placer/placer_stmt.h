@@ -17,7 +17,7 @@
 #include "placer.h"
 
 #define PLACER_SCHEMA(_STRUCTURE_) \
-int placer_struct_##_STRUCTURE_##_bind(sqlite3_stmt * sp, const struct _STRUCTURE_ * pp) { \
+int placer_stmt_struct_##_STRUCTURE_##_bind(sqlite3_stmt * sp, const struct _STRUCTURE_ * pp) { \
     int rc = SQLITE_ERROR; \
     int ii = 0; \
     int ll = 0; \
