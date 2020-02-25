@@ -452,6 +452,7 @@ int main(void)
         struct UnitTestSchema row[4];
         struct UnitTestSchema * rows[] = { &row[0], &row[1], &row[2], &row[3], (struct UnitTestSchema *)0, };
         struct UnitTestSchema ** here = (struct UnitTestSchema **)0;
+        placer_generic_callback_t generic = { stderr, 0 };
         sqlite3 * db = (sqlite3 *)0;
         sqlite3_stmt * stmt = (sqlite3_stmt *)0;
         int rc = 0;
@@ -586,6 +587,13 @@ int main(void)
         EXPECT(row[3].image[0] == REPLACED[3].image[0]);
         EXPECT(row[3].sn == REPLACED[3].sn);
         EXPECT(strcmp(row[3].ssn, REPLACED[3].ssn) == 0);
+
+        COMMENT("generic");
+        stmt = placer_prepare(db, SELECT);
+        ASSERT(stmt != (sqlite3_stmt *)0);
+        rc = placer_steps(stmt, placer_steps_generic_callback, &generic);
+        ASSERT(rc == SQLITE_OK);
+        ASSERT(generic.count == 4);
 
         COMMENT("close");
         rc = sqlite3_close(db);

@@ -152,7 +152,7 @@ extern char * placer_sql_formata(size_t size, const char * format, ...);
  ******************************************************************************/
 
 /**
- * Implement a generic SQLite callback useful for debugging.
+ * Implement a generic SQLite exec callback useful for debugging.
  * @param vp is a pointer to a generic callback structure or NULL.
  * @param ncols is the number of columns provided by SQLite.
  * @param value is the array of column values provided by SQLite.
@@ -165,7 +165,13 @@ extern int placer_exec_generic_callback(void * vp, int ncols, char ** value, cha
  * STEPS
  ******************************************************************************/
 
-typedef int (placer_steps_callback_t)(sqlite3_stmt *, void *);
+/**
+ * Implement a generlc SQLite steps callback useful for debugging.
+ * @param sp points to the active statement structure.
+ * @param vp is a pointer to a generic callback structure or NULL.
+ * @return always SQLITE_OK (0).
+ */
+extern int placer_steps_generic_callback(sqlite3_stmt * sp, void * vp);
 
 /*******************************************************************************
  * CORE
