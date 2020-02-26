@@ -41,7 +41,28 @@
 #include <errno.h>
 #include <assert.h>
 #include "com/diag/diminuto/diminuto_fs.h"
+#include "com/diag/diminuto/diminuto_countof.h"
 #include "com/diag/placer/placer.h"
+
+#include "com/diag/placer/placer_structure.h"
+#include "schema.h"
+#include "com/diag/placer/placer_end.h"
+
+#include "com/diag/placer/placer_steps_prototype.h"
+#include "schema.h"
+#include "com/diag/placer/placer_end.h"
+
+#include "com/diag/placer/placer_steps.h"
+#include "schema.h"
+#include "com/diag/placer/placer_end.h"
+
+#include "com/diag/placer/placer_stmt_prototype.h"
+#include "schema.h"
+#include "com/diag/placer/placer_end.h"
+
+#include "com/diag/placer/placer_stmt.h"
+#include "schema.h"
+#include "com/diag/placer/placer_end.h"
 
 static const char * Program = (const char *)0;
 static int Debug = 0;
@@ -59,85 +80,35 @@ static int clean(sqlite3 * db)
 {
     int xc = 0;
     int rc = 0;
-    char * sql = (char *)0;
+    sqlite3_stmt * sp = (sqlite3_stmt *)0;
+    static const char * SELECT[] = {
+        "SELECT * FROM census WHERE mark == 0;",
+        "DELETE FROM census WHERE mark == 0;",
+        "UPDATE census SET mark = 0 WHERE mark != 0;",
+        "SELECT * FROM census WHERE mark != 0;"
+    };
     placer_generic_callback_t state = PLACER_GENERIC_CALLBACK_INITIALIZER;
+    int ii = 0;
+
+    for (ii = 0; ii < countof(SELECT); ii++) {
+
+        fputs(SELECT[ii], state.fp);
+        fputc('\n', state.fp);
+
+        sp = placer_prepare(db, SELECT[ii]);
+        if (sp == (sqlite3_stmt *)0) {
+            xc = -13;
+            break;
+        }
+
+        rc = placer_steps(sp, placer_steps_generic_callback, &state);
+        if (rc != SQLITE_OK) {
+            xc = -13;
+            break;
+        }
+
+    }
    
-    do {
-
-        /*
-         *
-         */
-
-        sql = placer_sql_formata(Buffersize,
-            "SELECT * FROM census WHERE mark == 0;"
-        );
-        if (sql == (char *)0) {
-            xc = -12;
-            break;
-        }
-
-        if (Verbose) {
-            fputs(sql, stderr);
-            fputc('\n', stderr);
-        }
-
-        rc = placer_exec(db, sql, placer_exec_generic_callback, &state);
-        sqlite3_free(sql);
-        if (rc != SQLITE_OK) {
-            xc = -13;
-            break;
-        }
-
-        /*
-         *
-         */
-
-        sql = placer_sql_formata(Buffersize,
-            "DELETE FROM census WHERE mark == 0;"
-        );
-        if (sql == (char *)0) {
-            xc = -12;
-            break;
-        }
-
-        if (Verbose) {
-            fputs(sql, stderr);
-            fputc('\n', stderr);
-        }
-
-        rc = placer_exec(db, sql, placer_exec_generic_callback, &state);
-        sqlite3_free(sql);
-        if (rc != SQLITE_OK) {
-            xc = -13;
-            break;
-        }
-
-        /*
-         *
-         */
-
-        sql = placer_sql_formata(Buffersize,
-            "UPDATE census SET mark = 0 WHERE mark != 0;"
-        );
-        if (sql == (char *)0) {
-            xc = -12;
-            break;
-        }
-
-        if (Verbose) {
-            fputs(sql, stderr);
-            fputc('\n', stderr);
-        }
-
-        rc = placer_exec(db, sql, placer_exec_generic_callback, &state);
-        sqlite3_free(sql);
-        if (rc != SQLITE_OK) {
-            xc = -13;
-            break;
-        }
-
-    } while (0);
-
     return xc;
 }
 
@@ -156,156 +127,36 @@ static int mark(sqlite3 * db)
 {
     int xc = 0;
     int rc = 0;
-    char * sql = (char *)0;
+    sqlite3_stmt * sp = (sqlite3_stmt *)0;
+    static const char * SELECT[] = {
+        "UPDATE census SET mark = 1 WHERE nlink > 1;",
+        "SELECT * FROM census WHERE mark != 0;",
+        "SELECT * FROM census WHERE (mark != 0) AND (nlink <= 1);",
+        "SELECT * FROM census WHERE (mark == 0) AND (nlink > 1);",
+        "UPDATE census SET mark = 0 WHERE mark != 0;",
+        "SELECT * FROM census WHERE mark != 0;"
+    };
     placer_generic_callback_t state = PLACER_GENERIC_CALLBACK_INITIALIZER;
-   
-    do {
+    int ii = 0;
 
-        /*
-         *
-         */
+    for (ii = 0; ii < countof(SELECT); ii++) {
 
-        sql = placer_sql_formata(Buffersize,
-            "UPDATE census SET mark = 1 WHERE nlink > 1;"
-        );
-        if (sql == (char *)0) {
-            xc = -12;
+        fputs(SELECT[ii], state.fp);
+        fputc('\n', state.fp);
+
+        sp = placer_prepare(db, SELECT[ii]);
+        if (sp == (sqlite3_stmt *)0) {
+            xc = -13;
             break;
         }
 
-        if (Verbose) {
-            fputs(sql, stderr);
-            fputc('\n', stderr);
-        }
-
-        rc = placer_exec(db, sql, placer_exec_generic_callback, &state);
-        sqlite3_free(sql);
+        rc = placer_steps(sp, placer_steps_generic_callback, &state);
         if (rc != SQLITE_OK) {
             xc = -13;
             break;
         }
 
-        /*
-         *
-         */
-
-        sql = placer_sql_formata(Buffersize,
-            "SELECT * FROM census WHERE mark != 0;"
-        );
-        if (sql == (char *)0) {
-            xc = -12;
-            break;
-        }
-
-        if (Verbose) {
-            fputs(sql, stderr);
-            fputc('\n', stderr);
-        }
-
-        rc = placer_exec(db, sql, placer_exec_generic_callback, &state);
-        sqlite3_free(sql);
-        if (rc != SQLITE_OK) {
-            xc = -13;
-            break;
-        }
-
-        /*
-         *
-         */
-
-        sql = placer_sql_formata(Buffersize,
-            "SELECT * FROM census WHERE (mark != 0) AND (nlink <= 1);"
-        );
-        if (sql == (char *)0) {
-            xc = -12;
-            break;
-        }
-
-        if (Verbose) {
-            fputs(sql, stderr);
-            fputc('\n', stderr);
-        }
-
-        rc = placer_exec(db, sql, placer_exec_generic_callback, &state);
-        sqlite3_free(sql);
-        if (rc != SQLITE_OK) {
-            xc = -13;
-            break;
-        }
-
-        /*
-         *
-         */
-
-        sql = placer_sql_formata(Buffersize,
-            "SELECT * FROM census WHERE (mark == 0) AND (nlink > 1);"
-        );
-        if (sql == (char *)0) {
-            xc = -12;
-            break;
-        }
-
-        if (Verbose) {
-            fputs(sql, stderr);
-            fputc('\n', stderr);
-        }
-
-        rc = placer_exec(db, sql, placer_exec_generic_callback, &state);
-        sqlite3_free(sql);
-        if (rc != SQLITE_OK) {
-            xc = -13;
-            break;
-        }
-
-        /*
-         *
-         */
-
-        sql = placer_sql_formata(Buffersize,
-            "UPDATE census SET mark = 0 WHERE mark != 0;"
-        );
-        if (sql == (char *)0) {
-            xc = -12;
-            break;
-        }
-
-        if (Verbose) {
-            fputs(sql, stderr);
-            fputc('\n', stderr);
-        }
-
-        rc = placer_exec(db, sql, placer_exec_generic_callback, &state);
-        sqlite3_free(sql);
-        if (rc != SQLITE_OK) {
-            xc = -13;
-            break;
-        }
-
-        /*
-         *
-         */
-
-        sql = placer_sql_formata(Buffersize,
-            "SELECT * FROM census WHERE mark != 0;"
-        );
-        if (sql == (char *)0) {
-            xc = -12;
-            break;
-        }
-
-        if (Verbose) {
-            fputs(sql, stderr);
-            fputc('\n', stderr);
-        }
-
-        rc = placer_exec(db, sql, placer_exec_generic_callback, &state);
-        sqlite3_free(sql);
-        if (rc != SQLITE_OK) {
-            xc = -13;
-            break;
-        }
-
-    } while (0);
+    }
 
     return xc;
 }
@@ -321,22 +172,20 @@ static int mark(sqlite3 * db)
  * only selecting those DB entries whose link count is greater than one.
  */
 
-static int identifier(void * vp, int ncols, char ** value, char ** keyword)
+static int identifier(sqlite3_stmt * sp, void * vp)
 {
     const char * pp = (char *)0;
+    const char * vv = (char *)0;
     int ii = 0;
 
     pp = (const char *)vp;
+    vv = sqlite3_column_text(sp, 0);
 
-    for (ii = 0; ii < ncols; ++ii) {
-        if ((strcmp(keyword[ii], "path") == 0)  && (strcmp(value[ii], pp) != 0)) {
-            fputs("Aliased: \"", stdout);
-            fputs(value[ii], stdout);
-            fputs("\" \"", stdout);
-            fputs(pp, stdout);
-            fputs("\"\n", stdout);
-        }
-    }
+    fputs("Aliased: \"", stdout);
+    fputs(vv, stdout);
+    fputs("\" \"", stdout);
+    fputs(pp, stdout);
+    fputs("\"\n", stdout);
 
     return SQLITE_OK;
 }
@@ -346,7 +195,10 @@ static int identify(void * vp, const char * name, const char * path, size_t dept
     int xc = 0;
     int rc = 0;
     sqlite3 * db = (sqlite3 *)0;
-    char * sql = (char *)0;
+    sqlite3_stmt * sp = (sqlite3_stmt *)0;
+    static const char SELECT[] = "SELECT * FROM Schema WHERE (ino = ?) AND (devmajor = ?) AND (devminor = ?) AND (nlink > 1);";
+    placer_generic_callback_t state = { (FILE *)0, 0 };
+    int ii = 0;
    
     do {
 
@@ -356,28 +208,35 @@ static int identify(void * vp, const char * name, const char * path, size_t dept
 
         db = (sqlite3 *)vp;
 
+        sp = placer_prepare(db, SELECT);
+        if (sp == (sqlite3_stmt *)0) {
+            xc = -13;
+            break;
+        }
+
+        rc = sqlite3_bind_int(sp, ++ii, statp->st_ino);
+        if (rc != SQLITE_OK) {
+            xc = -13;
+            break;
+        }
+
+        rc = sqlite3_bind_int(sp, ++ii, major(statp->st_dev));
+        if (rc != SQLITE_OK) {
+            xc = -13;
+            break;
+        }
+
+        rc = sqlite3_bind_int(sp, ++ii, minor(statp->st_dev));
+        if (rc != SQLITE_OK) {
+            xc = -13;
+            break;
+        }
+
         /*
          * Select the row from the database.
          */
 
-        sql = placer_sql_formata(Buffersize,
-            "SELECT * FROM census WHERE (ino = %d) AND (devmajor = %d) AND (devminor = %d) AND (nlink > 1);"
-            , statp->st_ino
-            , major(statp->st_dev)
-            , minor(statp->st_dev)
-        );
-        if (sql == (char *)0) {
-            xc = -12;
-            break;
-        }
-
-        if (Verbose) {
-            fputs(sql, stderr);
-            fputc('\n', stderr);
-        }
-
-        rc = placer_exec(db, sql, identifier, (char *)path);
-        sqlite3_free(sql);
+        rc = placer_steps(sp, identifier, (void *)path);
         if (rc != SQLITE_OK) {
             xc = -13;
             break;
@@ -400,40 +259,33 @@ static int identify(void * vp, const char * name, const char * path, size_t dept
 static int enumerate(void * vp, const char * name, const char * path, size_t depth, const struct stat * statp)
 {
     int xc = 0;
-    sqlite3 * db = (sqlite3 *)0; 
+    sqlite3 * db = (sqlite3 *)0;
+    sqlite3_stmt * sp = (sqlite3_stmt *)0;
+    static const char SELECT[] = "SELECT * FROM Schema WHERE (path = ?);";
     int rc = 0;
-    char * to = (char *)0;
-    char * sql = (char *)0;
     placer_generic_callback_t state = { (FILE *)0, 0 };
    
     do {
 
         db = (sqlite3 *)vp;
 
-        to = placer_str_expanda(path);
-
         /*
          * Select the row from the database.
          */
 
-        sql = placer_sql_formata(Buffersize,
-            "SELECT * FROM census WHERE (path = '%s');"
-            , to
-        );
-        sqlite3_free(to);
-        if (sql == (char *)0) {
-            xc = -12;
+        sp = placer_prepare(db, SELECT);
+        if (sp == (sqlite3_stmt *)0) {
+            xc = -13;
             break;
         }
 
-        if (Verbose) {
-            fputs(sql, stderr);
-            fputc('\n', stderr);
+        rc = sqlite3_bind_text(sp, 1, path, strlen(path), (placer_bind_callback_t *)0);
+        if (rc != SQLITE_OK) {
+            xc = -13;
+            break;
         }
 
-        state.count = 0;
-        rc = placer_exec(db, sql, placer_exec_generic_callback, &state);
-        sqlite3_free(sql);
+        rc = placer_steps(sp, placer_steps_generic_callback, &state);
         if (rc != SQLITE_OK) {
             xc = -13;
             break;
@@ -472,32 +324,31 @@ static int extract(sqlite3 * db, diminuto_fs_type_t type)
     char * to = (char *)0;
     char * sql = (char *)0;
     placer_generic_callback_t state = PLACER_GENERIC_CALLBACK_INITIALIZER;
+    sqlite3_stmt * sp = (sqlite3_stmt *)0;
+    static const char SELECT[] = "SELECT * FROM Schema WHERE (type = '%s') AND (mode > %u);";
 
     do {
 
         tt[0] = type;
         to = placer_str_expanda(tt);
 
-        sql = placer_sql_formata(Buffersize, 
-            "SELECT * FROM census WHERE (type = '%s') AND (mode > %u);"
-            , to
-            , 0777U
-        );
+        sql = placer_sql_formata(Buffersize, SELECT, to, 0777U);
         sqlite3_free(to);
         if (sql == (char *)0) {
             xc = -20;
             break;
         }
 
-        if (Verbose) {
-            fputs(sql, stderr);
-            fputc('\n', stderr);
+        sp = placer_prepare(db, to);
+        sqlite3_free(sql);
+        if (sp == (sqlite3_stmt *)0) {
+            xc = -12;
+            break;
         }
 
-        rc = placer_exec(db, sql, placer_exec_generic_callback, &state);
-        sqlite3_free(sql);
+        rc = placer_steps(sp, placer_steps_generic_callback, &state);
         if (rc != SQLITE_OK) {
-            xc = -21;
+            xc = -13;
             break;
         }
 
@@ -515,58 +366,54 @@ static int replace(void * vp, const char * name, const char * path, size_t depth
 {
     int xc = 0;
     sqlite3 * db = (sqlite3 *)0;
+    sqlite3_stmt * sp = (sqlite3_stmt *)0;
     int rc = 0;
-    char * to = (char *)0;
-    char * sql = (char *)0;
     placer_generic_callback_t state = PLACER_GENERIC_CALLBACK_INITIALIZER;
+#include "com/diag/placer/placer_replace.h"
+#include "schema.h"
+#include "com/diag/placer/placer_end.h"
+    struct Schema schema;
+
+    strncpy(schema.path, path, sizeof(schema.path));
+    schema.type[0] = diminuto_fs_type(statp->st_mode); schema.type[1] = '\0';
+    schema.nlink = statp->st_nlink;
+    schema.uid = statp->st_uid;
+    schema.gid = statp->st_gid;
+    schema.mode = statp->st_mode & ~S_IFMT;
+    schema.ino = statp->st_ino;
+    schema.size = statp->st_size;
+    schema.blocks = statp->st_blocks;
+    schema.rdevmajor = major(statp->st_rdev);
+    schema.rdevminor = minor(statp->st_rdev);
+    schema.devmajor = major(statp->st_dev);
+    schema.devminor = minor(statp->st_dev);
+    schema.ctime = (unsigned long long)((1000000000ULL * statp->st_ctim.tv_sec) + statp->st_ctim.tv_nsec);
+    memcpy(schema.status, statp, sizeof(schema.status));
+    schema.mark = 0;
+
+    db = (sqlite3 *)vp;
+
+    /*
+     * Replace the row in the database.
+     */
 
     do {
 
-        db = (sqlite3 *)vp;
-   
-        /*
-         * Expand any single quotes in path.
-         */
-
-        to = placer_str_expanda(path);
-
-        /*
-         * Insert the row into the database.
-         */
-
-        sql = placer_sql_formata(Buffersize,
-            "REPLACE INTO census VALUES ('%s', '%c', %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %lld, %d);"
-            , to
-            , diminuto_fs_type(statp->st_mode)
-            , statp->st_nlink
-            , statp->st_uid
-            , statp->st_gid
-            , (statp->st_mode & ~S_IFMT)
-            , statp->st_ino
-            , statp->st_size
-            , statp->st_blocks
-            , major(statp->st_rdev)
-            , minor(statp->st_rdev)
-            , major(statp->st_dev)
-            , minor(statp->st_dev)
-            , (unsigned long long)((1000000000ULL * statp->st_ctim.tv_sec) + statp->st_ctim.tv_nsec)
-            , 1
-        );
-        sqlite3_free(to);
-        if (sql == (char *)0) {
+        sp = placer_prepare(db, PLACER_SQL_struct_Schema_REPLACE);
+        if (sp == (sqlite3_stmt *)0) {
             xc = -12;
             break;
         }
 
-        if (Verbose) {
-            fputs(sql, stderr);
-            fputc('\n', stderr);
-        }
-
-        rc = placer_exec(db, sql, placer_exec_generic_callback, &state);
-        sqlite3_free(sql);
+        rc = placer_stmt_struct_Schema_bind(sp, &schema);
         if (rc != SQLITE_OK) {
             xc = -13;
+            break;
+        }
+
+        rc = placer_steps(sp, placer_steps_generic_callback, &state);
+        if (rc != SQLITE_OK) {
+            xc = -14;
             break;
         }
 
@@ -585,58 +432,54 @@ static int insert(void * vp, const char * name, const char * path, size_t depth,
 {
     int xc = 0;
     sqlite3 * db = (sqlite3 *)0;
+    sqlite3_stmt * sp = (sqlite3_stmt *)0;
     int rc = 0;
-    char * to = (char *)0;
-    char * sql = (char *)0;
     placer_generic_callback_t state = PLACER_GENERIC_CALLBACK_INITIALIZER;
+#include "com/diag/placer/placer_insert.h"
+#include "schema.h"
+#include "com/diag/placer/placer_end.h"
+    struct Schema schema;
+
+    strncpy(schema.path, path, sizeof(schema.path));
+    schema.type[0] = diminuto_fs_type(statp->st_mode); schema.type[1] = '\0';
+    schema.nlink = statp->st_nlink;
+    schema.uid = statp->st_uid;
+    schema.gid = statp->st_gid;
+    schema.mode = statp->st_mode & ~S_IFMT;
+    schema.ino = statp->st_ino;
+    schema.size = statp->st_size;
+    schema.blocks = statp->st_blocks;
+    schema.rdevmajor = major(statp->st_rdev);
+    schema.rdevminor = minor(statp->st_rdev);
+    schema.devmajor = major(statp->st_dev);
+    schema.devminor = minor(statp->st_dev);
+    schema.ctime = (unsigned long long)((1000000000ULL * statp->st_ctim.tv_sec) + statp->st_ctim.tv_nsec);
+    memcpy(schema.status, statp, sizeof(schema.status));
+    schema.mark = 0;
+
+    db = (sqlite3 *)vp;
+   
+    /*
+     * Insert the row into the database.
+     */
 
     do {
 
-        db = (sqlite3 *)vp;
-   
-        /*
-         * Expand any single quotes in path.
-         */
-
-        to = placer_str_expanda(path);
-
-        /*
-         * Insert the row into the database.
-         */
-
-        sql = placer_sql_formata(Buffersize,
-            "INSERT INTO census VALUES ('%s', '%c', %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %lld, %d);"
-            , to
-            , diminuto_fs_type(statp->st_mode)
-            , statp->st_nlink
-            , statp->st_uid
-            , statp->st_gid
-            , (statp->st_mode & ~S_IFMT)
-            , statp->st_ino
-            , statp->st_size
-            , statp->st_blocks
-            , major(statp->st_rdev)
-            , minor(statp->st_rdev)
-            , major(statp->st_dev)
-            , minor(statp->st_dev)
-            , (unsigned long long)((1000000000ULL * statp->st_ctim.tv_sec) + statp->st_ctim.tv_nsec)
-            , 0
-        );
-        sqlite3_free(to);
-        if (sql == (char *)0) {
+        sp = placer_prepare(db, PLACER_SQL_struct_Schema_INSERT);
+        if (sp == (sqlite3_stmt *)0) {
             xc = -12;
             break;
         }
 
-        if (Verbose) {
-            fputs(sql, stderr);
-            fputc('\n', stderr);
-        }
-
-        rc = placer_exec(db, sql, placer_exec_generic_callback, &state);
-        sqlite3_free(sql);
+        rc = placer_stmt_struct_Schema_bind(sp, &schema);
         if (rc != SQLITE_OK) {
             xc = -13;
+            break;
+        }
+
+        rc = placer_steps(sp, placer_steps_generic_callback, &state);
+        if (rc != SQLITE_OK) {
+            xc = -14;
             break;
         }
 
@@ -655,30 +498,19 @@ static int show(sqlite3 * db)
 {
     int xc = 0;
     int rc = 0;
-    char * sql = (char *)0;
     placer_generic_callback_t state = PLACER_GENERIC_CALLBACK_INITIALIZER;
-   
+    sqlite3_stmt * sp = (sqlite3_stmt *)0;
+    static const char SELECT[] = "SELECT * FROM Schema";
+
     do {
 
-        /*
-         *
-         */
-
-        sql = placer_sql_formata(Buffersize,
-            "SELECT * FROM census;"
-        );
-        if (sql == (char *)0) {
+        sp = placer_prepare(db, SELECT);
+        if (sp == (sqlite3_stmt *)0) {
             xc = -12;
             break;
         }
 
-        if (Verbose) {
-            fputs(sql, stderr);
-            fputc('\n', stderr);
-        }
-
-        rc = placer_exec(db, sql, placer_exec_generic_callback, &state);
-        sqlite3_free(sql);
+        rc = placer_steps(sp, placer_steps_generic_callback, &state);
         if (rc != SQLITE_OK) {
             xc = -13;
             break;
@@ -697,19 +529,29 @@ static int show(sqlite3 * db)
 
 static int create(sqlite3 * db)
 {
-    static const char CREATE[] = "CREATE TABLE census ( path TEXT PRIMARY KEY, type TEXT, nlink INTEGER, uid INTEGER, gid INTEGER, mode INTEGER, ino INTEGER, size INTEGER, blocks INTEGER, rdevmajor INTEGER, rdevminor INTEGER, devmajor INTEGER, devminor INTEGER, ctime INTEGER, mark INTEGER);";
     int xc = 0;
     int rc = 0;
+    placer_generic_callback_t state = PLACER_GENERIC_CALLBACK_INITIALIZER;
+#include "com/diag/placer/placer_create.h"
+#include "schema.h"
+#include "com/diag/placer/placer_end.h"
+    sqlite3_stmt * sp = (sqlite3_stmt *)0;
 
-    if (Verbose) {
-        fputs(CREATE, stderr);
-        fputc('\n', stderr);
-    }
+    do {
 
-    rc = placer_exec(db, CREATE, (placer_exec_callback_t *)0, (void *)0);
-    if (rc != SQLITE_OK) {
-        xc = -13;
-    }
+        sp = placer_prepare(db, PLACER_SQL_struct_Schema_CREATE);
+        if (sp == (sqlite3_stmt *)0) {
+            xc = -12;
+            break;
+        }
+
+        rc = placer_steps(sp, (placer_steps_callback_t *)0, (void *)0);
+        if (rc != SQLITE_OK) {
+            xc = -13;
+            break;
+        }
+
+    } while (0);
 
     return xc;
 }
@@ -833,7 +675,7 @@ int main(int argc, char * argv[])
         }
 
         /*
-         * Create, or do nothing.
+         * Create, or Do Nothing.
          */
 
         if (!creating) {

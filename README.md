@@ -152,6 +152,9 @@ Run the functional test.
 Grant Allen, Mike Owens, *The Definitive Guide to SQLite*, 2nd ed.,
 Apress, 2010
 
+Richard Hipp at al., "Why SQLite succeeded as a database", *The Changelog*, 2016-04-30,
+<https://changelog.com/podcast/201>
+
 P. Hoffman, F. Yergeau, "UTF-16, an encoding of ISO 10646", *RFC 2781*, 2000-02,
 <https://www.rfc-editor.org/rfc/pdfrfc/rfc2781.txt.pdf>
 
