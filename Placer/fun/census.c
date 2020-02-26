@@ -72,7 +72,7 @@ static int clean(sqlite3 * db)
             "SELECT * FROM census WHERE mark == 0;"
         );
         if (sql == (char *)0) {
-            xc = -12;
+            xc = -100;
             break;
         }
 
@@ -84,7 +84,7 @@ static int clean(sqlite3 * db)
         rc = placer_exec(db, sql, placer_exec_generic_callback, &state);
         sqlite3_free(sql);
         if (rc != SQLITE_OK) {
-            xc = -13;
+            xc = -101;
             break;
         }
 
@@ -96,7 +96,7 @@ static int clean(sqlite3 * db)
             "DELETE FROM census WHERE mark == 0;"
         );
         if (sql == (char *)0) {
-            xc = -12;
+            xc = -102;
             break;
         }
 
@@ -108,7 +108,7 @@ static int clean(sqlite3 * db)
         rc = placer_exec(db, sql, placer_exec_generic_callback, &state);
         sqlite3_free(sql);
         if (rc != SQLITE_OK) {
-            xc = -13;
+            xc = -103;
             break;
         }
 
@@ -120,7 +120,7 @@ static int clean(sqlite3 * db)
             "UPDATE census SET mark = 0 WHERE mark != 0;"
         );
         if (sql == (char *)0) {
-            xc = -12;
+            xc = -104;
             break;
         }
 
@@ -132,7 +132,7 @@ static int clean(sqlite3 * db)
         rc = placer_exec(db, sql, placer_exec_generic_callback, &state);
         sqlite3_free(sql);
         if (rc != SQLITE_OK) {
-            xc = -13;
+            xc = -105;
             break;
         }
 
@@ -169,7 +169,7 @@ static int mark(sqlite3 * db)
             "UPDATE census SET mark = 1 WHERE nlink > 1;"
         );
         if (sql == (char *)0) {
-            xc = -12;
+            xc = -110;
             break;
         }
 
@@ -181,7 +181,7 @@ static int mark(sqlite3 * db)
         rc = placer_exec(db, sql, placer_exec_generic_callback, &state);
         sqlite3_free(sql);
         if (rc != SQLITE_OK) {
-            xc = -13;
+            xc = -111;
             break;
         }
 
@@ -193,7 +193,7 @@ static int mark(sqlite3 * db)
             "SELECT * FROM census WHERE mark != 0;"
         );
         if (sql == (char *)0) {
-            xc = -12;
+            xc = -112;
             break;
         }
 
@@ -205,7 +205,7 @@ static int mark(sqlite3 * db)
         rc = placer_exec(db, sql, placer_exec_generic_callback, &state);
         sqlite3_free(sql);
         if (rc != SQLITE_OK) {
-            xc = -13;
+            xc = -113;
             break;
         }
 
@@ -217,7 +217,7 @@ static int mark(sqlite3 * db)
             "SELECT * FROM census WHERE (mark != 0) AND (nlink <= 1);"
         );
         if (sql == (char *)0) {
-            xc = -12;
+            xc = -114;
             break;
         }
 
@@ -229,7 +229,7 @@ static int mark(sqlite3 * db)
         rc = placer_exec(db, sql, placer_exec_generic_callback, &state);
         sqlite3_free(sql);
         if (rc != SQLITE_OK) {
-            xc = -13;
+            xc = -115;
             break;
         }
 
@@ -241,7 +241,7 @@ static int mark(sqlite3 * db)
             "SELECT * FROM census WHERE (mark == 0) AND (nlink > 1);"
         );
         if (sql == (char *)0) {
-            xc = -12;
+            xc = -116;
             break;
         }
 
@@ -253,7 +253,7 @@ static int mark(sqlite3 * db)
         rc = placer_exec(db, sql, placer_exec_generic_callback, &state);
         sqlite3_free(sql);
         if (rc != SQLITE_OK) {
-            xc = -13;
+            xc = -117;
             break;
         }
 
@@ -265,7 +265,7 @@ static int mark(sqlite3 * db)
             "UPDATE census SET mark = 0 WHERE mark != 0;"
         );
         if (sql == (char *)0) {
-            xc = -12;
+            xc = -118;
             break;
         }
 
@@ -277,7 +277,7 @@ static int mark(sqlite3 * db)
         rc = placer_exec(db, sql, placer_exec_generic_callback, &state);
         sqlite3_free(sql);
         if (rc != SQLITE_OK) {
-            xc = -13;
+            xc = -119;
             break;
         }
 
@@ -289,7 +289,7 @@ static int mark(sqlite3 * db)
             "SELECT * FROM census WHERE mark != 0;"
         );
         if (sql == (char *)0) {
-            xc = -12;
+            xc = -120;
             break;
         }
 
@@ -301,7 +301,7 @@ static int mark(sqlite3 * db)
         rc = placer_exec(db, sql, placer_exec_generic_callback, &state);
         sqlite3_free(sql);
         if (rc != SQLITE_OK) {
-            xc = -13;
+            xc = -121;
             break;
         }
 
@@ -367,7 +367,7 @@ static int identify(void * vp, const char * name, const char * path, size_t dept
             , minor(statp->st_dev)
         );
         if (sql == (char *)0) {
-            xc = -12;
+            xc = -130;
             break;
         }
 
@@ -379,7 +379,7 @@ static int identify(void * vp, const char * name, const char * path, size_t dept
         rc = placer_exec(db, sql, identifier, (char *)path);
         sqlite3_free(sql);
         if (rc != SQLITE_OK) {
-            xc = -13;
+            xc = -131;
             break;
         }
 
@@ -422,7 +422,7 @@ static int enumerate(void * vp, const char * name, const char * path, size_t dep
         );
         sqlite3_free(to);
         if (sql == (char *)0) {
-            xc = -12;
+            xc = -140;
             break;
         }
 
@@ -435,7 +435,7 @@ static int enumerate(void * vp, const char * name, const char * path, size_t dep
         rc = placer_exec(db, sql, placer_exec_generic_callback, &state);
         sqlite3_free(sql);
         if (rc != SQLITE_OK) {
-            xc = -13;
+            xc = -141;
             break;
         }
 
@@ -485,7 +485,7 @@ static int extract(sqlite3 * db, diminuto_fs_type_t type)
         );
         sqlite3_free(to);
         if (sql == (char *)0) {
-            xc = -20;
+            xc = -150;
             break;
         }
 
@@ -497,7 +497,7 @@ static int extract(sqlite3 * db, diminuto_fs_type_t type)
         rc = placer_exec(db, sql, placer_exec_generic_callback, &state);
         sqlite3_free(sql);
         if (rc != SQLITE_OK) {
-            xc = -21;
+            xc = -151;
             break;
         }
 
@@ -554,7 +554,7 @@ static int replace(void * vp, const char * name, const char * path, size_t depth
         );
         sqlite3_free(to);
         if (sql == (char *)0) {
-            xc = -12;
+            xc = -160;
             break;
         }
 
@@ -566,7 +566,7 @@ static int replace(void * vp, const char * name, const char * path, size_t depth
         rc = placer_exec(db, sql, placer_exec_generic_callback, &state);
         sqlite3_free(sql);
         if (rc != SQLITE_OK) {
-            xc = -13;
+            xc = -161;
             break;
         }
 
@@ -624,7 +624,7 @@ static int insert(void * vp, const char * name, const char * path, size_t depth,
         );
         sqlite3_free(to);
         if (sql == (char *)0) {
-            xc = -12;
+            xc = -170;
             break;
         }
 
@@ -636,7 +636,7 @@ static int insert(void * vp, const char * name, const char * path, size_t depth,
         rc = placer_exec(db, sql, placer_exec_generic_callback, &state);
         sqlite3_free(sql);
         if (rc != SQLITE_OK) {
-            xc = -13;
+            xc = -171;
             break;
         }
 
@@ -668,7 +668,7 @@ static int show(sqlite3 * db)
             "SELECT * FROM census;"
         );
         if (sql == (char *)0) {
-            xc = -12;
+            xc = -180;
             break;
         }
 
@@ -680,7 +680,7 @@ static int show(sqlite3 * db)
         rc = placer_exec(db, sql, placer_exec_generic_callback, &state);
         sqlite3_free(sql);
         if (rc != SQLITE_OK) {
-            xc = -13;
+            xc = -181;
             break;
         }
 
@@ -708,7 +708,7 @@ static int create(sqlite3 * db)
 
     rc = placer_exec(db, CREATE, (placer_exec_callback_t *)0, (void *)0);
     if (rc != SQLITE_OK) {
-        xc = -13;
+        xc = -190;
     }
 
     return xc;
@@ -841,7 +841,7 @@ int main(int argc, char * argv[])
         } else if ((rc = create(db)) == 0) {
             /* Do nothing. */
         } else {
-            xc = 4;
+            xc = rc;
             break;
         }
 
@@ -867,7 +867,7 @@ int main(int argc, char * argv[])
         } else if ((rc = show(db)) == 0) {
             /* Do nothing. */
         } else {
-            xc = 5;
+            xc = rc;
         }
 
         if (!test1) {
@@ -875,7 +875,7 @@ int main(int argc, char * argv[])
         } else if ((rc = extract(db, DIMINUTO_FS_TYPE_FILE)) == 0) {
             /* Do nothing. */
         } else {
-            xc = 5;
+            xc = rc;
         }
 
         if (!test2) {
@@ -883,7 +883,7 @@ int main(int argc, char * argv[])
         } else if ((rc = extract(db, DIMINUTO_FS_TYPE_DIRECTORY)) == 0) {
             /* Do nothing. */
         } else {
-            xc = 5;
+            xc = rc;
         }
 
         if (!test3) {
@@ -891,7 +891,7 @@ int main(int argc, char * argv[])
         } else if ((rc = diminuto_fs_walk("/", enumerate, db)) == 0) {
             /* Do nothing. */
         } else {
-            xc = 5;
+            xc = rc;
         }
 
         if (!test4) {
@@ -899,7 +899,7 @@ int main(int argc, char * argv[])
         } else if ((rc = diminuto_fs_walk("/", identify, db)) == 0) {
             /* Do nothing. */
         } else {
-            xc = 5;
+            xc = rc;
         }
 
         if (!test5) {
@@ -907,7 +907,7 @@ int main(int argc, char * argv[])
         } else if ((rc = mark(db)) == 0) {
             /* Do nothing. */
         } else {
-            xc = 5;
+            xc = rc;
         }
 
         if (!test6) {
@@ -915,7 +915,7 @@ int main(int argc, char * argv[])
         } else if ((rc = clean(db)) == 0) {
             /* Do nothing. */
         } else {
-            xc = 5;
+            xc = rc;
         }
 
     } while (0);
