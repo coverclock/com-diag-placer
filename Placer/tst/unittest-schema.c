@@ -63,9 +63,52 @@
 #include "unittest-schema.h"
 #include "com/diag/placer/placer_end.h"
 
+#include "com/diag/placer/placer_name.h"
+#include "unittest-schema.h"
+#include "com/diag/placer/placer_end.h"
+
+#include "com/diag/placer/placer_bytes.h"
+#include "unittest-schema.h"
+#include "com/diag/placer/placer_end.h"
+
 int main(void)
 {
     SETLOGMASK();
+
+    {
+        TEST();
+        EXPECT(sizeof(placer_INTEGER_t) == 4);
+        EXPECT(sizeof(placer_TEXT16_t) == 2);
+        EXPECT(sizeof(placer_FLOAT_t) == 8);
+        EXPECT(sizeof(placer_BLOB_t) == 1);
+        EXPECT(sizeof(placer_INTEGER64_t) == 8);
+        EXPECT(sizeof(placer_TEXT_t) == 1);
+        STATUS();
+    }
+
+    {
+        TEST();
+        EXPECT(countof(PLACER_ARRAY_struct_UnitTestSchema_BYTES) == 6);
+        EXPECT(PLACER_ARRAY_struct_UnitTestSchema_BYTES[0] == 4);
+        EXPECT(PLACER_ARRAY_struct_UnitTestSchema_BYTES[1] == (64 * 2));
+        EXPECT(PLACER_ARRAY_struct_UnitTestSchema_BYTES[2] == 8);
+        EXPECT(PLACER_ARRAY_struct_UnitTestSchema_BYTES[3] == (4096 * 1));
+        EXPECT(PLACER_ARRAY_struct_UnitTestSchema_BYTES[4] == 8);
+        EXPECT(PLACER_ARRAY_struct_UnitTestSchema_BYTES[5] == (10 * 1));
+        STATUS();
+    }
+
+    {
+        TEST();
+        EXPECT(countof(PLACER_ARRAY_struct_UnitTestSchema_NAME) == 6);
+        EXPECT(strcmp(PLACER_ARRAY_struct_UnitTestSchema_NAME[0], "id") == 0);
+        EXPECT(strcmp(PLACER_ARRAY_struct_UnitTestSchema_NAME[1], "name") == 0);
+        EXPECT(strcmp(PLACER_ARRAY_struct_UnitTestSchema_NAME[2], "age") == 0);
+        EXPECT(strcmp(PLACER_ARRAY_struct_UnitTestSchema_NAME[3], "image") == 0);
+        EXPECT(strcmp(PLACER_ARRAY_struct_UnitTestSchema_NAME[4], "sn") == 0);
+        EXPECT(strcmp(PLACER_ARRAY_struct_UnitTestSchema_NAME[5], "ssn") == 0);
+        STATUS();
+    }
 
     {
         TEST();
