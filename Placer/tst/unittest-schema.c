@@ -71,7 +71,7 @@
 #include "unittest-schema.h"
 #include "com/diag/placer/placer_end.h"
 
-#include "com/diag/placer/placer_array_bytes.h"
+#include "com/diag/placer/placer_array_sizeof.h"
 #include "unittest-schema.h"
 #include "com/diag/placer/placer_end.h"
 
