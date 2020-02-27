@@ -67,6 +67,10 @@
 #include "unittest-schema.h"
 #include "com/diag/placer/placer_end.h"
 
+#include "com/diag/placer/placer_array_type.h"
+#include "unittest-schema.h"
+#include "com/diag/placer/placer_end.h"
+
 #include "com/diag/placer/placer_array_bytes.h"
 #include "unittest-schema.h"
 #include "com/diag/placer/placer_end.h"
@@ -107,6 +111,18 @@ int main(void)
         EXPECT(strcmp(PLACER_ARRAY_struct_UnitTestSchema_NAME[3], "image") == 0);
         EXPECT(strcmp(PLACER_ARRAY_struct_UnitTestSchema_NAME[4], "sn") == 0);
         EXPECT(strcmp(PLACER_ARRAY_struct_UnitTestSchema_NAME[5], "ssn") == 0);
+        STATUS();
+    }
+
+    {
+        TEST();
+        EXPECT(countof(PLACER_ARRAY_struct_UnitTestSchema_TYPE) == 6);
+        EXPECT(PLACER_ARRAY_struct_UnitTestSchema_TYPE[0] == SQLITE_INTEGER);
+        EXPECT(PLACER_ARRAY_struct_UnitTestSchema_TYPE[1] == SQLITE_TEXT);
+        EXPECT(PLACER_ARRAY_struct_UnitTestSchema_TYPE[2] == SQLITE_FLOAT);
+        EXPECT(PLACER_ARRAY_struct_UnitTestSchema_TYPE[3] == SQLITE_BLOB);
+        EXPECT(PLACER_ARRAY_struct_UnitTestSchema_TYPE[4] == SQLITE_INTEGER);
+        EXPECT(PLACER_ARRAY_struct_UnitTestSchema_TYPE[5] == SQLITE_TEXT);
         STATUS();
     }
 
