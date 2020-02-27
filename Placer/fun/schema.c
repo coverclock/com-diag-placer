@@ -52,7 +52,7 @@
 #include "schema.h"
 #include "com/diag/placer/placer_end.h"
 
-#include "com/diag/placer/placer_steps.h"
+#include "com/diag/placer/placer_steps_callback.h"
 #include "schema.h"
 #include "com/diag/placer/placer_end.h"
 
@@ -60,7 +60,7 @@
 #include "schema.h"
 #include "com/diag/placer/placer_end.h"
 
-#include "com/diag/placer/placer_stmt.h"
+#include "com/diag/placer/placer_stmt_bind.h"
 #include "schema.h"
 #include "com/diag/placer/placer_end.h"
 
@@ -369,7 +369,7 @@ static int replace(void * vp, const char * name, const char * path, size_t depth
     sqlite3_stmt * sp = (sqlite3_stmt *)0;
     int rc = 0;
     placer_generic_callback_t state = PLACER_GENERIC_CALLBACK_INITIALIZER;
-#include "com/diag/placer/placer_replace.h"
+#include "com/diag/placer/placer_sql_replace.h"
 #include "schema.h"
 #include "com/diag/placer/placer_end.h"
     struct Schema schema;
@@ -391,13 +391,13 @@ static int replace(void * vp, const char * name, const char * path, size_t depth
     memcpy(schema.status, statp, sizeof(schema.status));
     schema.mark = 0;
 
-    db = (sqlite3 *)vp;
-
     /*
      * Replace the row in the database.
      */
 
     do {
+
+        db = (sqlite3 *)vp;
 
         sp = placer_prepare(db, PLACER_SQL_struct_Schema_REPLACE);
         if (sp == (sqlite3_stmt *)0) {
@@ -435,7 +435,7 @@ static int insert(void * vp, const char * name, const char * path, size_t depth,
     sqlite3_stmt * sp = (sqlite3_stmt *)0;
     int rc = 0;
     placer_generic_callback_t state = PLACER_GENERIC_CALLBACK_INITIALIZER;
-#include "com/diag/placer/placer_insert.h"
+#include "com/diag/placer/placer_sql_insert.h"
 #include "schema.h"
 #include "com/diag/placer/placer_end.h"
     struct Schema schema;
@@ -532,7 +532,7 @@ static int create(sqlite3 * db)
     int xc = 0;
     int rc = 0;
     placer_generic_callback_t state = PLACER_GENERIC_CALLBACK_INITIALIZER;
-#include "com/diag/placer/placer_create.h"
+#include "com/diag/placer/placer_sql_create.h"
 #include "schema.h"
 #include "com/diag/placer/placer_end.h"
     sqlite3_stmt * sp = (sqlite3_stmt *)0;

@@ -43,7 +43,7 @@
 #include "unittest-schema.h"
 #include "com/diag/placer/placer_end.h"
 
-#include "com/diag/placer/placer_exec.h"
+#include "com/diag/placer/placer_exec_callback.h"
 #include "unittest-schema.h"
 #include "com/diag/placer/placer_end.h"
 
@@ -51,7 +51,7 @@
 #include "unittest-schema.h"
 #include "com/diag/placer/placer_end.h"
 
-#include "com/diag/placer/placer_steps.h"
+#include "com/diag/placer/placer_steps_callback.h"
 #include "unittest-schema.h"
 #include "com/diag/placer/placer_end.h"
 
@@ -59,15 +59,15 @@
 #include "unittest-schema.h"
 #include "com/diag/placer/placer_end.h"
 
-#include "com/diag/placer/placer_stmt.h"
+#include "com/diag/placer/placer_stmt_bind.h"
 #include "unittest-schema.h"
 #include "com/diag/placer/placer_end.h"
 
-#include "com/diag/placer/placer_name.h"
+#include "com/diag/placer/placer_array_name.h"
 #include "unittest-schema.h"
 #include "com/diag/placer/placer_end.h"
 
-#include "com/diag/placer/placer_bytes.h"
+#include "com/diag/placer/placer_array_bytes.h"
 #include "unittest-schema.h"
 #include "com/diag/placer/placer_end.h"
 
@@ -137,7 +137,7 @@ int main(void)
 
     {
         static const char CREATE[] = "CREATE TABLE UnitTestSchema (id INTEGER PRIMARY KEY, name TEXT , age FLOAT , image BLOB , sn INTEGER , ssn TEXT  );";
-#include "com/diag/placer/placer_create.h"
+#include "com/diag/placer/placer_sql_create.h"
 #include "unittest-schema.h"
 #include "com/diag/placer/placer_end.h"
 
@@ -149,7 +149,7 @@ int main(void)
 
     {
         static const char INSERT[] = "INSERT INTO UnitTestSchema VALUES (:id, :name, :age, :image, :sn, :ssn );";
-#include "com/diag/placer/placer_insert.h"
+#include "com/diag/placer/placer_sql_insert.h"
 #include "unittest-schema.h"
 #include "com/diag/placer/placer_end.h"
 
@@ -161,7 +161,7 @@ int main(void)
 
     {
         static const char REPLACE[] = "REPLACE INTO UnitTestSchema VALUES (:id, :name, :age, :image, :sn, :ssn );";
-#include "com/diag/placer/placer_replace.h"
+#include "com/diag/placer/placer_sql_replace.h"
 #include "unittest-schema.h"
 #include "com/diag/placer/placer_end.h"
 
@@ -470,13 +470,13 @@ int main(void)
 
     {
         static const char PATH[] = "out/host/sql/unittest-schema.db";
-#include "com/diag/placer/placer_create.h"
+#include "com/diag/placer/placer_sql_create.h"
 #include "unittest-schema.h"
 #include "com/diag/placer/placer_end.h"
-#include "com/diag/placer/placer_insert.h"
+#include "com/diag/placer/placer_sql_insert.h"
 #include "unittest-schema.h"
 #include "com/diag/placer/placer_end.h"
-#include "com/diag/placer/placer_replace.h"
+#include "com/diag/placer/placer_sql_replace.h"
 #include "unittest-schema.h"
 #include "com/diag/placer/placer_end.h"
         static const char SELECT[] = "SELECT * FROM UnitTestSchema;";
