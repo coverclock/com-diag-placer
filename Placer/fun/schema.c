@@ -82,10 +82,10 @@ static int clean(sqlite3 * db)
     int rc = 0;
     sqlite3_stmt * sp = (sqlite3_stmt *)0;
     static const char * SELECT[] = {
-        "SELECT * FROM census WHERE mark == 0;",
-        "DELETE FROM census WHERE mark == 0;",
-        "UPDATE census SET mark = 0 WHERE mark != 0;",
-        "SELECT * FROM census WHERE mark != 0;"
+        "SELECT * FROM Schema WHERE mark == 0;",
+        "DELETE FROM Schema WHERE mark == 0;",
+        "UPDATE Schema SET mark = 0 WHERE mark != 0;",
+        "SELECT * FROM Schema WHERE mark != 0;"
     };
     placer_generic_callback_t state = PLACER_GENERIC_CALLBACK_INITIALIZER;
     int ii = 0;
@@ -129,12 +129,12 @@ static int mark(sqlite3 * db)
     int rc = 0;
     sqlite3_stmt * sp = (sqlite3_stmt *)0;
     static const char * SELECT[] = {
-        "UPDATE census SET mark = 1 WHERE nlink > 1;",
-        "SELECT * FROM census WHERE mark != 0;",
-        "SELECT * FROM census WHERE (mark != 0) AND (nlink <= 1);",
-        "SELECT * FROM census WHERE (mark == 0) AND (nlink > 1);",
-        "UPDATE census SET mark = 0 WHERE mark != 0;",
-        "SELECT * FROM census WHERE mark != 0;"
+        "UPDATE Schema SET mark = 1 WHERE nlink > 1;",
+        "SELECT * FROM Schema WHERE mark != 0;",
+        "SELECT * FROM Schema WHERE (mark != 0) AND (nlink <= 1);",
+        "SELECT * FROM Schema WHERE (mark == 0) AND (nlink > 1);",
+        "UPDATE Schema SET mark = 0 WHERE mark != 0;",
+        "SELECT * FROM Schema WHERE mark != 0;"
     };
     placer_generic_callback_t state = PLACER_GENERIC_CALLBACK_INITIALIZER;
     int ii = 0;
@@ -181,11 +181,13 @@ static int identifier(sqlite3_stmt * sp, void * vp)
     pp = (const char *)vp;
     vv = sqlite3_column_text(sp, 0);
 
-    fputs("Aliased: \"", stdout);
-    fputs(vv, stdout);
-    fputs("\" \"", stdout);
-    fputs(pp, stdout);
-    fputs("\"\n", stdout);
+    if (strcmp(pp, vv) != 0) {
+        fputs("Aliased: \"", stdout);
+        fputs(vv, stdout);
+        fputs("\" \"", stdout);
+        fputs(pp, stdout);
+        fputs("\"\n", stdout);
+    }
 
     return SQLITE_OK;
 }
@@ -339,7 +341,7 @@ static int extract(sqlite3 * db, diminuto_fs_type_t type)
             break;
         }
 
-        sp = placer_prepare(db, to);
+        sp = placer_prepare(db, sql);
         sqlite3_free(sql);
         if (sp == (sqlite3_stmt *)0) {
             xc = -141;
