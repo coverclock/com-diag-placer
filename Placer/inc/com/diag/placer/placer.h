@@ -208,7 +208,7 @@ extern int placer_exec_generic_callback(void * vp, int ncols, char ** value, cha
 extern int placer_exec(sqlite3 * db, const char * sql, placer_exec_callback_t * cp, void * vp);
 
 /*******************************************************************************
- * STEPS
+ * STMT
  ******************************************************************************/
 
 /**
@@ -220,6 +220,10 @@ extern int placer_exec(sqlite3 * db, const char * sql, placer_exec_callback_t * 
  * @return a pointer to SQLite3 statement object.
  */
 extern sqlite3_stmt * placer_prepare(sqlite3 * db, const char * sql);
+
+/*******************************************************************************
+ * STEPS
+ ******************************************************************************/
 
 /**
  * Implement a generlc SQLite steps callback useful for debugging.

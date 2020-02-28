@@ -19,26 +19,6 @@
 #include "com/diag/diminuto/diminuto_phex.h"
 #include "placer.h" /* Private API. */
 
-sqlite3_stmt * placer_prepare(sqlite3 * db, const char * sql)
-{
-    sqlite3_stmt * sp = (sqlite3_stmt *)0;
-    int rc = SQLITE_ERROR;
-
-    rc = sqlite3_prepare_v2(db, sql, -1, &sp, (const char **)0);
-    if (rc != SQLITE_OK) {
-        placer_error(rc);
-        if (sp != (sqlite3_stmt *)0) {
-            rc = sqlite3_finalize(sp);
-            if (rc != SQLITE_OK) {
-                placer_error(rc);
-            }
-            sp = (sqlite3_stmt *)0;
-        }
-    }
-
-    return sp;
-}
-
 int placer_steps_generic_callback(sqlite3_stmt * sp, void * vp) {
     placer_generic_callback_t * pp = (placer_generic_callback_t *)0;
     int ncols = 0;
