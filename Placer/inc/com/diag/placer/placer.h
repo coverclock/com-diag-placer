@@ -77,7 +77,7 @@ typedef struct PlacerGenericCallback {
     { stdout, 0 }
 
 /*******************************************************************************
- * CALLBACKS
+ * PROTOTYPES
  ******************************************************************************/
 
 /**
@@ -94,6 +94,41 @@ typedef void (placer_bind_callback_t)(void *);
  * THis is the prototype for the callback function for the Placer steps feature.
  */
 typedef int (placer_steps_callback_t)(sqlite3_stmt *, void *);
+
+/*******************************************************************************
+ * CORE
+ ******************************************************************************/
+
+/**
+ * Sets the debug file pointer. If the pointer is non-NULL, debugging
+ * information is emitted to it. The prior debug file pointer is returned.
+ * @param now is the new file pointer used for debugging, or NULL.
+ * @return the prior debug file pointer (which may be NULL).
+ */
+extern FILE * placer_debug(FILE * now);
+
+/**
+ * Sets the single separator character that the generic call backs use when
+ * emitting a printable line. The default is the same as that used by
+ * SQLite3 itself, the vertical bar '|'.
+ * @param now is the new separator character (need not be printable).
+ * @return the prior separator character.
+ */
+extern char placer_separator(char now);
+
+/**
+ * Emit the SQLite error message to standard error if it is
+ * non-NULL and then free it.
+ * @param message is the SQLite error message or nULL.
+ */
+extern void placer_message(char * message);
+
+/**
+ * Turn the SQLite error number into a printable string and emit it
+ * to standard error.
+ * @param error is the SQLite error number.
+ */
+extern void placer_error(int error);
 
 /*******************************************************************************
  * STRINGS
@@ -161,53 +196,6 @@ extern char * placer_sql_formata(size_t size, const char * format, ...);
  */
 extern int placer_exec_generic_callback(void * vp, int ncols, char ** value, char ** keyword);
 
-/*******************************************************************************
- * STEPS
- ******************************************************************************/
-
-/**
- * Implement a generlc SQLite steps callback useful for debugging.
- * @param sp points to the active statement structure.
- * @param vp is a pointer to a generic callback structure or NULL.
- * @return always SQLITE_OK (0).
- */
-extern int placer_steps_generic_callback(sqlite3_stmt * sp, void * vp);
-
-/*******************************************************************************
- * CORE
- ******************************************************************************/
-
-/**
- * Sets the debug file pointer. If the pointer is non-NULL, debugging
- * information is emitted to it. The prior debug file pointer is returned.
- * @param now is the new file pointer used for debugging, or NULL.
- * @return the prior debug file pointer (which may be NULL).
- */
-extern FILE * placer_debug(FILE * now);
-
-/**
- * Sets the single separator character that the generic call backs use when
- * emitting a printable line. The default is the same as that used by
- * SQLite3 itself, the vertical bar '|'.
- * @param now is the new separator character (need not be printable).
- * @return the prior separator character.
- */
-extern char placer_separator(char now);
-
-/**
- * Emit the SQLite error message to standard error if it is
- * non-NULL and then free it.
- * @param message is the SQLite error message or nULL.
- */
-extern void placer_message(char * message);
-
-/**
- * Turn the SQLite error number into a printable string and emit it
- * to standard error.
- * @param error is the SQLite error number.
- */
-extern void placer_error(int error);
-
 /**
  * A convenience function that calls sqlite3_exec(), emits any error messages to standard
  * error, and returns the SQLite3 return code. The sql statement is NOT freed.
@@ -219,6 +207,10 @@ extern void placer_error(int error);
  */
 extern int placer_exec(sqlite3 * db, const char * sql, placer_exec_callback_t * cp, void * vp);
 
+/*******************************************************************************
+ * STEPS
+ ******************************************************************************/
+
 /**
  * A convenience function that calls sqlite3_prepare() to compile an SQL string
  * into a SQLite3 statement object. Parameters from a schema can be bound to the
@@ -228,6 +220,14 @@ extern int placer_exec(sqlite3 * db, const char * sql, placer_exec_callback_t * 
  * @return a pointer to SQLite3 statement object.
  */
 extern sqlite3_stmt * placer_prepare(sqlite3 * db, const char * sql);
+
+/**
+ * Implement a generlc SQLite steps callback useful for debugging.
+ * @param sp points to the active statement structure.
+ * @param vp is a pointer to a generic callback structure or NULL.
+ * @return always SQLITE_OK (0).
+ */
+extern int placer_steps_generic_callback(sqlite3_stmt * sp, void * vp);
 
 /**
  * Incrementally runs the SQLite3 step function with the provided statement

@@ -18,45 +18,6 @@
 #include "com/diag/diminuto/diminuto_types.h"
 #include "placer.h" /* Private API. */
 
-int placer_exec_generic_callback(void * vp, int ncols, char ** value, char ** keyword)
-{
-    placer_generic_callback_t * pp = (placer_generic_callback_t *)0;
-    int ii = 0;
-
-    if (vp != (void *)0) {
-
-        pp = (placer_generic_callback_t *)vp;
-
-        ++(pp->count);
-
-        if (pp->fp == (FILE *)0) {
-            /* Do nothing. */
-        } else if (ncols <= 0) {
-            /* Do nothing. */
-        } else {
-            if (pp->count == 1) {
-                for (ii = 0; ii < ncols; ++ii) {
-                    if (ii > 0) {
-                        fputc(placer_Separator, pp->fp);
-                    }
-                    fputs(keyword[ii], pp->fp);
-                }
-                fputc('\n', pp->fp);
-            }
-            for (ii = 0; ii < ncols; ++ii) {
-                if (ii > 0) {
-                    fputc(placer_Separator, pp->fp);
-                }
-                fputs(value[ii], pp->fp);
-            }
-            fputc('\n', pp->fp);
-        }
-
-    }
-
-    return SQLITE_OK;
-}
-
 int placer_exec_BLOB_import(placer_BLOB_t * dest, const char * src, size_t items)
 {
     int rc = SQLITE_OK;
@@ -154,6 +115,59 @@ int placer_exec_TEXT16_import(placer_TEXT16_t * dest, const char * src, size_t i
             dest[items - 1] = 0;
             placer_error(rc);
         }
+    }
+
+    return rc;
+}
+
+int placer_exec_generic_callback(void * vp, int ncols, char ** value, char ** keyword)
+{
+    placer_generic_callback_t * pp = (placer_generic_callback_t *)0;
+    int ii = 0;
+
+    if (vp != (void *)0) {
+
+        pp = (placer_generic_callback_t *)vp;
+
+        ++(pp->count);
+
+        if (pp->fp == (FILE *)0) {
+            /* Do nothing. */
+        } else if (ncols <= 0) {
+            /* Do nothing. */
+        } else {
+            if (pp->count == 1) {
+                for (ii = 0; ii < ncols; ++ii) {
+                    if (ii > 0) {
+                        fputc(placer_Separator, pp->fp);
+                    }
+                    fputs(keyword[ii], pp->fp);
+                }
+                fputc('\n', pp->fp);
+            }
+            for (ii = 0; ii < ncols; ++ii) {
+                if (ii > 0) {
+                    fputc(placer_Separator, pp->fp);
+                }
+                fputs(value[ii], pp->fp);
+            }
+            fputc('\n', pp->fp);
+        }
+
+    }
+
+    return SQLITE_OK;
+}
+
+int placer_exec(sqlite3 * db, const char * sql, placer_exec_callback_t * cp, void * vp)
+{
+    int rc = SQLITE_ERROR;
+    char * sqlmessage = (char *)0;
+
+    rc = sqlite3_exec(db, sql, cp, vp, &sqlmessage);
+    if (rc != SQLITE_OK) {
+        placer_message(sqlmessage);
+        placer_error(rc);
     }
 
     return rc;

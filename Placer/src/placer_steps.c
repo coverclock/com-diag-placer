@@ -19,6 +19,26 @@
 #include "com/diag/diminuto/diminuto_phex.h"
 #include "placer.h" /* Private API. */
 
+sqlite3_stmt * placer_prepare(sqlite3 * db, const char * sql)
+{
+    sqlite3_stmt * sp = (sqlite3_stmt *)0;
+    int rc = SQLITE_ERROR;
+
+    rc = sqlite3_prepare_v2(db, sql, -1, &sp, (const char **)0);
+    if (rc != SQLITE_OK) {
+        placer_error(rc);
+        if (sp != (sqlite3_stmt *)0) {
+            rc = sqlite3_finalize(sp);
+            if (rc != SQLITE_OK) {
+                placer_error(rc);
+            }
+            sp = (sqlite3_stmt *)0;
+        }
+    }
+
+    return sp;
+}
+
 int placer_steps_generic_callback(sqlite3_stmt * sp, void * vp) {
     placer_generic_callback_t * pp = (placer_generic_callback_t *)0;
     int ncols = 0;
@@ -80,4 +100,57 @@ int placer_steps_generic_callback(sqlite3_stmt * sp, void * vp) {
     }
 
     return SQLITE_OK;
+}
+
+int placer_steps(sqlite3_stmt * sp, placer_steps_callback_t * cp, void * vp)
+{
+    int rc = SQLITE_ERROR;
+    int tc = SQLITE_ERROR;
+    int ii = 0;
+
+    while (!0) {
+
+        if (placer_Debug != (FILE *)0) {
+            fprintf(placer_Debug, "%s@%d: step=%d\n", __FILE__, __LINE__, ii);
+        }
+
+        rc = sqlite3_step(sp);
+
+        if (placer_Debug != (FILE *)0) {
+            fprintf(placer_Debug, "%s@%d: step=%d rc=%d=\"%s\"\n", __FILE__, __LINE__, ii, rc, sqlite3_errstr(rc));
+        }
+
+        if (rc == SQLITE_OK) {
+            rc = SQLITE_ERROR;
+            placer_error(rc);
+            break;
+        }
+
+        if (rc == SQLITE_DONE) {
+            rc = SQLITE_OK;
+            break;
+        }
+
+        if (rc != SQLITE_ROW) {
+            placer_error(rc);
+            break;
+        }
+
+        if (cp != (placer_steps_callback_t *)0) {
+            rc = (*cp)(sp, vp);
+            if (rc != SQLITE_OK) {
+                placer_error(rc);
+                break;
+            }
+        }
+
+    } 
+
+    tc = sqlite3_finalize(sp);
+    if (tc != SQLITE_OK) {
+        placer_error(tc);
+        rc = tc;
+    }
+
+    return rc;
 }
