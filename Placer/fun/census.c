@@ -410,6 +410,8 @@ static int enumerate(void * vp, const char * name, const char * path, size_t dep
 
         db = (sqlite3 *)vp;
 
+        if (Verbose) { state.fp = stdout; }
+
         to = placer_str_expanda(path);
 
         /*
@@ -448,7 +450,9 @@ static int enumerate(void * vp, const char * name, const char * path, size_t dep
             fputs(path, stdout);
             fputc('\n', stdout);
         } else {
-            /* Do nothing. */
+            fputs("ONLY: ", stdout);
+            fputs(path, stdout);
+            fputc('\n', stdout);
         }
 
     } while (0);
@@ -726,6 +730,7 @@ int main(int argc, char * argv[])
     sqlite3 * db = (sqlite3 *)0;
     diminuto_fs_walker_t * cp = (diminuto_fs_walker_t *)0;
     const char * database = (const char *)0;
+    const char * path = "/";
     int creating = 0;
     int test0 = 0;
     int test1 = 0;
@@ -735,7 +740,7 @@ int main(int argc, char * argv[])
     int test5 = 0;
     int test6 = 0;
     char * end = (char *)0;
-    static const char USAGE[] = "-D DATABASE [ -B BLOCKSIZE ] [ -d ] [ -v ] [ -0 ] [ -1 ] [ -2 ] [ -3 ] [ -4 ] [ -5 ] [ -6 ] [ -c ] [ [ -r ]  ROOT [ ROOT ... ] ]\n";
+    static const char USAGE[] = "-D DATABASE [ -B BLOCKSIZE ] [ -d ] [ -v ] [ -0 ] [ -1 ] [ -2 ] [ -3 ] [ -4 ] [ -5 ] [ -6 ] [ -P PATH ] [ [ -c | -r ]  ROOT [ ROOT ... ] ]\n";
     int opt = 0;
     extern char * optarg;
     extern int optind;
@@ -748,7 +753,7 @@ int main(int argc, char * argv[])
 
         cp = insert;
 
-        while ((opt = getopt(argc, argv, "?0123456B:D:cdrv")) >= 0) {
+        while ((opt = getopt(argc, argv, "?0123456B:D:P:cdrv")) >= 0) {
             switch (opt) {
             case '?':
                 fprintf(stdout, "usage: %s %s\n", Program, USAGE);
@@ -784,6 +789,9 @@ int main(int argc, char * argv[])
                 break;
             case 'D':
                 database = optarg;
+                break;
+            case 'P':
+                path = optarg;
                 break;
             case 'c':
                 creating = !0;
@@ -894,7 +902,7 @@ int main(int argc, char * argv[])
 
         if (!test3) {
             /* Do nothing. */
-        } else if ((rc = diminuto_fs_walk("/", enumerate, db)) == 0) {
+        } else if ((rc = diminuto_fs_walk(path, enumerate, db)) == 0) {
             /* Do nothing. */
         } else {
             xc = rc;
@@ -902,7 +910,7 @@ int main(int argc, char * argv[])
 
         if (!test4) {
             /* Do nothing. */
-        } else if ((rc = diminuto_fs_walk("/", identify, db)) == 0) {
+        } else if ((rc = diminuto_fs_walk(path, identify, db)) == 0) {
             /* Do nothing. */
         } else {
             xc = rc;
