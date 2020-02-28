@@ -30,6 +30,7 @@
 #include <unistd.h>
 #include <errno.h>
 #include "com/diag/diminuto/diminuto_unittest.h"
+#include "com/diag/diminuto/diminuto_fs.h"
 #include "com/diag/diminuto/diminuto_countof.h"
 #include "com/diag/diminuto/diminuto_dump.h"
 #include "../src/placer.h" /* Private API. */
@@ -78,6 +79,8 @@
 int main(void)
 {
     SETLOGMASK();
+
+    
 
     {
         TEST();
@@ -521,6 +524,8 @@ int main(void)
 
         TEST();
         debug = placer_debug(stderr);
+        rc = diminuto_fs_mkdirp(PATH, 0755, 0);
+        ASSERT(rc == 0);
 
         COMMENT("setup");
         ASSERT((mkdir("out", 0755) == 0) || (errno == EEXIST));

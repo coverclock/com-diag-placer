@@ -635,7 +635,7 @@ int main(int argc, char * argv[])
                 if ((end != (char *)0) && (end[0] != '\0')) {
                     errno = EINVAL;
                     perror(optarg);
-                    xc = 1;
+                    xc = -10;
                 }
                 break;
             case 'D':
@@ -655,7 +655,7 @@ int main(int argc, char * argv[])
                 break;
             default:
                 fprintf(stdout, "usage: %s %s\n", Program, USAGE);
-                xc = 1;
+                xc = -11;
                 break;
             }
         }
@@ -667,7 +667,7 @@ int main(int argc, char * argv[])
         if (database == (const char *)0) {
             errno = EINVAL;
             perror("-D");
-            xc = 1;
+            xc = -12;
             break;
         }
 
@@ -675,14 +675,20 @@ int main(int argc, char * argv[])
             (void)placer_debug(stderr);
         }
 
+        if ((rc = diminuto_fs_mkdirp(database, 0755, 0)) < 0) {
+            perror(database);
+            xc = -13;
+            break;
+        }
+
         if ((rc = sqlite3_open(database, &db)) != SQLITE_OK) {
             placer_error(rc);
-            xc = 2;
+            xc = -14;
             break;
         } else if (db == (sqlite3 *)0) {
             errno = EADDRNOTAVAIL;
             perror(database);
-            xc = 3;
+            xc = -15;
             break;
         } else {
             /* Do nothing. */
@@ -783,7 +789,7 @@ int main(int argc, char * argv[])
     } else {
         placer_error(rc);
         if (xc == 0) {
-            xc = 9;
+            xc = -16;
         }
     }
 
