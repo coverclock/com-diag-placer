@@ -210,6 +210,9 @@ static int identify(void * vp, const char * name, const char * path, size_t dept
 
         db = (sqlite3 *)vp;
 
+        fputs(path, stdout);
+        fputc('\n', stdout);
+
         sp = placer_prepare(db, SELECT);
         if (sp == (sqlite3_stmt *)0) {
             xc = -120;
@@ -270,6 +273,9 @@ static int enumerate(void * vp, const char * name, const char * path, size_t dep
     do {
 
         db = (sqlite3 *)vp;
+
+        fputs(path, stdout);
+        fputc('\n', stdout);
 
         /*
          * Select the row from the database.
@@ -376,6 +382,9 @@ static int replace(void * vp, const char * name, const char * path, size_t depth
 #include "com/diag/placer/placer_end.h"
     struct Schema schema;
 
+    fputs(path, stdout);
+    fputc('\n', stdout);
+
     strncpy(schema.path, path, sizeof(schema.path));
     schema.type[0] = diminuto_fs_type(statp->st_mode); schema.type[1] = '\0';
     schema.nlink = statp->st_nlink;
@@ -441,6 +450,9 @@ static int insert(void * vp, const char * name, const char * path, size_t depth,
 #include "schema.h"
 #include "com/diag/placer/placer_end.h"
     struct Schema schema;
+
+    fputs(path, stdout);
+    fputc('\n', stdout);
 
     strncpy(schema.path, path, sizeof(schema.path));
     schema.type[0] = diminuto_fs_type(statp->st_mode); schema.type[1] = '\0';
