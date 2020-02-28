@@ -96,7 +96,7 @@ int main(void)
         EXPECT(PLACER_ARRAY_struct_UnitTestSchema_BYTES[0] == 4);
         EXPECT(PLACER_ARRAY_struct_UnitTestSchema_BYTES[1] == (64 * 2));
         EXPECT(PLACER_ARRAY_struct_UnitTestSchema_BYTES[2] == 8);
-        EXPECT(PLACER_ARRAY_struct_UnitTestSchema_BYTES[3] == (4096 * 1));
+        EXPECT(PLACER_ARRAY_struct_UnitTestSchema_BYTES[3] == (256 * 1));
         EXPECT(PLACER_ARRAY_struct_UnitTestSchema_BYTES[4] == 8);
         EXPECT(PLACER_ARRAY_struct_UnitTestSchema_BYTES[5] == (10 * 1));
         STATUS();
@@ -129,7 +129,7 @@ int main(void)
     {
         TEST();
         COMMENT("sizeof(struct UnitTestSchema)=%zu\n", sizeof(struct UnitTestSchema));
-        EXPECT(sizeof(struct UnitTestSchema) == 4264);
+        EXPECT(sizeof(struct UnitTestSchema) == 424);
         STATUS();
     }
 
@@ -141,7 +141,7 @@ int main(void)
 
         TEST();
         COMMENT("sizeof(record)=%zu\n", sizeof(record));
-        EXPECT(sizeof(record) == 4264);
+        EXPECT(sizeof(record) == 424);
         EXPECT(record.id == (int32_t)0);
         EXPECT(record.name[0] == L'\0');
         EXPECT(record.age == (double)0.0);
@@ -425,7 +425,7 @@ int main(void)
         struct UnitTestSchema results[3] = { { 0, } };
         struct UnitTestSchema * gather[] = { &(results[0]), &(results[1]), &(results[2]), (struct UnitTestSchema *)0 };
         struct UnitTestSchema ** here = &(gather[0]);
-        placer_BLOB_t image[4][4096] = { { 0x11, }, { 0x22, }, { 0x33, }, { 0x44 }, };
+        placer_BLOB_t image[4][256] = { { 0x11, }, { 0x22, }, { 0x33, }, { 0x44 }, };
         char * value[4][6] = {
             { "1", "Chip Overclock", "63.625", (char *)&(image[0]), "42", "123456789", },
             { "2", "Red Black", "51.", (char *)&(image[1]), "86", "234567890", },
