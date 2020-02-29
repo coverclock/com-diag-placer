@@ -300,18 +300,33 @@ static int enumerate(void * vp, const char * name, const char * path, size_t dep
 
         if (current == &pointers[0]) {
             fputs("NONE: ", stdout);
+            fputc('"', stdout);
             fputs(path, stdout);
+            fputc('"', stdout);
             fputc('\n', stdout);
         } else if (current == &pointers[1]) {
             fputs("ONLY: ", stdout);
+            fputc('"', stdout);
             fputs(path, stdout);
+            fputc('"', stdout);
+            fputc(' ', stdout);
+            fputc('"', stdout);
             fputs(data[0].path, stdout);
+            fputc('"', stdout);
             fputc('\n', stdout);
         } else if (current == &pointers[2]) {
             fputs("MANY: ", stdout);
+            fputc('"', stdout);
             fputs(path, stdout);
+            fputc('"', stdout);
+            fputc(' ', stdout);
+            fputc('"', stdout);
             fputs(data[0].path, stdout);
+            fputc('"', stdout);
+            fputc(' ', stdout);
+            fputc('"', stdout);
             fputs(data[1].path, stdout);
+            fputc('"', stdout);
             fputc('\n', stdout);
         } else {
             diminuto_core_fatal();
