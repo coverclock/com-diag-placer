@@ -679,7 +679,7 @@ int main(int argc, char * argv[])
             (void)placer_debug(stderr);
         }
 
-        if ((rc = diminuto_fs_mkdirp(database, 0755, 0)) < 0) {
+        if ((rc = diminuto_fs_mkdir_p(database, 0755, 0)) < 0) {
             perror(database);
             xc = -13;
             break;

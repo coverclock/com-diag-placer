@@ -524,7 +524,7 @@ int main(void)
 
         TEST();
         debug = placer_debug(stderr);
-        rc = diminuto_fs_mkdirp(PATH, 0755, 0);
+        rc = diminuto_fs_mkdir_p(PATH, 0755, 0);
         ASSERT(rc == 0);
 
         COMMENT("setup");
