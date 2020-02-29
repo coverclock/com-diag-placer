@@ -42,6 +42,7 @@
 #include <assert.h>
 #include "com/diag/diminuto/diminuto_fs.h"
 #include "com/diag/diminuto/diminuto_countof.h"
+#include "com/diag/diminuto/diminuto_core.h"
 #include "com/diag/placer/placer.h"
 
 #include "com/diag/placer/placer_structure.h"
@@ -267,13 +268,13 @@ static int enumerate(void * vp, const char * name, const char * path, size_t dep
     sqlite3_stmt * sp = (sqlite3_stmt *)0;
     static const char SELECT[] = "SELECT * FROM Schema WHERE (path = ?);";
     int rc = 0;
-    placer_generic_callback_t state = { (FILE *)0, 0 };
-   
+    struct Schema data[2];
+    struct Schema * pointers[] = { &data[0], &data[1], (struct Schema *)0 };
+    struct Schema ** current = &pointers[0];
+ 
     do {
 
         db = (sqlite3 *)vp;
-
-        if (Verbose) { state.fp = stdout; }
 
         /*
          * Select the row from the database.
@@ -291,24 +292,29 @@ static int enumerate(void * vp, const char * name, const char * path, size_t dep
             break;
         }
 
-        rc = placer_steps(sp, placer_steps_generic_callback, &state);
+        rc = placer_steps(sp, placer_steps_struct_Schema_callback, &current);
         if (rc != SQLITE_OK) {
             xc = -132;
             break;
         }
 
-        if (state.count < 1) {
+        if (current == &pointers[0]) {
             fputs("NONE: ", stdout);
             fputs(path, stdout);
             fputc('\n', stdout);
-        } else if (state.count > 1) {
-            fputs("MANY: ", stdout);
-            fputs(path, stdout);
-            fputc('\n', stdout);
-        } else {
+        } else if (current == &pointers[1]) {
             fputs("ONLY: ", stdout);
             fputs(path, stdout);
+            fputs(data[0].path, stdout);
             fputc('\n', stdout);
+        } else if (current == &pointers[2]) {
+            fputs("MANY: ", stdout);
+            fputs(path, stdout);
+            fputs(data[0].path, stdout);
+            fputs(data[1].path, stdout);
+            fputc('\n', stdout);
+        } else {
+            diminuto_core_fatal();
         }
 
     } while (0);
@@ -591,8 +597,9 @@ int main(int argc, char * argv[])
     int test4 = 0;
     int test5 = 0;
     int test6 = 0;
+    int test7 = 0;
     char * end = (char *)0;
-    static const char USAGE[] = "-D DATABASE [ -B BLOCKSIZE ] [ -d ] [ -v ] [ -0 ] [ -1 ] [ -2 ] [ -3 ] [ -4 ] [ -5 ] [ -6 ] [ -P PATH ] [ [ -c | -r ]  ROOT [ ROOT ... ] ]\n";
+    static const char USAGE[] = "-D DATABASE [ -B BLOCKSIZE ] [ -d ] [ -v ] [ -0 ] [ -1 ] [ -2 ] [ -3 ] [ -4 ] [ -5 ] [ -6 ] [ -7 ] [ -P PATH ] [ [ -c | -r ]  ROOT [ ROOT ... ] ]\n";
     int opt = 0;
     extern char * optarg;
     extern int optind;
@@ -605,7 +612,7 @@ int main(int argc, char * argv[])
 
         cp = insert;
 
-        while ((opt = getopt(argc, argv, "?0123456B:D:P:cdrv")) >= 0) {
+        while ((opt = getopt(argc, argv, "?01234567B:D:P:cdrv")) >= 0) {
             switch (opt) {
             case '?':
                 fprintf(stdout, "usage: %s %s\n", Program, USAGE);
@@ -630,6 +637,9 @@ int main(int argc, char * argv[])
                 break;
             case '6':
                 test6 = !0;
+                break;
+            case '7':
+                test7 = !0;
                 break;
             case 'B':
                 Buffersize = strtoul(optarg, &end, 0);
@@ -779,6 +789,14 @@ int main(int argc, char * argv[])
         if (!test6) {
             /* Do nothing. */
         } else if ((rc = clean(db)) == 0) {
+            /* Do nothing. */
+        } else {
+            xc = rc;
+        }
+
+        if (!test7) {
+            /* Do nothing. */
+        } else if ((rc = enumerate(db, path, path, 0, (struct stat *)0)) == 0) {
             /* Do nothing. */
         } else {
             xc = rc;
