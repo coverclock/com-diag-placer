@@ -80,8 +80,6 @@ int main(void)
 {
     SETLOGMASK();
 
-    
-
     {
         TEST();
         EXPECT(sizeof(placer_INTEGER_t) == 4);
@@ -250,103 +248,6 @@ int main(void)
         EXPECT(strcmp(result, "BCDEFGHI") == 0);
         EXPECT(placer_exec_TEXT_import(result, "JKLMNOPQR", countof(result)) == SQLITE_OK);
         EXPECT(strncmp(result, "JKLMNOPQR", sizeof(result)) == 0);
-        STATUS();
-    }
-
-    {
-        static const placer_TEXT16_t DATA1[] = { 0 };
-        static const placer_TEXT16_t DATA2[] = { 'A', 0 };
-        static const placer_TEXT16_t DATA3[] = { 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 0 };
-        static const placer_TEXT16_t DATA4[] = { 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 0 };
-
-        TEST();
-        EXPECT(placer_TEXT16_length(DATA1, countof(DATA1)) == 0);
-        EXPECT(placer_TEXT16_length(DATA2, countof(DATA2)) == 1);
-        EXPECT(placer_TEXT16_length(DATA3, countof(DATA3)) == 8);
-        EXPECT(placer_TEXT16_length(DATA4, countof(DATA4)) == 9);
-        EXPECT(placer_TEXT16_length(DATA4, countof(DATA3)) == 9);
-        EXPECT(placer_TEXT16_length(DATA4, countof(DATA3) - 1) == 8);
-        STATUS();
-    }
-
-    {
-        static const placer_TEXT16_t DATA1[] = { 0 };
-        static const placer_TEXT16_t DATA2[] = { 'A', 0 };
-        static const placer_TEXT16_t DATA3[] = { 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 0 };
-        static const placer_TEXT16_t DATA4[] = { 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 0 };
-        static const placer_TEXT16_t DATA5[] = { 'B', 0 };
-
-        TEST();
-
-        COMMENT("1");
-        EXPECT(placer_TEXT16_compare(DATA1, DATA1, countof(DATA1)) == 0);
-        EXPECT(placer_TEXT16_compare(DATA1, DATA2, countof(DATA1)) == -1);
-        EXPECT(placer_TEXT16_compare(DATA1, DATA3, countof(DATA1)) == -1);
-        EXPECT(placer_TEXT16_compare(DATA1, DATA4, countof(DATA1)) == -1);
-        EXPECT(placer_TEXT16_compare(DATA1, DATA5, countof(DATA1)) == -1);
-        EXPECT(placer_TEXT16_compare(DATA1, DATA5, 1) == -1);
-        EXPECT(placer_TEXT16_compare(DATA1, DATA5, 0) == 0);
-
-        COMMENT("2");
-        EXPECT(placer_TEXT16_compare(DATA2, DATA1, countof(DATA2)) == 1);
-        EXPECT(placer_TEXT16_compare(DATA2, DATA2, countof(DATA2)) == 0);
-        EXPECT(placer_TEXT16_compare(DATA2, DATA3, countof(DATA2)) == -1);
-        EXPECT(placer_TEXT16_compare(DATA2, DATA4, countof(DATA2)) == -1);
-        EXPECT(placer_TEXT16_compare(DATA2, DATA5, countof(DATA2)) == -1);
-        EXPECT(placer_TEXT16_compare(DATA2, DATA5, 1) == -1);
-        EXPECT(placer_TEXT16_compare(DATA2, DATA5, 0) == 0);
-
-        COMMENT("3");
-        EXPECT(placer_TEXT16_compare(DATA3, DATA1, countof(DATA3)) == 1);
-        EXPECT(placer_TEXT16_compare(DATA3, DATA2, countof(DATA3)) == 1);
-        EXPECT(placer_TEXT16_compare(DATA3, DATA3, countof(DATA3)) == 0);
-        EXPECT(placer_TEXT16_compare(DATA3, DATA4, countof(DATA3)) == -1);
-        EXPECT(placer_TEXT16_compare(DATA3, DATA5, countof(DATA3)) == 1);
-        EXPECT(placer_TEXT16_compare(DATA3, DATA5, 1) == 0);
-        EXPECT(placer_TEXT16_compare(DATA3, DATA5, 0) == 0);
-
-        COMMENT("4");
-        EXPECT(placer_TEXT16_compare(DATA4, DATA1, countof(DATA4)) == 1);
-        EXPECT(placer_TEXT16_compare(DATA4, DATA2, countof(DATA4)) == 1);
-        EXPECT(placer_TEXT16_compare(DATA4, DATA3, countof(DATA4)) == 1);
-        EXPECT(placer_TEXT16_compare(DATA4, DATA4, countof(DATA4)) == 0);
-        EXPECT(placer_TEXT16_compare(DATA4, DATA5, countof(DATA4)) == 1);
-        EXPECT(placer_TEXT16_compare(DATA4, DATA5, 1) == 1);
-        EXPECT(placer_TEXT16_compare(DATA4, DATA5, 0) == 0);
-
-        STATUS();
-    }
-
-    {
-        static const placer_TEXT16_t DATA1[] = { 0 };
-        static const placer_TEXT16_t DATA2[] = { 'A', 0 };
-        static const placer_TEXT16_t DATA3[] = { 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 0 };
-        static const placer_TEXT16_t DATA4[] = { 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 0 };
-        static const placer_TEXT16_t DATA5[] = { 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 0 };
-        placer_TEXT16_t result[] = { '0', '1', '2', '3', '4', '5', '6', '7', 0, };
-
-        TEST();
-
-        COMMENT("1");
-        EXPECT(placer_TEXT16_copy(result, DATA1, countof(result)) == result);
-        EXPECT(placer_TEXT16_compare(result, DATA1, countof(result)) == 0);
-        EXPECT(result[countof(result) - 1] == 0);
-
-        COMMENT("2");
-        EXPECT(placer_TEXT16_copy(result, DATA2, countof(result)) == result);
-        EXPECT(placer_TEXT16_compare(result, DATA2, countof(result)) == 0);
-        EXPECT(result[countof(result) - 1] == 0);
-
-        COMMENT("3");
-        EXPECT(placer_TEXT16_copy(result, DATA3, countof(result)) == result);
-        EXPECT(placer_TEXT16_compare(result, DATA3, countof(result)) == 0);
-        EXPECT(result[countof(result) - 1] == 0);
-
-        COMMENT("4");
-        EXPECT(placer_TEXT16_copy(result, DATA4, countof(result)) == result);
-        EXPECT(placer_TEXT16_compare(result, DATA4, countof(result)) == 0);
-        EXPECT(result[countof(result) - 1] == 'R');
-
         STATUS();
     }
 
