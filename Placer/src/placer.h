@@ -68,7 +68,9 @@ extern int placer_exec_INTEGER64_import(placer_INTEGER64_t * dest, const char * 
 
 /**
  * Import a TEXT string from a characcter pointer provided by SQLite3 to the exec
- * callback. This is called by the schema exec macros.
+ * callback. This is called by the schema exec macros. The destination buffer
+ * is NOT guaranteed to be NUL terminated if the source data completely fills
+ * it.
  * @param dest points to the TEXT field in the schema strructure.
  * @param src points to the data provided by SQLite3.
  * @param items it the number of UTF-8 charactgers in the TEXT field.
@@ -76,8 +78,10 @@ extern int placer_exec_INTEGER64_import(placer_INTEGER64_t * dest, const char * 
 extern int placer_exec_TEXT_import(placer_TEXT_t * dest, const char * src, size_t items);
 
 /**
- * Import a TEXT16 string from a characcter pointer provided by SQLite3 to the exec
- * callback. This is called by the schema exec macros.
+ * Import a TEXT16 string from a characcter pointer provided by SQLite3 to the
+ * exec callback. This is called by the schema exec macros. The destination
+ * buffer is NOT guaranteed to be NUL terminated if the source data completely
+ * fills it.
  * @param dest points to the TEXT16 field in the schema strructure.
  * @param src points to the data provided by SQLite3.
  * @param items it the number of UTF-16 characters (NOT BYTES) in the TEXT16 field.

@@ -92,9 +92,9 @@ int placer_steps_struct_##_STRUCTURE_##_callback(sqlite3_stmt * sp, void * vp) {
             if (strcmp(name, #_NAME_) != 0) { break; } \
             text = sqlite3_column_text(sp, ii); \
             bytes = sqlite3_column_bytes(sp, ii); \
-            if (bytes > (((_ITEMS_) - 1) * sizeof(placer_TEXT_t))) { break; } \
+            if (bytes > ((_ITEMS_) * sizeof(placer_TEXT_t))) { break; } \
             strncpy(pp->_NAME_, text, bytes); \
-            pp->_NAME_[bytes / sizeof(placer_TEXT_t)] = '\0'; \
+            if (bytes < ((_ITEMS_) * sizeof(placer_TEXT_t))) { pp->_NAME_[bytes / sizeof(placer_TEXT_t)] = '\0'; } \
             ii += 1; \
         }
 
@@ -108,9 +108,9 @@ int placer_steps_struct_##_STRUCTURE_##_callback(sqlite3_stmt * sp, void * vp) {
             if (strcmp(name, #_NAME_) != 0) { break; } \
             text16 = sqlite3_column_text16(sp, ii); \
             bytes = sqlite3_column_bytes16(sp, ii); \
-            if (bytes > (((_ITEMS_) - 1) * sizeof(placer_TEXT16_t))) { break; } \
+            if (bytes > ((_ITEMS_) * sizeof(placer_TEXT16_t))) { break; } \
             placer_TEXT16_copy(pp->_NAME_, text16, bytes / sizeof(placer_TEXT16_t)); \
-            pp->_NAME_[bytes / sizeof(placer_TEXT16_t)] = 0; \
+            if (bytes < ((_ITEMS_) * sizeof(placer_TEXT16_t))) { pp->_NAME_[bytes / sizeof(placer_TEXT16_t)] = '\0'; } \
             ii += 1; \
         }
 

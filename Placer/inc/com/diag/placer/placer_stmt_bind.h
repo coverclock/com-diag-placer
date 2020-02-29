@@ -56,7 +56,7 @@ int placer_stmt_struct_##_STRUCTURE_##_bind(sqlite3_stmt * sp, const struct _STR
         { \
             if (ii >= ll) { rc = SQLITE_ERROR; break; } \
             ii += 1; \
-            if ((rc = sqlite3_bind_text(sp, ii, pp->_NAME_, strnlen(pp->_NAME_, (_ITEMS_)), (placer_bind_callback_t *)0)) != SQLITE_OK) { break; } \
+            if ((rc = sqlite3_bind_text(sp, ii, pp->_NAME_, strnlen(pp->_NAME_, (_ITEMS_)) * sizeof(placer_TEXT_t), (placer_bind_callback_t *)0)) != SQLITE_OK) { break; } \
         }
 
 #define PLACER_TEXT16(_NAME_, _ITEMS_) \

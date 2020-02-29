@@ -74,46 +74,24 @@ int placer_exec_INTEGER64_import(placer_INTEGER64_t * dest, const char * src)
 
 int placer_exec_TEXT_import(placer_TEXT_t * dest, const char * src, size_t items)
 {
-    int rc = SQLITE_ERROR;
+    int rc = SQLITE_OK;
 
-    if (items < 1) {
-        rc = SQLITE_OK;
-    } else {
-        dest[items - 1] = '\0';
-        (void)strncpy(dest, (placer_TEXT_t *)src, items);
-        if (dest[items - 1] == '\0') {
-            rc = SQLITE_OK;
-        } else {
-            dest[items - 1] = '\0';
-            placer_error(rc);
-        }
-    }
+    (void)strncpy(dest, (placer_TEXT_t *)src, items);
 
     return rc;
 }
 
 int placer_exec_TEXT16_import(placer_TEXT16_t * dest, const char * src, size_t items)
 {
-    int rc = SQLITE_ERROR;
+    int rc = SQLITE_OK;
     placer_TEXT16_t * dp = (placer_TEXT16_t *)0;
     const char * sp = (const char *)0;
     size_t ii = 0;
 
-    if (items < 1) {
-        rc = SQLITE_OK;
-    } else {
-        dest[items - 1] = 0;
-        for (dp = dest, sp = src, ii = items; ii > 0; dp++, sp++, ii--) {
-            *dp = *sp; /* Conversion. */
-            if (*sp == '\0') {
-                break;
-            }
-        }
-        if (dest[items - 1] == 0) {
-            rc = SQLITE_OK;
-        } else {
-            dest[items - 1] = 0;
-            placer_error(rc);
+    for (dp = dest, sp = src, ii = items; ii > 0; dp++, sp++, ii--) {
+        *dp = *sp; /* Conversion. */
+        if (*sp == '\0') {
+            break;
         }
     }
 

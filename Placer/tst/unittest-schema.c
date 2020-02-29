@@ -248,8 +248,8 @@ int main(void)
         EXPECT(strcmp(result, "A") == 0);
         EXPECT(placer_exec_TEXT_import(result, "BCDEFGHI", countof(result)) == SQLITE_OK);
         EXPECT(strcmp(result, "BCDEFGHI") == 0);
-        EXPECT(placer_exec_TEXT_import(result, "JKLMNOPQR", countof(result)) == SQLITE_ERROR);
-        EXPECT(strcmp(result, "JKLMNOPQ") == 0);
+        EXPECT(placer_exec_TEXT_import(result, "JKLMNOPQR", countof(result)) == SQLITE_OK);
+        EXPECT(strncmp(result, "JKLMNOPQR", sizeof(result)) == 0);
         STATUS();
     }
 
@@ -360,7 +360,6 @@ int main(void)
         static const placer_TEXT16_t RESULT2[] = { 'A', '\0' };
         static const placer_TEXT16_t RESULT3[] = { 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', '\0' };
         static const placer_TEXT16_t RESULT4[] = { 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', '\0' };
-        static const placer_TEXT16_t RESULT5[] = { 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', '\0' };
         placer_TEXT16_t result[]  = { '0', '1', '2', '3', '4', '5', '6', '7', '\0' };
 
         TEST();
@@ -390,12 +389,11 @@ int main(void)
         EXPECT(placer_TEXT16_compare(result, RESULT3, countof(result)) == 0);
  
         COMMENT("4");
-        EXPECT(placer_exec_TEXT16_import(result, (char *)DATA4, countof(result)) == SQLITE_ERROR);
+        EXPECT(placer_exec_TEXT16_import(result, (char *)DATA4, countof(result)) == SQLITE_OK);
         diminuto_dump(stderr, DATA4, sizeof(DATA4));
         diminuto_dump(stderr, RESULT4, sizeof(RESULT4));
-        diminuto_dump(stderr, RESULT5, sizeof(RESULT5));
         diminuto_dump(stderr, result, sizeof(result));
-        EXPECT(placer_TEXT16_compare(result, RESULT5, countof(result)) == 0);
+        EXPECT(placer_TEXT16_compare(result, RESULT4, countof(result)) == 0);
 
         STATUS();
     }
