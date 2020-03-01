@@ -1,9 +1,5 @@
 #include <limits.h>
 
-/*
- * TODO: use pathconf(3) instead of PATH_MAX.
- */
-
 PLACER_SCHEMA(Schema)
 PLACER_TEXT(path, PATH_MAX) PLACER_FIELD(PRIMARY KEY)
 PLACER_TEXT(type, sizeof("'")) PLACER_FIELD()
