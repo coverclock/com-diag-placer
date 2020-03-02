@@ -16,6 +16,7 @@
 #include <errno.h>
 #include "sqlite3.h"
 #include "com/diag/diminuto/diminuto_types.h"
+#include "com/diag/placer/placer.h"
 #include "placer.h" /* Private API. */
 
 char * placer_sql_vformata(size_t size, const char * format, va_list op)

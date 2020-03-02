@@ -16,6 +16,7 @@
 #include <errno.h>
 #include "sqlite3.h"
 #include "com/diag/diminuto/diminuto_types.h"
+#include "com/diag/placer/placer.h"
 #include "placer.h" /* Private API. */
 
 size_t placer_str_expand(char * to, const char * from, size_t size) {

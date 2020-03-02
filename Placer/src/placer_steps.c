@@ -17,6 +17,7 @@
 #include "sqlite3.h"
 #include "com/diag/diminuto/diminuto_types.h"
 #include "com/diag/diminuto/diminuto_phex.h"
+#include "com/diag/placer/placer.h"
 #include "placer.h" /* Private API. */
 
 int placer_steps_generic_callback(sqlite3_stmt * sp, void * vp) {

@@ -17,6 +17,7 @@
 #include <errno.h>
 #include "sqlite3.h"
 #include "com/diag/diminuto/diminuto_types.h"
+#include "com/diag/placer/placer.h"
 #include "placer.h" /* Private API. */
 
 sqlite3_stmt * placer_prepare(sqlite3 * db, const char * sql)

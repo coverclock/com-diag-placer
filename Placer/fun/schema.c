@@ -17,7 +17,7 @@
  *
  * USAGE
  *
- * census [ -? ] [ -d ] [ -v ] -D DATABASE [ -1 ] [ -2 ] [ -3 ] [ -4 ] [ -5 ] [ -6 ] [ [ -r ] ROOT ... ]
+ * census [ -? ] [ -d ] [ -v ] -D DATABASE [ -1 ] [ -2 ] [ -3 ] [ -4 ] [ -5 ] [ -6 ] [ -7 ] [ -8 ] [ -P PATH ] [ -I INODE ] [ [ -r ] ROOT ... ]
  *
  * EXAMPLES
  *
@@ -71,6 +71,63 @@ static int Verbose = 0;
 static size_t Buffersize = 256;
 
 /*
+ * TEST8
+ *
+ * Find every entry who has a specific inode number. This includes
+ * files in different file systems which may coincidentally have
+ * the same inode number.
+ */
+
+static int reveal(void * vp, ino_t ino)
+{
+    int xc = 0;
+    sqlite3 * db = (sqlite3 *)0;
+    sqlite3_stmt * sp = (sqlite3_stmt *)0;
+    static const char SELECT[] = "SELECT * FROM Schema WHERE (ino = ?);";
+    int rc = 0;
+    struct Schema data[8];
+    struct Schema * pointers[] = { &data[0], &data[1], &data[2], &data[3], &data[4], &data[5], &data[6], &data[7], (struct Schema *)0 };
+    struct Schema ** current = &pointers[0];
+    int ii = 0;
+ 
+    do {
+
+        db = (sqlite3 *)vp;
+
+        /*
+         * Select the row from the database.
+         */
+
+        sp = placer_prepare(db, SELECT);
+        if (sp == (sqlite3_stmt *)0) {
+            xc = -190;
+            break;
+        }
+
+        rc = sqlite3_bind_int(sp, 1, ino);
+        if (rc != SQLITE_OK) {
+            xc = -191;
+            break;
+        }
+
+        rc = placer_steps(sp, placer_steps_struct_Schema_callback, &current);
+        if (rc != SQLITE_OK) {
+            xc = -192;
+            break;
+        }
+
+        printf("0: ino=%d\n", ino);
+
+        for (ii = 0; &pointers[ii] != current; ++ii) {
+            printf("%d: ino=%d device=%d,%d path=\"%s\"\n", ii + 1, (pointers[ii])->ino, (pointers[ii])->devmajor, (pointers[ii])->devminor, (pointers[ii])->path);
+        }
+
+    } while (0);
+
+    return xc;
+}
+
+/*
  * TEST6
  *
  * Remove the entries for files that are not marked following a replace, then
@@ -90,6 +147,10 @@ static int clean(sqlite3 * db)
     };
     placer_generic_callback_t state = PLACER_GENERIC_CALLBACK_INITIALIZER;
     int ii = 0;
+
+    if (!Verbose) {
+        state.fp = (FILE *)0;
+    }
 
     for (ii = 0; ii < countof(SELECT); ii++) {
 
@@ -139,6 +200,10 @@ static int mark(sqlite3 * db)
     };
     placer_generic_callback_t state = PLACER_GENERIC_CALLBACK_INITIALIZER;
     int ii = 0;
+
+    if (!Verbose) {
+        state.fp = (FILE *)0;
+    }
 
     for (ii = 0; ii < countof(SELECT); ii++) {
 
@@ -253,7 +318,7 @@ static int identify(void * vp, const char * name, const char * path, size_t dept
 }
 
 /*
- * TEST3
+ * TEST3, TEST7
  *
  * For every file in the file system, enumerate the number of entries
  * for the same path in the DB. Something is amiss if that number if
@@ -358,6 +423,10 @@ static int extract(sqlite3 * db, diminuto_fs_type_t type)
 
     do {
 
+        if (!Verbose) {
+            state.fp = (FILE *)0;
+        }
+
         tt[0] = type;
         to = placer_str_expanda(tt);
 
@@ -403,8 +472,12 @@ static int replace(void * vp, const char * name, const char * path, size_t depth
 #include "com/diag/placer/placer_end.h"
     struct Schema schema;
 
-    fputs(path, stdout);
-    fputc('\n', stdout);
+    if (!Verbose) {
+        state.fp = (FILE *)0;
+    } else {
+        fputs(path, stdout);
+        fputc('\n', stdout);
+    }
 
     strncpy(schema.path, path, sizeof(schema.path));
     schema.type[0] = diminuto_fs_type(statp->st_mode); schema.type[1] = '\0';
@@ -472,8 +545,12 @@ static int insert(void * vp, const char * name, const char * path, size_t depth,
 #include "com/diag/placer/placer_end.h"
     struct Schema schema;
 
-    fputs(path, stdout);
-    fputc('\n', stdout);
+    if (!Verbose) {
+        state.fp = (FILE *)0;
+    } else {
+        fputs(path, stdout);
+        fputc('\n', stdout);
+    }
 
     strncpy(schema.path, path, sizeof(schema.path));
     schema.type[0] = diminuto_fs_type(statp->st_mode); schema.type[1] = '\0';
@@ -539,6 +616,10 @@ static int show(sqlite3 * db)
 
     do {
 
+        if (!Verbose) {
+            state.fp = (FILE *)0;
+        }
+
         sp = placer_prepare(db, SELECT);
         if (sp == (sqlite3_stmt *)0) {
             xc = -170;
@@ -566,7 +647,6 @@ static int create(sqlite3 * db)
 {
     int xc = 0;
     int rc = 0;
-    placer_generic_callback_t state = PLACER_GENERIC_CALLBACK_INITIALIZER;
 #include "com/diag/placer/placer_sql_create.h"
 #include "schema.h"
 #include "com/diag/placer/placer_end.h"
@@ -604,6 +684,7 @@ int main(int argc, char * argv[])
     diminuto_fs_walker_t * cp = (diminuto_fs_walker_t *)0;
     const char * database = (const char *)0;
     const char * path = "/";
+    ino_t ino = 1;
     int creating = 0;
     int test0 = 0;
     int test1 = 0;
@@ -613,8 +694,9 @@ int main(int argc, char * argv[])
     int test5 = 0;
     int test6 = 0;
     int test7 = 0;
+    int test8 = 0;
     char * end = (char *)0;
-    static const char USAGE[] = "-D DATABASE [ -B BLOCKSIZE ] [ -d ] [ -v ] [ -0 ] [ -1 ] [ -2 ] [ -3 ] [ -4 ] [ -5 ] [ -6 ] [ -7 ] [ -P PATH ] [ [ -c | -r ]  ROOT [ ROOT ... ] ]\n";
+    static const char USAGE[] = "-D DATABASE [ -B BLOCKSIZE ] [ -d ] [ -v ] [ -0 ] [ -1 ] [ -2 ] [ -3 ] [ -4 ] [ -5 ] [ -6 ] [ -7 ] [ -8 ] [ -P PATH ] [ -I INODE ] [ [ -c | -r ]  ROOT [ ROOT ... ] ]\n";
     int opt = 0;
     extern char * optarg;
     extern int optind;
@@ -627,7 +709,7 @@ int main(int argc, char * argv[])
 
         cp = insert;
 
-        while ((opt = getopt(argc, argv, "?01234567B:D:P:cdrv")) >= 0) {
+        while ((opt = getopt(argc, argv, "?012345678B:D:I:P:cdrv")) >= 0) {
             switch (opt) {
             case '?':
                 fprintf(stdout, "usage: %s %s\n", Program, USAGE);
@@ -656,6 +738,9 @@ int main(int argc, char * argv[])
             case '7':
                 test7 = !0;
                 break;
+            case '8':
+                test8 = !0;
+                break;
             case 'B':
                 Buffersize = strtoul(optarg, &end, 0);
                 if ((end != (char *)0) && (end[0] != '\0')) {
@@ -666,6 +751,14 @@ int main(int argc, char * argv[])
                 break;
             case 'D':
                 database = optarg;
+                break;
+            case 'I':
+                ino = strtoul(optarg, &end, 0);
+                if ((end != (char *)0) && (end[0] != '\0')) {
+                    errno = EINVAL;
+                    perror(optarg);
+                    xc = -17;
+                }
                 break;
             case 'P':
                 path = optarg;
@@ -812,6 +905,14 @@ int main(int argc, char * argv[])
         if (!test7) {
             /* Do nothing. */
         } else if ((rc = enumerate(db, path, path, 0, (struct stat *)0)) == 0) {
+            /* Do nothing. */
+        } else {
+            xc = rc;
+        }
+
+        if (!test8) {
+            /* Do nothing. */
+        } else if ((rc = reveal(db, ino)) == 0) {
             /* Do nothing. */
         } else {
             xc = rc;

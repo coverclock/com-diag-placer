@@ -16,7 +16,7 @@
 #include <errno.h>
 #include "sqlite3.h"
 #include "com/diag/diminuto/diminuto_types.h"
-#include "placer.h" /* Private API. */
+#include "com/diag/placer/placer.h"
 
 placer_TEXT16_t * placer_TEXT16_copy(placer_TEXT16_t * dest, const placer_TEXT16_t * src, size_t items)
 {
