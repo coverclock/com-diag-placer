@@ -11,33 +11,89 @@
  * N.B. THIS HEADER FILE CAN BE INCLUDED MORE THAN ONCE.
  */
 
+/**
+ * @def PLACER_SCHEMA(_STRUCTURE_)
+ * This macro generates the front matter for an SQL REPLACE for the schema.
+ * Each field is idenfified by an autoindexed name against which a bind
+ * command can be done. There is a set of macros to generate a function
+ * to accomplish such a bind against every field in the schema.
+ * @a _STRUCTURE_ is the schema name.
+ */
 #define PLACER_SCHEMA(_STRUCTURE_) \
     static const char PLACER_SQL_struct_##_STRUCTURE_##_REPLACE[] = \
         "REPLACE INTO " #_STRUCTURE_ " VALUES ("
 
+/**
+ * @def PLACER_BLOB(_NAME_, _ITEMS_)
+ * This macro generates the code for a field of type BLOB.
+ * @a _NAME_ parameter is the field name.
+ * @a _ITEMS_ parameters is the number of placer_BLOB_t elements in the field.
+ */
 #define PLACER_BLOB(_NAME_, _ITEMS_) \
             ":"#_NAME_
 
+/**
+ * @def PLACER_FLOAT(_ITEM_)
+ * This macro generates the code for a field of type FLOAT.
+ * @a _NAME_ parameter is the field name.
+ */
 #define PLACER_FLOAT(_NAME_) \
             ":"#_NAME_
 
+/**
+ * @def PLACER_INTEGER(_NAME_)
+ * This macro generates the code for a field of type INTEGER.
+ * @a _NAME_ parameter is the field name.
+ */
 #define PLACER_INTEGER(_NAME_) \
             ":"#_NAME_
 
+/**
+ * @def PLACER_INTEGER64(_NAME_)
+ * This macro generates the code for a field of type INTEGER64.
+ * @a _NAME_ parameter is the field name.
+ */
 #define PLACER_INTEGER64(_NAME_) \
             ":"#_NAME_
 
+/**
+ * @def PLACER_TEXT(_NAME_, _ITEMS_)
+ * This macro generates the code for a field of type TEXT.
+ * @a _NAME_ parameter is the field name.
+ * @a _ITEMS_ parameters is the number of placer_TEXT_t elements in the field.
+ */
 #define PLACER_TEXT(_NAME_, _ITEMS_) \
             ":"#_NAME_
 
+/**
+ * @def PLACER_TEXT16(_NAME_, _ITEMS_)
+ * This macro generates the code for a field of type TEXT16.
+ * @a _NAME_ parameter is the field name.
+ * @a _ITEMS_ parameters is the number of placer_TEXT16_t elements in the field.
+ */
 #define PLACER_TEXT16(_NAME_, _ITEMS_) \
             ":"#_NAME_
 
+/**
+ * @def PLACER_FIELD(_CONSTRAINTS_)
+ * This macro generates the ending for any field that is not the last field.
+ * @a _CONSTRAINTS_ is any additional contraints on the field.
+ */
 #define PLACER_FIELD(_CONSTRAINTS_) \
             ", "
 
+/**
+ * @def PLACER_FINAL(_CONSTRAINTS_)
+ * This macro generates the ending for any field that is the last field.
+ * @a _CONSTRAINTS_ is any additional contraints on the field.
+ */
 #define PLACER_FINAL(_CONSTRAINTS_) \
             " "
 
+/**
+ * @def PLACER_END(_CONSTRAINTS_)
+ * This macro generates the end matter for an SQL REPLACE for the schema.
+ * @a _CONSTRAINTS_ is any additional contraints on the schema.
+ */
 #define PLACER_END(_CONSTRAINTS_) \
         ");";

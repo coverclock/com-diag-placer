@@ -116,10 +116,10 @@ static int reveal(void * vp, ino_t ino)
             break;
         }
 
-        printf("0: ino=%d\n", ino);
+        printf("0: ino=%lld\n", (long long)ino);
 
         for (ii = 0; &pointers[ii] != current; ++ii) {
-            printf("%d: ino=%d device=%d,%d path=\"%s\"\n", ii + 1, (pointers[ii])->ino, (pointers[ii])->devmajor, (pointers[ii])->devminor, (pointers[ii])->path);
+            printf("%d: ino=%lld device=%d,%d path=\"%s\"\n", ii + 1, (long long)((pointers[ii])->ino), (pointers[ii])->devmajor, (pointers[ii])->devminor, (pointers[ii])->path);
         }
 
     } while (0);

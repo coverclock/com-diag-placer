@@ -76,6 +76,10 @@
 #include "unittest-schema.h"
 #include "com/diag/placer/placer_end.h"
 
+#include "com/diag/placer/placer_null.h"
+#include "unittest-schema.h"
+#include "com/diag/placer/placer_end.h"
+
 int main(void)
 {
     SETLOGMASK();

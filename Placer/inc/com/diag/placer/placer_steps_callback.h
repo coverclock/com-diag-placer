@@ -16,6 +16,18 @@
 #include <sqlite3.h>
 #include "placer.h"
 
+/**
+ * @def PLACER_SCHEMA(_STRUCTURE_)
+ * This macro generates the front matter for a placer_steps() callback
+ * function that loads the data from a single selected row in a table
+ * into a structure for the schema. The structure is pointed to by an
+ * element in a null-terminated array of structure pointers through which
+ * successive calls to the callback function indexes. Each successive row
+ * is loaded into the next structure until either the selection of rows is
+ * exhausted or the null pointer at the end of the structure pointer array
+ * is reached.
+ * @a _STRUCTURE_ is the schema name.
+ */
 #define PLACER_SCHEMA(_STRUCTURE_) \
 int placer_steps_struct_##_STRUCTURE_##_callback(sqlite3_stmt * sp, void * vp) { \
     int rc = SQLITE_ERROR; \
@@ -34,6 +46,12 @@ int placer_steps_struct_##_STRUCTURE_##_callback(sqlite3_stmt * sp, void * vp) {
         if (pp == (struct _STRUCTURE_ *)0) { break; } \
         count = sqlite3_column_count(sp); \
 
+/**
+ * @def PLACER_BLOB(_NAME_, _ITEMS_)
+ * This macro generates the code for a field of type BLOB.
+ * @a _NAME_ parameter is the field name.
+ * @a _ITEMS_ parameters is the number of placer_BLOB_t elements in the field.
+ */
 #define PLACER_BLOB(_NAME_, _ITEMS_) \
         { \
             const placer_BLOB_t * blob = (const placer_BLOB_t *)0; \
@@ -49,6 +67,11 @@ int placer_steps_struct_##_STRUCTURE_##_callback(sqlite3_stmt * sp, void * vp) {
             ii += 1; \
         }
 
+/**
+ * @def PLACER_FLOAT(_ITEM_)
+ * This macro generates the code for a field of type FLOAT.
+ * @a _NAME_ parameter is the field name.
+ */
 #define PLACER_FLOAT(_NAME_) \
         { \
             if (ii >= count) { break; } \
@@ -60,6 +83,11 @@ int placer_steps_struct_##_STRUCTURE_##_callback(sqlite3_stmt * sp, void * vp) {
             ii += 1; \
         }
 
+/**
+ * @def PLACER_INTEGER(_NAME_)
+ * This macro generates the code for a field of type INTEGER.
+ * @a _NAME_ parameter is the field name.
+ */
 #define PLACER_INTEGER(_NAME_) \
         { \
             if (ii >= count) { break; } \
@@ -71,6 +99,11 @@ int placer_steps_struct_##_STRUCTURE_##_callback(sqlite3_stmt * sp, void * vp) {
             ii += 1; \
         }
 
+/**
+ * @def PLACER_INTEGER64(_NAME_)
+ * This macro generates the code for a field of type INTEGER64.
+ * @a _NAME_ parameter is the field name.
+ */
 #define PLACER_INTEGER64(_NAME_) \
         { \
             if (ii >= count) { break; } \
@@ -82,6 +115,12 @@ int placer_steps_struct_##_STRUCTURE_##_callback(sqlite3_stmt * sp, void * vp) {
             ii += 1; \
         }
 
+/**
+ * @def PLACER_TEXT(_NAME_, _ITEMS_)
+ * This macro generates the code for a field of type TEXT.
+ * @a _NAME_ parameter is the field name.
+ * @a _ITEMS_ parameters is the number of placer_TEXT_t elements in the field.
+ */
 #define PLACER_TEXT(_NAME_, _ITEMS_) \
         { \
             const placer_TEXT_t * text = (const placer_TEXT_t *)0; \
@@ -98,6 +137,12 @@ int placer_steps_struct_##_STRUCTURE_##_callback(sqlite3_stmt * sp, void * vp) {
             ii += 1; \
         }
 
+/**
+ * @def PLACER_TEXT16(_NAME_, _ITEMS_)
+ * This macro generates the code for a field of type TEXT16.
+ * @a _NAME_ parameter is the field name.
+ * @a _ITEMS_ parameters is the number of placer_TEXT16_t elements in the field.
+ */
 #define PLACER_TEXT16(_NAME_, _ITEMS_) \
         { \
             const placer_TEXT16_t * text16 = (const placer_TEXT16_t *)0; \
@@ -114,10 +159,27 @@ int placer_steps_struct_##_STRUCTURE_##_callback(sqlite3_stmt * sp, void * vp) {
             ii += 1; \
         }
 
+/**
+ * @def PLACER_FIELD(_CONSTRAINTS_)
+ * This macro generates the ending for any field that is not the last field.
+ * @a _CONSTRAINTS_ is any additional contraints on the field.
+ */
 #define PLACER_FIELD(_CONSTRAINTS_)
 
+/**
+ * @def PLACER_FINAL(_CONSTRAINTS_)
+ * This macro generates the ending for any field that is the last field.
+ * @a _CONSTRAINTS_ is any additional contraints on the field.
+ */
 #define PLACER_FINAL(_CONSTRAINTS_)
 
+/**
+ * @def PLACER_END(_CONSTRAINTS_)
+ * This macro generates the end matter for a placer_steps() callback
+ * function that loads the data from a single selected row in a table
+ * into a structure for the schema.
+ * @a _CONSTRAINTS_ is any additional contraints on the schema.
+ */
 #define PLACER_END(_CONSTRAINTS_) \
         (*ip) += 1; \
         rc = SQLITE_OK; \

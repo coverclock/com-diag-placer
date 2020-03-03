@@ -7,24 +7,17 @@
  * Licensed under the terms in README.h<BR>
  * Chip Overclock (coverclock@diag.com)<BR>
  * https://github.com/coverclock/com-diag-placer<BR>
- * These X macros generate a list of SQLite3 field types.
+ * These X macros generate no code for a schema.
  * N.B. THIS HEADER FILE CAN BE INCLUDED MORE THAN ONCE.
- * Note that there are no SQLITE_INTEGER64 or SQLITE_TEXT16
- * fundamental types.
  */
-
-#include "placer.h"
 
 /**
  * @def PLACER_SCHEMA(_STRUCTURE_)
- * This macro generates the front matter for an array that contains
- * the SQLite3 field type for each field in the schema. Note that
- * SQLite3 classifies both TEXT and TEXT16 fields as type TEXT,
- * and both INTEGER and INTEGER64 fields as type INTEGER.
+ * This macro generates the front matter for no operations for the schema.
  * @a _STRUCTURE_ is the schema name.
  */
 #define PLACER_SCHEMA(_STRUCTURE_) \
-    static const int PLACER_ARRAY_struct_##_STRUCTURE_##_TYPE[] = {
+	/**/
 
 /**
  * @def PLACER_BLOB(_NAME_, _ITEMS_)
@@ -33,7 +26,7 @@
  * @a _ITEMS_ parameters is the number of placer_BLOB_t elements in the field.
  */
 #define PLACER_BLOB(_NAME_, _ITEMS_) \
-	( SQLITE_BLOB )
+	/**/
 
 /**
  * @def PLACER_FLOAT(_ITEM_)
@@ -41,7 +34,7 @@
  * @a _NAME_ parameter is the field name.
  */
 #define PLACER_FLOAT(_NAME_) \
-	( SQLITE_FLOAT )
+	/**/
 
 /**
  * @def PLACER_INTEGER(_NAME_)
@@ -49,7 +42,7 @@
  * @a _NAME_ parameter is the field name.
  */
 #define PLACER_INTEGER(_NAME_) \
-	( SQLITE_INTEGER )
+	/**/
 
 /**
  * @def PLACER_INTEGER64(_NAME_)
@@ -57,7 +50,7 @@
  * @a _NAME_ parameter is the field name.
  */
 #define PLACER_INTEGER64(_NAME_) \
-	( SQLITE_INTEGER )
+	/**/
 
 /**
  * @def PLACER_TEXT(_NAME_, _ITEMS_)
@@ -66,7 +59,7 @@
  * @a _ITEMS_ parameters is the number of placer_TEXT_t elements in the field.
  */
 #define PLACER_TEXT(_NAME_, _ITEMS_) \
-	( SQLITE_TEXT )
+	/**/
 
 /**
  * @def PLACER_TEXT16(_NAME_, _ITEMS_)
@@ -75,28 +68,28 @@
  * @a _ITEMS_ parameters is the number of placer_TEXT16_t elements in the field.
  */
 #define PLACER_TEXT16(_NAME_, _ITEMS_) \
-	( SQLITE_TEXT )
+	/**/
 
 /**
  * @def PLACER_FIELD(_CONSTRAINTS_)
- * This macro generates the ending for any field that is not the last field.
+ * This macro generates the ending of any field that is not the last field.
  * @a _CONSTRAINTS_ is any additional contraints on the field.
  */
 #define PLACER_FIELD(_CONSTRAINTS_) \
-        ,
+	/**/
 
 /**
  * @def PLACER_FINAL(_CONSTRAINTS_)
- * This macro generates the ending for any field that is the last field.
+ * This macro generates the ending of any field that is the last field.
  * @a _CONSTRAINTS_ is any additional contraints on the field.
  */
-#define PLACER_FINAL(_CONSTRAINTS_)
+#define PLACER_FINAL(_CONSTRAINTS_) \
+	/**/
 
 /**
  * @def PLACER_END(_CONSTRAINTS_)
- * This macro generates the end matter for a schema.
+ * This macro generates the end matter for no operations for the schema.
  * @a _CONSTRAINTS_ is any additional contraints on the schema.
  */
 #define PLACER_END(_CONSTRAINTS_) \
-    };
-
+	/**/
