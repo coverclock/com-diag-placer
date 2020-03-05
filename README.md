@@ -123,7 +123,7 @@ but this is a simple one.)
 Unmark all of the entries in the database that are marked. Display the
 results.
 
-    survey -D out/host/sql/census.db -6
+    survey -D out/host/sql/survey.db -6
 
 Display the entries in the database that have the specified path name.
 (There should be at most one.)
