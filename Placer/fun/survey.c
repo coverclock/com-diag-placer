@@ -17,11 +17,11 @@
  *
  * USAGE
  *
- * census [ -? ] [ -d ] [ -v ] -D DATABASE [ -1 ] [ -2 ] [ -3 ] [ -4 ] [ -5 ] [ -6 ] [ -7 ] [ -8 ] [ -P PATH ] [ -I INODE ] [ [ -r ] ROOT ... ]
+ * survey [ -? ] -D DATABASE [ -B BLOCKSIZE ] [ -d ] [ -v ] [ -0 ] [ -1 ] [ -2 ] [ -3 ] [ -4 ] [ -5 ] [ -6 ] [ -7 ] [ -8 ] [ -P PATH ] [ -I INODE ] [ [ -c ]  [ -i | -r ]  ROOT [ ROOT ... ] ]
  *
  * EXAMPLES
  *
- * census -D out/host/sql/census.db /
+ * survey -D out/host/sql/survey.db /
  *
  * REFERENCES
  *
@@ -181,7 +181,7 @@ static int clean(sqlite3 * db)
  * with the same inode number but a different path name. This could be
  * a hard link, in which case the number of links field should be greater
  * than one. But it could also be that the file system has changed since
- * the census, and the inode number reused. We make that less likely by
+ * the curvey, and the inode number reused. We make that less likely by
  * only selecting those DB entries whose link count is greater than one.
  */
 
@@ -234,7 +234,7 @@ static int mark(sqlite3 * db)
  * with the same inode number but a different path name. This could be
  * a hard link, in which case the number of links field should be greater
  * than one. But it could also be that the file system has changed since
- * the census, and the inode number reused. We make that less likely by
+ * the survey, and the inode number reused. We make that less likely by
  * only selecting those DB entries whose link count is greater than one.
  */
 
@@ -275,8 +275,10 @@ static int identify(void * vp, const char * name, const char * path, size_t dept
 
         db = (sqlite3 *)vp;
 
-        fputs(path, stdout);
-        fputc('\n', stdout);
+        if (Verbose) {
+            fputs(path, stdout);
+            fputc('\n', stdout);
+        }
 
         sp = placer_prepare(db, SELECT);
         if (sp == (sqlite3_stmt *)0) {
@@ -323,7 +325,7 @@ static int identify(void * vp, const char * name, const char * path, size_t dept
  * For every file in the file system, enumerate the number of entries
  * for the same path in the DB. Something is amiss if that number if
  * greater than one. But it could also be zero, if the file has been
- * deleted since the census was done.
+ * deleted since the survey was done.
  */
 
 static int enumerate(void * vp, const char * name, const char * path, size_t depth, const struct stat * statp)
@@ -405,7 +407,7 @@ static int enumerate(void * vp, const char * name, const char * path, size_t dep
 /*
  * TEST1, TEST2
  *
- * Find all files in the census which have the specified type and
+ * Find all files in the survey which have the specified type and
  * for which any of the higher order mode bits - those that don't
  * deal with the basic user, group, other permissions - are set.
  */
@@ -456,7 +458,7 @@ static int extract(sqlite3 * db, diminuto_fs_type_t type)
 }
 
 /*
- * Update a census by walking the file system and storing the absolute
+ * Update a survey by walking the file system and storing the absolute
  * path and attributes of every object encountered.
  */
 
@@ -529,7 +531,7 @@ static int replace(void * vp, const char * name, const char * path, size_t depth
 
 
 /*
- * Perform a census by walking the file system and storing the absolute
+ * Perform a survey by walking the file system and storing the absolute
  * path and attributes of every object encountered.
  */
 
@@ -696,7 +698,6 @@ int main(int argc, char * argv[])
     int test7 = 0;
     int test8 = 0;
     char * end = (char *)0;
-    static const char USAGE[] = "-D DATABASE [ -B BLOCKSIZE ] [ -d ] [ -v ] [ -0 ] [ -1 ] [ -2 ] [ -3 ] [ -4 ] [ -5 ] [ -6 ] [ -7 ] [ -8 ] [ -P PATH ] [ -I INODE ] [ [ -c | -r ]  ROOT [ ROOT ... ] ]\n";
     int opt = 0;
     extern char * optarg;
     extern int optind;
@@ -709,7 +710,10 @@ int main(int argc, char * argv[])
 
         cp = insert;
 
-        while ((opt = getopt(argc, argv, "?012345678B:D:I:P:cdrv")) >= 0) {
+        while ((opt = getopt(argc, argv, "?012345678B:D:I:P:cdirv")) >= 0) {
+
+            static const char USAGE[] = "[ -? ] -D DATABASE [ -B BLOCKSIZE ] [ -d ] [ -v ] [ -0 ] [ -1 ] [ -2 ] [ -3 ] [ -4 ] [ -5 ] [ -6 ] [ -7 ] [ -8 ] [ -P PATH ] [ -I INODE ] [ [ -c ]  [ -i | -r ]  ROOT [ ROOT ... ] ]\n";
+
             switch (opt) {
             case '?':
                 fprintf(stdout, "usage: %s %s\n", Program, USAGE);
@@ -768,6 +772,9 @@ int main(int argc, char * argv[])
                 break;
             case 'd':
                 Debug = !0;
+                break;
+            case 'i':
+                cp = insert;
                 break;
             case 'r':
                 cp = replace;

@@ -17,7 +17,7 @@
  *
  * USAGE
  *
- * census [ -? ] [ -d ] [ -v ] -D DATABASE [ -1 ] [ -2 ] [ -3 ] [ -4 ] [ -5 ] [ -6 ] [ [ -r ] ROOT ... ]
+ * census [ -? ] -D DATABASE [ -B BLOCKSIZE ] [ -d ] [ -v ] [ -0 ] [ -1 ] [ -2 ] [ -3 ] [ -4 ] [ -5 ] [ -6 ] [ -P PATH ] [ [ -c ] [ -i | -r ]  ROOT [ ROOT ... ] ]\n";
  *
  * EXAMPLES
  *
@@ -740,7 +740,6 @@ int main(int argc, char * argv[])
     int test5 = 0;
     int test6 = 0;
     char * end = (char *)0;
-    static const char USAGE[] = "-D DATABASE [ -B BLOCKSIZE ] [ -d ] [ -v ] [ -0 ] [ -1 ] [ -2 ] [ -3 ] [ -4 ] [ -5 ] [ -6 ] [ -P PATH ] [ [ -c | -r ]  ROOT [ ROOT ... ] ]\n";
     int opt = 0;
     extern char * optarg;
     extern int optind;
@@ -753,7 +752,10 @@ int main(int argc, char * argv[])
 
         cp = insert;
 
-        while ((opt = getopt(argc, argv, "?0123456B:D:P:cdrv")) >= 0) {
+        while ((opt = getopt(argc, argv, "?0123456B:D:P:cdirv")) >= 0) {
+
+            static const char USAGE[] = "[ -? ] -D DATABASE [ -B BLOCKSIZE ] [ -d ] [ -v ] [ -0 ] [ -1 ] [ -2 ] [ -3 ] [ -4 ] [ -5 ] [ -6 ] [ -P PATH ] [ [ -c ] [ -i | -r ]  ROOT [ ROOT ... ] ]\n";
+
             switch (opt) {
             case '?':
                 fprintf(stdout, "usage: %s %s\n", Program, USAGE);
@@ -798,6 +800,9 @@ int main(int argc, char * argv[])
                 break;
             case 'd':
                 Debug = !0;
+                break;
+            case 'i':
+                cp = insert;
                 break;
             case 'r':
                 cp = replace;

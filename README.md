@@ -1,6 +1,6 @@
 # com-diag-placer
 
-Musings with SQLite,  X-Macros, and UTF-16 (A WORK IN PROGRESS).
+Musings with SQLite,  X-Macros, and UTF-16
 
 # Copyright
 
@@ -26,8 +26,8 @@ in the use of SQLite in the C programming language.  It is my excuse to
 re-learn SQLite after having been away from it for a few years. It has
 also given me the opportunity to revisit X-Macros which I've used in C
 and C++ based projects in the past (where we referred to them - not
-entirely incorrectly - has "magic macros"). I've applied them here to
-generate C code to implement a database schema.
+entirely incorrectly - as "magic macros"). I've applied them here to
+generate C code to partially automate  a database schema.
 
 SQLite is a server-less relational database system that is featured in
 Android and Apple phones and tablets, Windows 10 (so it is rumored),
@@ -35,6 +35,106 @@ and countless embedded system including some of which I have helped
 develop. I am not a database person, but I very much appreciate the
 persistent data management model offered by SQLite that is usable both
 from within applications and the command line.
+
+# Remarks
+
+This library and its applications support the following SQLite3 data
+types: BLOB, INTEGER, INTEGER64, FLOAT, TEXT, TEXT16 (UTF-16).
+
+SQLite3 provides two basic approaches to executing SQL statements in its
+API: the simpler sqlite3_exec(), which is a purely text-based interface
+(referred to here as "exec"), and sqlite3_prepare()/sqlite3_step(),
+which is a more flexible, iterative interative (referred to here as
+"steps"). Placer supports both, and I recommend the steps approach.
+
+Placer uses so called "x-macros" that allow the developer to describe
+a database schema: a row with fields, each with a specific data type,
+and one of which is a primary key. The same schema description can then
+be used to generate a C structure with appropriately typed fields to
+hold the data from a database row, to generate C code describing SQL
+commands, to generate C functions for the binding of structure fields
+to SQL commands like INSERT and REPLACE, and C functions to import data
+from SQL operations like SELECT.
+
+# Functional Tests Using the Simpler Exec Approach
+
+Set up the PATH, LD_LIBRARY_PATH, and other environmental variables in the
+context of your current shell.
+
+    ./out/host/bin/setup
+
+Create a database, walk the file system tree starting at some convenient
+place, and INSERT the files encountered along with their metadata into
+the database, using placer_exec(). The full path name of the file is used
+as the primary index. (You can start at / root too, but it is likely
+to take a long time.) (You can drop the -v command line flag for less
+output.)
+
+    census -D out/host/sql/census.db -c -i -v ${HOME}
+
+Update an existing database by walking the file system and doing a REPLACE
+of the files encountered with their metadata, using placer_exec().
+.
+
+    census -D out/host/sql/census.db -r -v ${HOME}
+
+Dump the contents of the database. (If you drop the -v command line flag
+you just get a count of the number of items in the database.)
+
+    census -D out/host/sql/census.db -v -0
+
+Mark all of the entries in the database for which the file has more
+than one hard link. Display the results. (There are lots of other tests,
+but this is a simple one.)
+
+    census -D out/host/sql/census.db -5
+
+Unmark all of the entries in the database that are marked. Display the
+results.
+
+    census -D out/host/sql/census.db -6
+
+# Functional Tests Using the More Powerful Steps Approach
+
+Set up the PATH, LD_LIBRARY_PATH, and other environmental variables in the
+context of your current shell.
+
+    ./out/host/bin/setup
+
+Create a database, walk the file system tree starting at some convenient
+place, and INSERT the files encountered along with their metadata into the
+database, using placer_steps(). The full path name of the file is used as
+the primary index. (You can start at / root too, but it is likely to take
+a long time.) (You can drop the -v command line flag for less output.)
+
+    survey -D out/host/sql/survey.db -c -i -v ${HOME}
+
+Update an existing database by walking the file system and doing a REPLACE
+of the files encountered with their metadata, using placer_steps().
+
+    survey -D out/host/sql/survey.db -r -v ${HOME}
+
+Mark all of the entries in the database for which the file has more
+than one hard link. Display the results. (There are lots of other tests,
+but this is a simple one.)
+
+    survey -D out/host/sql/survey.db -5
+
+Unmark all of the entries in the database that are marked. Display the
+results.
+
+    survey -D out/host/sql/census.db -6
+
+Display the entries in the database that have the specified path name.
+(There should be at most one.)
+
+    survey -D out/host/sql/survey.db -7 -P ${HOME}/.profile
+
+Display the entries in the database that have the specified inode number.
+(There may be zero to many, depending on your fondness for hard links,
+up to the limit of the buffer in the application, which is eight.)
+
+    survey -D out/host/sql/survey.db -8 -I 105
 
 # Targets
 
@@ -56,7 +156,7 @@ Linux 4.13.0
 gcc 5.4.0    
 sqlite 3.22.0    
 
-# Remarks
+# Notes
 
 On Rhodium, I installed SQLite3 3.30 manually by downloading and
 building it and installing the build artifacts in the default root
@@ -124,17 +224,21 @@ Run the unit tests
 
     cd ~/src/com-diag-placer/Placer
     . out/host/bin/setup
-    unittest-expand
-    unittest-format
-    unittest-message
-    unittest-schema
+    make sanity
 
-Run the functional test.
+# Functional Tests
 
-    cd ~/src/com-diag-placer/Placer
-    . out/host/bin/setup
-    make out/host/sql/census.db
-    census -D out/host/sql/census.db -v -0 .
+* census - file system walker with tests using placer_exec().
+* survey - file system walker with tests using placer_steps().
+
+# Unit Tests
+
+* unittest-expand - tests argument expansion functions.
+* unittest-exec - tests placer_exec() infrastructure.
+* unittest-format - tests SQL statement formatting functions.
+* unittest-message - tests functions that handle SQLite3 error messages.
+* unittest-steps - tests placer_exec() and placer_steps() together.
+* unittest-utf16 - tests UTF16 (TEXT16) support functions.
 
 # Directories
  
@@ -146,6 +250,28 @@ Run the functional test.
 * sql - Structured Query Language scripts.
 * src - feature implementation and private header source files.
 * tst - unit test source files.
+
+# Artifacts
+
+* out/host/sym - binary executables with symbols intact.
+* out/host/gen - generated source code of executable programs.
+* out/host/fun - executable functional tests.
+* out/host/bin - executable utilities.
+* out/host/inc/com/diag/placer - generated header files.
+* out/host/doc - generated documentation.
+* out/host/doc/man/man3 - generated section 3 man pages.
+* out/host/doc/html - generated HTML documentation.
+* out/host/doc/pdf - generated PDF documentation.
+* out/host/doc/latex - generated LaTEX files.
+* out/host/tst - executable unit tests.
+* out/host/lib - compiled shared object files.
+* out/host/log - log files.
+* out/host/obc/fun - compiled object files of functional tests.
+* out/host/obc/tst - compiled object files of unit tests.
+* out/host/obc/src - compiled object files of source components.
+* out/host/arc - compiled archive files.
+* out/host/sql - test databases.
+* out/host/dep - header dependency make include files.
 
 # References
 
