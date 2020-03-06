@@ -39,7 +39,7 @@ from within applications and the command line.
 # Remarks
 
 This library and its applications support the following SQLite3 data
-types: BLOB, INTEGER, INTEGER64, FLOAT, TEXT, TEXT16 (UTF-16).
+types: BLOB, INTEGER, INTEGER64, FLOAT, TEXT (UTF-8), TEXT16 (UTF-16).
 
 SQLite3 provides two basic approaches to executing SQL statements in its
 API: the simpler sqlite3_exec(), which is a purely text-based interface
@@ -265,7 +265,7 @@ Run the unit tests
 
     PLACER_SCHEMA(Schema)
     PLACER_TEXT(path, PATH_MAX) PLACER_FIELD(PRIMARY KEY)
-    PLACER_TEXT(type, sizeof("'")) PLACER_FIELD()
+    PLACER_TEXT16(type, sizeof("'")) PLACER_FIELD()
     PLACER_INTEGER64(nlink) PLACER_FIELD()
     PLACER_INTEGER(uid) PLACER_FIELD()
     PLACER_INTEGER(gid) PLACER_FIELD()
