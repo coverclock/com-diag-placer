@@ -749,3 +749,8 @@ sanity:
 		test "$$T" = "FAILED!" && R="$$T"; \
 	done; \
 	echo $$R 1>&2
+
+########## Functional Tests
+
+functional:
+	census-suite && survey-suite
