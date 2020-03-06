@@ -248,6 +248,60 @@ Run the unit tests
 * unittest-steps - tests placer_exec() and placer_steps() together.
 * unittest-utf16 - tests UTF16 (TEXT16) support functions.
 
+# Schema Operators
+
+* PLACER_SCHEMA(_STRUCTURE_) - Identifies the front matter for a schema named _STRUCTURE_.
+* PLACER_BLOB(_NAME_, _ITEMS_) - Identifies a field of type BLOB, named _NAME_, of _ITEMS_ bytes in length.
+* PLACER_FLOAT(_NAME_) - Identifies a field of type FLOAT, named _NAME_.
+* PLACER_INTEGER(_NAME_) - Identifies a field of type INTEGER, named _NAME_.
+* PLACER_INTEGER64(_NAME_) - Identifies a field of type INTEGER64, named _NAME_.
+* PLACER_TEXT(_NAME_, _ITEMS_) - Identifies a field of type TEXT, named _NAME_, of _ITEMS_ UTF-8 characters in length.
+* PLACER_TEXT16(_NAME_, _ITEMS_) - Identifies a field of type TEXT16, named _NAME_, of _ITEMS_ UTF-16 characters in length.
+* PLACER_FIELD(_CONSTRAINTS_) - Signals the ending of any field that is not the last field, adding _CONSTRAINTS_ constraints.
+* PLACER_FINAL(_CONSTRAINTS_) - Signals the ending of any field that is the last field, adding _CONSTRAINTS_ constraints.
+* PLACER_END(_CONSTRAINTS_) - Identifies the end matter for the schema, adding _CONSTRAINTS_ contraints.
+
+# Schema Example
+
+    PLACER_SCHEMA(Schema)
+    PLACER_TEXT(path, PATH_MAX) PLACER_FIELD(PRIMARY KEY)
+    PLACER_TEXT(type, sizeof("'")) PLACER_FIELD()
+    PLACER_INTEGER64(nlink) PLACER_FIELD()
+    PLACER_INTEGER(uid) PLACER_FIELD()
+    PLACER_INTEGER(gid) PLACER_FIELD()
+    PLACER_INTEGER(mode) PLACER_FIELD()
+    PLACER_INTEGER64(ino) PLACER_FIELD()
+    PLACER_INTEGER64(blocks) PLACER_FIELD()
+    PLACER_INTEGER64(size) PLACER_FIELD()
+    PLACER_INTEGER(rdevmajor) PLACER_FIELD()
+    PLACER_INTEGER(rdevminor) PLACER_FIELD()
+    PLACER_INTEGER(devmajor) PLACER_FIELD()
+    PLACER_INTEGER(devminor) PLACER_FIELD()
+    PLACER_INTEGER64(ctime) PLACER_FIELD()
+    PLACER_BLOB(status, sizeof(struct stat)) PLACER_FIELD()
+    PLACER_INTEGER(mark) PLACER_FINAL()
+    PLACER_END()
+
+# Code Generators
+
+* placer_array_name - Generates an array of field names for a schema.
+* placer_array_sizeof - Generates an array of field sizes for a schema.
+* placer_array_type - Generates an array of field SQLite3 types for a schema.
+* placer_exec_callback - Generates an exec callback function for a schema.
+* placer_exec_prototype - Generates a prototype for an exec callback function.
+* placer_null - Generates no code for a schema.
+* placer_sql_create - Generates a CREATE SQL command for a schema.
+* placer_sql_insert - Generates an INSERT SQL command for a schema.
+* placer_sql_replace - Generates a REPLACE SQL command for a schema.
+* placer_steps_callback - Generates a steps callback function for a schema.
+* placer_steps_prototype - Generates a prototype for a steps callback function.
+* placer_stmt_bind - Generates a statement bind function for a schema.
+* placer_stmt_prototype - Generates a prototype for a statement bind function.
+* placer_structure_definition - Generates a C structure definition for a schema.
+* placer_structure_display - Generates a display function for a schema.
+* placer_structure_initializer - Generates a C structure initializer for a schema.
+* placer_structure_prototype - Generates a prototype for a display function.
+
 # Directories
  
 * bin - utility source files.
