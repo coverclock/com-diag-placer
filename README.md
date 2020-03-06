@@ -228,11 +228,12 @@ expects it, some minor Makefile hacking might be required.)
     make depend
     make all
 
-Run the unit tests
+Run the unit tests and functional tests.
 
     cd ~/src/com-diag-placer/Placer
     . out/host/bin/setup
     make sanity
+    make functionality
 
 # Functional Tests
 
