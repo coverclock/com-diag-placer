@@ -36,7 +36,7 @@
 #include "../src/placer.h" /* Private API. */
 #include "com/diag/placer/placer.h"
 
-#include "com/diag/placer/placer_structure.h"
+#include "com/diag/placer/placer_structure_definition.h"
 #include "unittest-schema.h"
 #include "com/diag/placer/placer_end.h"
 

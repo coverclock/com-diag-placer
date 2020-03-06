@@ -40,7 +40,15 @@
 #include "../src/placer.h" /* Private API. */
 #include "com/diag/placer/placer.h"
 
-#include "com/diag/placer/placer_structure.h"
+#include "com/diag/placer/placer_structure_definition.h"
+#include "unittest-schema.h"
+#include "com/diag/placer/placer_end.h"
+
+#include "com/diag/placer/placer_structure_prototype.h"
+#include "unittest-schema.h"
+#include "com/diag/placer/placer_end.h"
+
+#include "com/diag/placer/placer_structure_display.h"
 #include "unittest-schema.h"
 #include "com/diag/placer/placer_end.h"
 
@@ -215,7 +223,7 @@ int main(void)
             { 4, { 'D', 'r', 'e', 'a', 'd', ' ', 'P', 'i', 'r', 'a', 't', 'e', ' ', 'R', 'o', 'b', 'e', 'r', 't', 's', 0 }, 31,     { 0x44, },  1LL, "456789012", },
         };
         static const struct UnitTestSchema REPLACED[4] = {
-            { 1, { 'C', 'h', 'i', 'p', ' ', 'O', 'v', 'e', 'r', 'c', 'l', 'o', 'c', 'k', 0 },                               63.625, { 0x55, }, 2,    "567890123", }, 
+            { 1, { 'C', 'h', 'i', 'p', ' ', 'O', 'v', 'e', 'r', 'c', 'l', 'o', 'c', 'k', 0 },                               63.625, { 0x55, }, 2LL,    "567890123", }, 
             { 2, { 'R', 'e', 'd', ' ', 'B', 'l', 'a', 'c', 'k', 0 },                                                        51.,    { 0x66, }, 4LL,  "456789012", },
             { 3, { 'T', 'h', 'e', ' ', 'F', 'r', 'e', 'n', 'c', 'h', ' ', 'W', 'o', 'm', 'a', 'n', 0 },                     62,     { 0x77, }, 6LL,  "345678901", },
             { 4, { 'D', 'r', 'e', 'a', 'd', ' ', 'P', 'i', 'r', 'a', 't', 'e', ' ', 'R', 'o', 'b', 'e', 'r', 't', 's', 0 }, 31,     { 0x88, }, 10LL, "234567890", },
@@ -255,6 +263,7 @@ int main(void)
         COMMENT("insert");
         for (ii = 0; ii < countof(INSERTED); ++ii) {
             COMMENT("%d\n", ii);
+            placer_struct_UnitTestSchema_display(stderr, &INSERTED[ii]);
             stmt = placer_prepare(db, PLACER_SQL_struct_UnitTestSchema_INSERT);
             ASSERT(stmt != (sqlite3_stmt *)0);
             rc = placer_stmt_struct_UnitTestSchema_bind(stmt, &INSERTED[ii]);
@@ -315,6 +324,7 @@ int main(void)
         COMMENT("replace");
         for (ii = 0; ii < countof(REPLACED); ++ii) {
             COMMENT("%d\n", ii);
+            placer_struct_UnitTestSchema_display(stderr, &REPLACED[ii]);
             stmt = placer_prepare(db, PLACER_SQL_struct_UnitTestSchema_REPLACE);
             ASSERT(stmt != (sqlite3_stmt *)0);
             rc = placer_stmt_struct_UnitTestSchema_bind(stmt, &REPLACED[ii]);

@@ -98,7 +98,7 @@ int placer_steps(sqlite3_stmt * sp, placer_steps_callback_t * cp, void * vp)
         rc = sqlite3_step(sp);
 
         if (placer_Debug != (FILE *)0) {
-            fprintf(placer_Debug, "%s@%d: step=%d rc=%d=\"%s\"\n", __FILE__, __LINE__, ii, rc, sqlite3_errstr(rc));
+            fprintf(placer_Debug, "%s@%d: step=%d rc=%d\n", __FILE__, __LINE__, ii, rc);
         }
 
         if (rc == SQLITE_OK) {

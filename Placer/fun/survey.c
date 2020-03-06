@@ -45,7 +45,7 @@
 #include "com/diag/diminuto/diminuto_core.h"
 #include "com/diag/placer/placer.h"
 
-#include "com/diag/placer/placer_structure.h"
+#include "com/diag/placer/placer_structure_definition.h"
 #include "schema.h"
 #include "com/diag/placer/placer_end.h"
 
