@@ -130,8 +130,8 @@ static int reveal(void * vp, ino_t ino)
 /*
  * TEST6
  *
- * Remove the entries for files that are not marked following a replace, then
- * unmark all entries.
+ * Remove the entries for files that are marked (for exmaple following
+ * a -r).
  */
 
 static int clean(sqlite3 * db)
@@ -139,11 +139,12 @@ static int clean(sqlite3 * db)
     int xc = 0;
     int rc = 0;
     sqlite3_stmt * sp = (sqlite3_stmt *)0;
-    static const char * SELECT[] = {
+    static const char * SQL[] = {
         "SELECT * FROM Schema WHERE mark == 0;",
-        "DELETE FROM Schema WHERE mark == 0;",
-        "UPDATE Schema SET mark = 0 WHERE mark != 0;",
-        "SELECT * FROM Schema WHERE mark != 0;"
+        "SELECT * FROM Schema WHERE mark != 0;",
+        "DELETE FROM Schema WHERE mark == 1;",
+        "SELECT * FROM Schema WHERE mark == 0;",
+        "SELECT * FROM Schema WHERE mark != 0;",
     };
     placer_generic_callback_t state = PLACER_GENERIC_CALLBACK_INITIALIZER;
     int ii = 0;
@@ -152,12 +153,14 @@ static int clean(sqlite3 * db)
         state.fp = (FILE *)0;
     }
 
-    for (ii = 0; ii < countof(SELECT); ii++) {
+    for (ii = 0; ii < countof(SQL); ii++) {
 
-        fputs(SELECT[ii], state.fp);
-        fputc('\n', state.fp);
+        if (Verbose) {
+            fputs(SQL[ii], state.fp);
+            fputc('\n', state.fp);
+        }
 
-        sp = placer_prepare(db, SELECT[ii]);
+        sp = placer_prepare(db, SQL[ii]);
         if (sp == (sqlite3_stmt *)0) {
             xc = -100;
             break;
@@ -177,12 +180,9 @@ static int clean(sqlite3 * db)
 /*
  * TEST5
  *
- * For every file in the file system, see if there is a file in the DB
- * with the same inode number but a different path name. This could be
- * a hard link, in which case the number of links field should be greater
- * than one. But it could also be that the file system has changed since
- * the curvey, and the inode number reused. We make that less likely by
- * only selecting those DB entries whose link count is greater than one.
+ * Mark every file in the database. This is so you can rescan the file
+ * system with -r and then subsequently remove the entries that are
+ * stale.
  */
 
 static int mark(sqlite3 * db)
@@ -190,13 +190,10 @@ static int mark(sqlite3 * db)
     int xc = 0;
     int rc = 0;
     sqlite3_stmt * sp = (sqlite3_stmt *)0;
-    static const char * SELECT[] = {
-        "UPDATE Schema SET mark = 1 WHERE nlink > 1;",
+    static const char * SQL[] = {
         "SELECT * FROM Schema WHERE mark != 0;",
-        "SELECT * FROM Schema WHERE (mark != 0) AND (nlink <= 1);",
-        "SELECT * FROM Schema WHERE (mark == 0) AND (nlink > 1);",
-        "UPDATE Schema SET mark = 0 WHERE mark != 0;",
-        "SELECT * FROM Schema WHERE mark != 0;"
+        "UPDATE Schema SET mark = 1;",
+        "SELECT * FROM Schema WHERE mark != 0;",
     };
     placer_generic_callback_t state = PLACER_GENERIC_CALLBACK_INITIALIZER;
     int ii = 0;
@@ -205,12 +202,14 @@ static int mark(sqlite3 * db)
         state.fp = (FILE *)0;
     }
 
-    for (ii = 0; ii < countof(SELECT); ii++) {
+    for (ii = 0; ii < countof(SQL); ii++) {
 
-        fputs(SELECT[ii], state.fp);
-        fputc('\n', state.fp);
+        if (Verbose) {
+            fputs(SQL[ii], state.fp);
+            fputc('\n', state.fp);
+        }
 
-        sp = placer_prepare(db, SELECT[ii]);
+        sp = placer_prepare(db, SQL[ii]);
         if (sp == (sqlite3_stmt *)0) {
             xc = -110;
             break;
@@ -634,7 +633,7 @@ static int show(sqlite3 * db)
             break;
         }
 
-        fprintf(stderr, "count=%zu\n", state.count);
+        fprintf(stdout, "count=%zu\n", state.count);
 
     } while (0);
 
@@ -685,7 +684,7 @@ int main(int argc, char * argv[])
     sqlite3 * db = (sqlite3 *)0;
     diminuto_fs_walker_t * cp = (diminuto_fs_walker_t *)0;
     const char * database = (const char *)0;
-    const char * path = "/";
+    const char * path = (const char *)0;
     ino_t ino = 1;
     int creating = 0;
     int test0 = 0;
@@ -761,7 +760,7 @@ int main(int argc, char * argv[])
                 if ((end != (char *)0) && (end[0] != '\0')) {
                     errno = EINVAL;
                     perror(optarg);
-                    xc = -17;
+                    xc = -18;
                 }
                 break;
             case 'P':
@@ -796,7 +795,7 @@ int main(int argc, char * argv[])
         if (database == (const char *)0) {
             errno = EINVAL;
             perror("-D");
-            xc = -12;
+            xc = -19;
             break;
         }
 

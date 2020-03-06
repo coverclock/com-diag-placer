@@ -41,6 +41,7 @@
 #include <errno.h>
 #include <assert.h>
 #include "com/diag/diminuto/diminuto_fs.h"
+#include "com/diag/diminuto/diminuto_countof.h"
 #include "com/diag/placer/placer.h"
 
 static const char * Program = (const char *)0;
@@ -51,8 +52,7 @@ static size_t Buffersize = 256;
 /*
  * TEST6
  *
- * Remove the entries for files that are not marked following a replace, then
- * unmark all entries.
+ * Remove every marked file, e.g. after a -r.
  */
 
 static int clean(sqlite3 * db)
@@ -60,83 +60,30 @@ static int clean(sqlite3 * db)
     int xc = 0;
     int rc = 0;
     char * sql = (char *)0;
+    static const char * SQL[] = {
+        "SELECT * FROM Census WHERE mark == 0;",
+        "SELECT * FROM Census WHERE mark != 0;",
+        "DELETE FROM Census WHERE mark == 1;",
+        "SELECT * FROM Census WHERE mark == 0;",
+        "SELECT * FROM Census WHERE mark != 0;",
+    };
     placer_generic_callback_t state = PLACER_GENERIC_CALLBACK_INITIALIZER;
+    int ii = 0;
    
-    do {
-
-        /*
-         *
-         */
-
-        sql = placer_sql_formata(Buffersize,
-            "SELECT * FROM census WHERE mark == 0;"
-        );
-        if (sql == (char *)0) {
-            xc = -100;
-            break;
-        }
+    for (ii = 0; ii < countof(SQL); ii++) {
 
         if (Verbose) {
-            fputs(sql, stderr);
-            fputc('\n', stderr);
+            fputs(SQL[ii], stdout);
+            fputc('\n', stdout);
         }
 
-        rc = placer_exec(db, sql, placer_exec_generic_callback, &state);
-        sqlite3_free(sql);
+        rc = placer_exec(db, SQL[ii], placer_exec_generic_callback, &state);
         if (rc != SQLITE_OK) {
             xc = -101;
             break;
         }
 
-        /*
-         *
-         */
-
-        sql = placer_sql_formata(Buffersize,
-            "DELETE FROM census WHERE mark == 0;"
-        );
-        if (sql == (char *)0) {
-            xc = -102;
-            break;
-        }
-
-        if (Verbose) {
-            fputs(sql, stderr);
-            fputc('\n', stderr);
-        }
-
-        rc = placer_exec(db, sql, placer_exec_generic_callback, &state);
-        sqlite3_free(sql);
-        if (rc != SQLITE_OK) {
-            xc = -103;
-            break;
-        }
-
-        /*
-         *
-         */
-
-        sql = placer_sql_formata(Buffersize,
-            "UPDATE census SET mark = 0 WHERE mark != 0;"
-        );
-        if (sql == (char *)0) {
-            xc = -104;
-            break;
-        }
-
-        if (Verbose) {
-            fputs(sql, stderr);
-            fputc('\n', stderr);
-        }
-
-        rc = placer_exec(db, sql, placer_exec_generic_callback, &state);
-        sqlite3_free(sql);
-        if (rc != SQLITE_OK) {
-            xc = -105;
-            break;
-        }
-
-    } while (0);
+    }
 
     return xc;
 }
@@ -144,12 +91,7 @@ static int clean(sqlite3 * db)
 /*
  * TEST5
  *
- * For every file in the file system, see if there is a file in the DB
- * with the same inode number but a different path name. This could be
- * a hard link, in which case the number of links field should be greater
- * than one. But it could also be that the file system has changed since
- * the census, and the inode number reused. We make that less likely by
- * only selecting those DB entries whose link count is greater than one.
+ * Mark every file in the database e.g. prior to a -r.
  */
 
 static int mark(sqlite3 * db)
@@ -158,150 +100,23 @@ static int mark(sqlite3 * db)
     int rc = 0;
     char * sql = (char *)0;
     placer_generic_callback_t state = PLACER_GENERIC_CALLBACK_INITIALIZER;
+    static const char * SQL[] = {
+        "SELECT * FROM Census WHERE mark != 0;",
+        "UPDATE Census SET mark = 1;",
+        "SELECT * FROM Census WHERE mark != 0;",
+    };
+    int ii = 0;
+
+    for (ii = 0; ii < countof(SQL); ii++) {
    
-    do {
-
-        /*
-         *
-         */
-
-        sql = placer_sql_formata(Buffersize,
-            "UPDATE census SET mark = 1 WHERE nlink > 1;"
-        );
-        if (sql == (char *)0) {
-            xc = -110;
-            break;
-        }
-
         if (Verbose) {
-            fputs(sql, stderr);
-            fputc('\n', stderr);
+            fputs(SQL[ii], stdout);
+            fputc('\n', stdout);
         }
 
-        rc = placer_exec(db, sql, placer_exec_generic_callback, &state);
-        sqlite3_free(sql);
+        rc = placer_exec(db, SQL[ii], placer_exec_generic_callback, &state);
         if (rc != SQLITE_OK) {
             xc = -111;
-            break;
-        }
-
-        /*
-         *
-         */
-
-        sql = placer_sql_formata(Buffersize,
-            "SELECT * FROM census WHERE mark != 0;"
-        );
-        if (sql == (char *)0) {
-            xc = -112;
-            break;
-        }
-
-        if (Verbose) {
-            fputs(sql, stderr);
-            fputc('\n', stderr);
-        }
-
-        rc = placer_exec(db, sql, placer_exec_generic_callback, &state);
-        sqlite3_free(sql);
-        if (rc != SQLITE_OK) {
-            xc = -113;
-            break;
-        }
-
-        /*
-         *
-         */
-
-        sql = placer_sql_formata(Buffersize,
-            "SELECT * FROM census WHERE (mark != 0) AND (nlink <= 1);"
-        );
-        if (sql == (char *)0) {
-            xc = -114;
-            break;
-        }
-
-        if (Verbose) {
-            fputs(sql, stderr);
-            fputc('\n', stderr);
-        }
-
-        rc = placer_exec(db, sql, placer_exec_generic_callback, &state);
-        sqlite3_free(sql);
-        if (rc != SQLITE_OK) {
-            xc = -115;
-            break;
-        }
-
-        /*
-         *
-         */
-
-        sql = placer_sql_formata(Buffersize,
-            "SELECT * FROM census WHERE (mark == 0) AND (nlink > 1);"
-        );
-        if (sql == (char *)0) {
-            xc = -116;
-            break;
-        }
-
-        if (Verbose) {
-            fputs(sql, stderr);
-            fputc('\n', stderr);
-        }
-
-        rc = placer_exec(db, sql, placer_exec_generic_callback, &state);
-        sqlite3_free(sql);
-        if (rc != SQLITE_OK) {
-            xc = -117;
-            break;
-        }
-
-        /*
-         *
-         */
-
-        sql = placer_sql_formata(Buffersize,
-            "UPDATE census SET mark = 0 WHERE mark != 0;"
-        );
-        if (sql == (char *)0) {
-            xc = -118;
-            break;
-        }
-
-        if (Verbose) {
-            fputs(sql, stderr);
-            fputc('\n', stderr);
-        }
-
-        rc = placer_exec(db, sql, placer_exec_generic_callback, &state);
-        sqlite3_free(sql);
-        if (rc != SQLITE_OK) {
-            xc = -119;
-            break;
-        }
-
-        /*
-         *
-         */
-
-        sql = placer_sql_formata(Buffersize,
-            "SELECT * FROM census WHERE mark != 0;"
-        );
-        if (sql == (char *)0) {
-            xc = -120;
-            break;
-        }
-
-        if (Verbose) {
-            fputs(sql, stderr);
-            fputc('\n', stderr);
-        }
-
-        rc = placer_exec(db, sql, placer_exec_generic_callback, &state);
-        sqlite3_free(sql);
-        if (rc != SQLITE_OK) {
-            xc = -121;
             break;
         }
 
@@ -372,8 +187,8 @@ static int identify(void * vp, const char * name, const char * path, size_t dept
         }
 
         if (Verbose) {
-            fputs(sql, stderr);
-            fputc('\n', stderr);
+            fputs(sql, stdout);
+            fputc('\n', stdout);
         }
 
         rc = placer_exec(db, sql, identifier, (char *)path);
@@ -429,8 +244,8 @@ static int enumerate(void * vp, const char * name, const char * path, size_t dep
         }
 
         if (Verbose) {
-            fputs(sql, stderr);
-            fputc('\n', stderr);
+            fputs(sql, stdout);
+            fputc('\n', stdout);
         }
 
         state.count = 0;
@@ -494,8 +309,8 @@ static int extract(sqlite3 * db, diminuto_fs_type_t type)
         }
 
         if (Verbose) {
-            fputs(sql, stderr);
-            fputc('\n', stderr);
+            fputs(sql, stdout);
+            fputc('\n', stdout);
         }
 
         rc = placer_exec(db, sql, placer_exec_generic_callback, &state);
@@ -554,7 +369,7 @@ static int replace(void * vp, const char * name, const char * path, size_t depth
             , major(statp->st_dev)
             , minor(statp->st_dev)
             , (unsigned long long)((1000000000ULL * statp->st_ctim.tv_sec) + statp->st_ctim.tv_nsec)
-            , 1
+            , 0
         );
         sqlite3_free(to);
         if (sql == (char *)0) {
@@ -563,8 +378,8 @@ static int replace(void * vp, const char * name, const char * path, size_t depth
         }
 
         if (Verbose) {
-            fputs(sql, stderr);
-            fputc('\n', stderr);
+            fputs(sql, stdout);
+            fputc('\n', stdout);
         }
 
         rc = placer_exec(db, sql, placer_exec_generic_callback, &state);
@@ -633,8 +448,8 @@ static int insert(void * vp, const char * name, const char * path, size_t depth,
         }
 
         if (Verbose) {
-            fputs(sql, stderr);
-            fputc('\n', stderr);
+            fputs(sql, stdout);
+            fputc('\n', stdout);
         }
 
         rc = placer_exec(db, sql, placer_exec_generic_callback, &state);
@@ -677,8 +492,8 @@ static int show(sqlite3 * db)
         }
 
         if (Verbose) {
-            fputs(sql, stderr);
-            fputc('\n', stderr);
+            fputs(sql, stdout);
+            fputc('\n', stdout);
         }
 
         rc = placer_exec(db, sql, placer_exec_generic_callback, &state);
@@ -688,7 +503,7 @@ static int show(sqlite3 * db)
             break;
         }
 
-        fprintf(stderr, "count=%zu\n", state.count);
+        fprintf(stdout, "count=%zu\n", state.count);
 
     } while (0);
 
@@ -706,8 +521,8 @@ static int create(sqlite3 * db)
     int rc = 0;
 
     if (Verbose) {
-        fputs(CREATE, stderr);
-        fputc('\n', stderr);
+        fputs(CREATE, stdout);
+        fputc('\n', stdout);
     }
 
     rc = placer_exec(db, CREATE, (placer_exec_callback_t *)0, (void *)0);
@@ -730,7 +545,7 @@ int main(int argc, char * argv[])
     sqlite3 * db = (sqlite3 *)0;
     diminuto_fs_walker_t * cp = (diminuto_fs_walker_t *)0;
     const char * database = (const char *)0;
-    const char * path = "/";
+    const char * path = (const char *)0;
     int creating = 0;
     int test0 = 0;
     int test1 = 0;
@@ -824,7 +639,7 @@ int main(int argc, char * argv[])
         if (database == (const char *)0) {
             errno = EINVAL;
             perror("-D");
-            xc = -12;
+            xc = -19;
             break;
         }
 

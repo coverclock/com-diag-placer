@@ -66,33 +66,33 @@ context of your current shell.
 Create a database, walk the file system tree starting at some convenient
 place, and INSERT the files encountered along with their metadata into
 the database, using placer_exec(). The full path name of the file is used
-as the primary index. (You can start at / root too, but it is likely
-to take a long time.) (You can drop the -v command line flag for less
-output.)
+as the primary index. You can start at / root too, but it is likely
+to take a long time. You can drop the -v command line flag for less
+output and to run a lot faster too.
 
-    census -D out/host/sql/census.db -c -i -v ${HOME}
+    cp /dev/null ./TEST_FILE
+    census -D out/host/sql/census.db -c -i -v .
+
+Mark all of the entries in the database.
+
+    census -D out/host/sql/census.db -v -5
 
 Update an existing database by walking the file system and doing a REPLACE
 of the files encountered with their metadata, using placer_exec().
 .
 
-    census -D out/host/sql/census.db -r -v ${HOME}
+    rm ./TEST_FILE
+    census -D out/host/sql/census.db -r -v .
 
-Dump the contents of the database. (If you drop the -v command line flag
-you just get a count of the number of items in the database.)
+Delete all of the entries in the database that are marked. This deletes
+the entries that are stale.
+
+    census -D out/host/sql/census.db -v -6
+
+Dump the contents of the database. If you drop the -v command line flag
+you just get a count of the number of items in the database.
 
     census -D out/host/sql/census.db -v -0
-
-Mark all of the entries in the database for which the file has more
-than one hard link. Display the results. (There are lots of other tests,
-but this is a simple one.)
-
-    census -D out/host/sql/census.db -5
-
-Unmark all of the entries in the database that are marked. Display the
-results.
-
-    census -D out/host/sql/census.db -6
 
 # Functional Tests Using the More Powerful Steps Approach
 
@@ -104,37 +104,45 @@ context of your current shell.
 Create a database, walk the file system tree starting at some convenient
 place, and INSERT the files encountered along with their metadata into the
 database, using placer_steps(). The full path name of the file is used as
-the primary index. (You can start at / root too, but it is likely to take
-a long time.) (You can drop the -v command line flag for less output.)
+the primary index. You can start at / root too, but it is likely to take
+a long time. You can drop the -v command line flag for less output and
+to run a lot faster too.
 
-    survey -D out/host/sql/survey.db -c -i -v ${HOME}
+    cp /dev/null ./TEST_FILE
+    survey -D out/host/sql/survey.db -c -i -v .
+
+Mark all of the entries in the database.
+
+    survey -D out/host/sql/survey.db -v -5
 
 Update an existing database by walking the file system and doing a REPLACE
 of the files encountered with their metadata, using placer_steps().
 
-    survey -D out/host/sql/survey.db -r -v ${HOME}
+    rm ./TEST_FILE
+    survey -D out/host/sql/survey.db -r -v .
 
-Mark all of the entries in the database for which the file has more
-than one hard link. Display the results. (There are lots of other tests,
-but this is a simple one.)
+Delete all of the entries in the database that are marked. This deletes
+the entries that are stale.
 
-    survey -D out/host/sql/survey.db -5
+    survey -D out/host/sql/survey.db -v -6
 
-Unmark all of the entries in the database that are marked. Display the
-results.
+Dump the contents of the database. If you drop the -v command line flag
+you just get a count of the number of items in the database.
 
-    survey -D out/host/sql/survey.db -6
+    survey -D out/host/sql/survey.db -v -0
 
 Display the entries in the database that have the specified path name.
-(There should be at most one.)
+There should be at most one.
 
-    survey -D out/host/sql/survey.db -7 -P ${HOME}/.profile
+    survey -D out/host/sql/survey.db -7 -P `realpath ./doxygen.cf`
 
 Display the entries in the database that have the specified inode number.
-(There may be zero to many, depending on your fondness for hard links,
-up to the limit of the buffer in the application, which is eight.)
+You can find out the inode number of a file using for example "ls -i
+./doxygen.cf".  There may be zero to many, depending on your fondness
+for hard links, up to the limit of the buffer in the application, which
+is eight.
 
-    survey -D out/host/sql/survey.db -8 -I 105
+    survey -D out/host/sql/survey.db -8 -I 15731248
 
 # Targets
 
