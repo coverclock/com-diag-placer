@@ -250,16 +250,16 @@ Run the unit tests
 
 # Schema Operators
 
-* PLACER_SCHEMA(_STRUCTURE_) - Identifies the front matter for a schema named _STRUCTURE_.
-* PLACER_BLOB(_NAME_, _ITEMS_) - Identifies a field of type BLOB, named _NAME_, of _ITEMS_ bytes in length.
-* PLACER_FLOAT(_NAME_) - Identifies a field of type FLOAT, named _NAME_.
-* PLACER_INTEGER(_NAME_) - Identifies a field of type INTEGER, named _NAME_.
-* PLACER_INTEGER64(_NAME_) - Identifies a field of type INTEGER64, named _NAME_.
-* PLACER_TEXT(_NAME_, _ITEMS_) - Identifies a field of type TEXT, named _NAME_, of _ITEMS_ UTF-8 characters in length.
-* PLACER_TEXT16(_NAME_, _ITEMS_) - Identifies a field of type TEXT16, named _NAME_, of _ITEMS_ UTF-16 characters in length.
-* PLACER_FIELD(_CONSTRAINTS_) - Signals the ending of any field that is not the last field, adding _CONSTRAINTS_ constraints.
-* PLACER_FINAL(_CONSTRAINTS_) - Signals the ending of any field that is the last field, adding _CONSTRAINTS_ constraints.
-* PLACER_END(_CONSTRAINTS_) - Identifies the end matter for the schema, adding _CONSTRAINTS_ contraints.
+* PLACER_SCHEMA(_STRUCTURE_) - The front matter for a schema named _STRUCTURE_.
+* PLACER_BLOB(_NAME_, _ITEMS_) - A field of type BLOB, named _NAME_, of _ITEMS_ bytes in length.
+* PLACER_FLOAT(_NAME_) - A field of type FLOAT, named _NAME_.
+* PLACER_INTEGER(_NAME_) - A field of type INTEGER, named _NAME_.
+* PLACER_INTEGER64(_NAME_) - A field of type INTEGER64, named _NAME_.
+* PLACER_TEXT(_NAME_, _ITEMS_) - A field of type TEXT, named _NAME_, of _ITEMS_ UTF-8 characters in length.
+* PLACER_TEXT16(_NAME_, _ITEMS_) - A field of type TEXT16, named _NAME_, of _ITEMS_ UTF-16 characters in length.
+* PLACER_FIELD(_CONSTRAINTS_) - The ending of any field that is not the last field, adding _CONSTRAINTS_ constraints.
+* PLACER_FINAL(_CONSTRAINTS_) - The ending of any field that is the last field, adding _CONSTRAINTS_ constraints.
+* PLACER_END(_CONSTRAINTS_) - The end matter for the schema, adding _CONSTRAINTS_ contraints.
 
 # Schema Example
 
