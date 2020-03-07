@@ -134,7 +134,7 @@ you just get a count of the number of items in the database.
 Display the entries in the database that have the specified path name.
 There should be at most one.
 
-    survey -D out/host/sql/survey.db -7 -P `realpath ./doxygen.cf`
+    survey -D out/host/sql/survey.db -7 -P $(realpath ./doxygen.cf)
 
 Display the entries in the database that have the specified inode number.
 You can find out the inode number of a file using for example "ls -i
@@ -142,7 +142,7 @@ You can find out the inode number of a file using for example "ls -i
 for hard links, up to the limit of the buffer in the application, which
 is eight.
 
-    survey -D out/host/sql/survey.db -8 -I 15731248
+    survey -D out/host/sql/survey.db -8 -I $(ls -i ./doxygen.cf | cut -d ' ' -f 1)
 
 # Targets
 
