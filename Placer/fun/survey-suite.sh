@@ -1,7 +1,7 @@
 #!/bin/bash
 OUT=./out/host
 LOG=${OUT}/log
-${OUT}/bin/setup
+. ${OUT}/bin/setup
 mkdir -p ${LOG}
 (
     rm -f out/host/sql/survey.db
