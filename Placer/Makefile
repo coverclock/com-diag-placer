@@ -753,4 +753,5 @@ sanity:
 ########## Functional Tests
 
 functionality:
-	census-suite && survey-suite
+	census-suite
+	survey-suite

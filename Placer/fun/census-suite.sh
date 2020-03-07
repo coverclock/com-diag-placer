@@ -1,7 +1,7 @@
 #!/bin/bash
 # Copyright 2020 Digital Aggregates Corporation, Arvada CO USA.
 # Author: coverclock@diag.com
-OUT=./$(make out)
+OUT=out/host
 mkdir -p ${OUT}/tmp
 rm -f ${OUT}/sql/census.db
 cp /dev/null ${OUT}/tmp/CENSUS_TEST_FILE
