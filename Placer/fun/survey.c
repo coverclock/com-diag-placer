@@ -49,6 +49,14 @@
 #include "schema.h"
 #include "com/diag/placer/placer_end.h"
 
+#include "com/diag/placer/placer_structure_prototype.h"
+#include "schema.h"
+#include "com/diag/placer/placer_end.h"
+
+#include "com/diag/placer/placer_structure_display.h"
+#include "schema.h"
+#include "com/diag/placer/placer_end.h"
+
 #include "com/diag/placer/placer_steps_prototype.h"
 #include "schema.h"
 #include "com/diag/placer/placer_end.h"
@@ -116,10 +124,10 @@ static int reveal(void * vp, ino_t ino)
             break;
         }
 
-        printf("0: ino=%lld\n", (long long)ino);
+        printf("INODE: %lld\n", (long long)ino);
 
         for (ii = 0; &pointers[ii] != current; ++ii) {
-            printf("%d: ino=%lld device=%d,%d path=\"%s\"\n", ii + 1, (long long)((pointers[ii])->ino), (pointers[ii])->devmajor, (pointers[ii])->devminor, (pointers[ii])->path);
+            placer_struct_Schema_display(stdout, &data[ii]);
         }
 
     } while (0);
@@ -365,35 +373,14 @@ static int enumerate(void * vp, const char * name, const char * path, size_t dep
         }
 
         if (current == &pointers[0]) {
-            fputs("NONE: ", stdout);
-            fputc('"', stdout);
-            fputs(path, stdout);
-            fputc('"', stdout);
-            fputc('\n', stdout);
+            fprintf(stdout, "NONE: \"%s\"\n", path);
         } else if (current == &pointers[1]) {
-            fputs("ONLY: ", stdout);
-            fputc('"', stdout);
-            fputs(path, stdout);
-            fputc('"', stdout);
-            fputc(' ', stdout);
-            fputc('"', stdout);
-            fputs(data[0].path, stdout);
-            fputc('"', stdout);
-            fputc('\n', stdout);
+            fprintf(stdout, "ONLY: \"%s\"\n", path);
+            placer_struct_Schema_display(stdout, &data[0]);
         } else if (current == &pointers[2]) {
-            fputs("MANY: ", stdout);
-            fputc('"', stdout);
-            fputs(path, stdout);
-            fputc('"', stdout);
-            fputc(' ', stdout);
-            fputc('"', stdout);
-            fputs(data[0].path, stdout);
-            fputc('"', stdout);
-            fputc(' ', stdout);
-            fputc('"', stdout);
-            fputs(data[1].path, stdout);
-            fputc('"', stdout);
-            fputc('\n', stdout);
+            fprintf(stdout, "MANY: \"%s\"\n", path);
+            placer_struct_Schema_display(stdout, &data[0]);
+            placer_struct_Schema_display(stdout, &data[1]);
         } else {
             diminuto_core_fatal();
         }
