@@ -15,7 +15,7 @@
 #include <string.h>
 #include <errno.h>
 #include "sqlite3.h"
-#include "com/diag/diminuto/diminuto_types.h"
+#include "com/diag/diminuto/diminuto_log.h"
 #include "com/diag/placer/placer.h"
 #include "placer.h" /* Private API. */
 
@@ -43,21 +43,17 @@ char placer_separator(char now)
     return was;
 }
 
-void placer_message(char * message)
+void placer_message_f(const char * file, int line, char * message)
 {
     if (message != (char *)0) {
-        fputs("SQLite: \"", stderr);
-        fputs(message, stderr);
-        fputs("\"\n", stderr);
+        diminuto_log_log(DIMINUTO_LOG_PRIORITY_ERROR, "%s@%d: SQLite: \"%s\"\n", file, line, message);
         sqlite3_free(message);
     }
 }
 
-void placer_error(int error)
+void placer_error_f(const char * file, int line, int error)
 {
     if (error != SQLITE_OK) {
-        fprintf(stderr, "SQLite: [%d] \"", error);
-        fputs(sqlite3_errstr(error), stderr);
-        fputs("\"\n", stderr);
+        diminuto_log_log(DIMINUTO_LOG_PRIORITY_ERROR, "%s@%d[%d]: SQLite: \"%s\"\n", file, line, error, sqlite3_errstr(error));
     }
 }
