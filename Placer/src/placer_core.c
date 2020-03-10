@@ -54,6 +54,6 @@ void placer_message_f(const char * file, int line, char * message)
 void placer_error_f(const char * file, int line, int error)
 {
     if (error != SQLITE_OK) {
-        diminuto_log_log(DIMINUTO_LOG_PRIORITY_ERROR, "%s@%d[%d]: SQLite: \"%s\"\n", file, line, error, sqlite3_errstr(error));
+        diminuto_log_log(DIMINUTO_LOG_PRIORITY_ERROR, "%s@%d: SQLite: \"%s\" (%d)\n", file, line, sqlite3_errstr(error), error);
     }
 }
