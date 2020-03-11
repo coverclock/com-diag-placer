@@ -3,11 +3,11 @@
 /**
  * @file
  *
- * Copyright 2020 Digital Aggregates Corporation, Colorado, USA<BR>
- * Licensed under the terms in README.h<BR>
- * Chip Overclock (coverclock@diag.com)<BR>
- * https://github.com/coverclock/com-diag-placer<BR>
- * This header file undefines the X macros for a schema.
+ * Copyright 2020 Digital Aggregates Corporation, Colorado, USA.
+ * Licensed under the terms in LICENSE.txt.
+ *
+ * The End feature undefines any previous x-macros  for a schema.
+ *
  * N.B. THIS HEADER FILE CAN BE INCLUDED MORE THAN ONCE.
  */
 

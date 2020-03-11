@@ -3,14 +3,14 @@
 /**
  * @file
  *
- * Copyright 2020 Digital Aggregates Corporation, Colorado, USA<BR>
- * Licensed under the terms in README.h<BR>
- * Chip Overclock (coverclock@diag.com)<BR>
- * https://github.com/coverclock/com-diag-placer<BR>
- * These X macros generate a list of SQLite3 field types.
+ * Copyright 2020 Digital Aggregates Corporation, Colorado, USA.
+ * Licensed under the terms in LICENSE.txt.
+
+ * The Array Type feature generates an array of SQLite3 field (not data)
+ * type numbers from a schema. Note that there are no SQLITE_INTEGER64 or
+ * SQLITE_TEXT16 field types.
+ *
  * N.B. THIS HEADER FILE CAN BE INCLUDED MORE THAN ONCE.
- * Note that there are no SQLITE_INTEGER64 or SQLITE_TEXT16
- * fundamental types.
  */
 
 #include "placer.h"

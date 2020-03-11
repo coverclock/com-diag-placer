@@ -5,11 +5,12 @@
 /**
  * @file
  *
- * Copyright 2020 Digital Aggregates Corporation, Colorado, USA<BR>
- * Licensed under the terms in README.h<BR>
- * Chip Overclock (coverclock@diag.com)<BR>
- * https://github.com/coverclock/com-diag-placer<BR>
- * This defines the public API for Placer.
+ * Copyright 2020 Digital Aggregates Corporation, Colorado, USA.
+ * Licensed under the terms in LICENSE.txt.
+ *
+ * The Placer package provides mechanisms to generate and use code
+ * based on user-defined schemas for the SQLite3 relational database
+ * management system (RDBMS).
  */
 
 #include <stdint.h>

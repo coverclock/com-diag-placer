@@ -233,7 +233,7 @@ Run the unit tests and functional tests.
     cd ~/src/com-diag-placer/Placer
     . out/host/bin/setup
     make sanity
-    make functionality
+    make functional
 
 # Functional Tests
 
@@ -367,6 +367,11 @@ Wikibooks, "C Programming/Serialization",
 
 F. Yergeau, "UTF-8, a transformation format of ISO 10646", *RFC 3629*, 2003-11,
 <https://www.rfc-editor.org/rfc/pdfrfc/rfc3629.txt.pdf>
+
+# Articles
+
+Chip Overclock, "When Learning By Doing Goes To Eleven", 2020-03,
+<https://coverclock.blogspot.com/2020/03/when-learning-by-doing-goes-to-eleven.html>
 
 # Soundtrack
 

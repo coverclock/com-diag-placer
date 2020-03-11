@@ -3,11 +3,12 @@
 /**
  * @file
  *
- * Copyright 2020 Digital Aggregates Corporation, Colorado, USA<BR>
- * Licensed under the terms in README.h<BR>
- * Chip Overclock (coverclock@diag.com)<BR>
- * https://github.com/coverclock/com-diag-placer<BR>
- * These X macros generate the prototype for a schema bind function.
+ * Copyright 2020 Digital Aggregates Corporation, Colorado, USA;
+ * Licensed under the terms in LICENSE.txt.
+ *
+ * The Statement Prototype generates a prototype for a statement bind
+ * function from a schema.
+ *
  * N.B. THIS HEADER FILE CAN BE INCLUDED MORE THAN ONCE.
  */
 

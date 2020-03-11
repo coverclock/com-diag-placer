@@ -3,13 +3,13 @@
 /**
  * @file
  *
- * Copyright 2020 Digital Aggregates Corporation, Colorado, USA<BR>
- * Licensed under the terms in README.h<BR>
- * Chip Overclock (coverclock@diag.com)<BR>
- * https://github.com/coverclock/com-diag-placer<BR>
- * These X macros generate a bind function for a schema.
- * N.B. THIS HEADER FILE CAN BE INCLUDED MORE THAN ONCE.
+ * Copyright 2020 Digital Aggregates Corporation, Colorado, USA.
+ * Licensed under the terms in LICENSE.txt.
+ *
+ * The Statement Bind feature generates a bind function from a schema.
  * Note that the parameter index is ONE based.
+ *
+ * N.B. THIS HEADER FILE CAN BE INCLUDED MORE THAN ONCE.
  */
 
 #include <string.h>

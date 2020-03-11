@@ -3,11 +3,12 @@
 /**
  * @file
  *
- * Copyright 2020 Digital Aggregates Corporation, Colorado, USA<BR>
- * Licensed under the terms in README.h<BR>
- * Chip Overclock (coverclock@diag.com)<BR>
- * https://github.com/coverclock/com-diag-placer<BR>
- * These X macros generate a list of field sizes in bytes.
+ * Copyright 2020 Digital Aggregates Corporation, Colorado, USA.
+ * Licensed under the terms in LICENSE.txt.
+ *
+ * The Array Size Of feature generates an array of field sizes in bytes from
+ * a schema.
+ *
  * N.B. THIS HEADER FILE CAN BE INCLUDED MORE THAN ONCE.
  */
 
