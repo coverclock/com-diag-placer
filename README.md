@@ -242,8 +242,8 @@ Run the unit tests and functional tests.
 
 # Unit Tests
 
-* make sanity - these tests run in just a minute or two.
 * make functional - these tests run in just a few minutes.
+* make sanity - these tests run in just a minute or two.
 
 # Schema Operators
 
