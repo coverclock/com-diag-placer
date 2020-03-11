@@ -242,12 +242,8 @@ Run the unit tests and functional tests.
 
 # Unit Tests
 
-* unittest-expand - tests argument expansion functions.
-* unittest-exec - tests placer_exec() infrastructure.
-* unittest-format - tests SQL statement formatting functions.
-* unittest-message - tests functions that handle SQLite3 error messages.
-* unittest-steps - tests placer_exec() and placer_steps() together.
-* unittest-utf16 - tests UTF16 (TEXT16) support functions.
+* make sanity - these tests run in just a minute or two.
+* make functional - these tests run in just a few minutes.
 
 # Schema Operators
 
