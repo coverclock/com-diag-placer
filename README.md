@@ -242,6 +242,8 @@ Run the unit tests and functional tests.
 
 # Unit Tests
 
+Preceed with . out/host/bin/setup to setup PATH etc.
+
 * make functional - these tests run in just a few minutes.
 * make sanity - these tests run in just a minute or two.
 
