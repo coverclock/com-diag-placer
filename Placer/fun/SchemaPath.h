@@ -1,6 +1,13 @@
+/*
+ * Path schema describes a DB row that is indexed by the unique path
+ * name of the entry in the file system. Multiple paths may reference
+ * the same inode, and hence the same physical file, But the absolute
+ * fully qualified path name is itself unique.
+ */
+
 #include <limits.h>
 
-PLACER_SCHEMA(Schema)
+PLACER_SCHEMA(Path)
 PLACER_TEXT(path, PATH_MAX) PLACER_FIELD(PRIMARY KEY)
 PLACER_TEXT16(type, sizeof("'")) PLACER_FIELD()
 PLACER_INTEGER64(nlink) PLACER_FIELD()

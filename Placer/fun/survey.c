@@ -45,38 +45,85 @@
 #include "com/diag/diminuto/diminuto_core.h"
 #include "com/diag/placer/placer.h"
 
+/*
+ * Path Schema
+ */
+
 #include "com/diag/placer/placer_structure_definition.h"
-#include "schema.h"
+#include "SchemaPath.h"
 #include "com/diag/placer/placer_end.h"
 
 #include "com/diag/placer/placer_structure_prototype.h"
-#include "schema.h"
+#include "SchemaPath.h"
 #include "com/diag/placer/placer_end.h"
 
 #include "com/diag/placer/placer_structure_display.h"
-#include "schema.h"
+#include "SchemaPath.h"
 #include "com/diag/placer/placer_end.h"
 
 #include "com/diag/placer/placer_steps_prototype.h"
-#include "schema.h"
+#include "SchemaPath.h"
 #include "com/diag/placer/placer_end.h"
 
 #include "com/diag/placer/placer_steps_callback.h"
-#include "schema.h"
+#include "SchemaPath.h"
 #include "com/diag/placer/placer_end.h"
 
 #include "com/diag/placer/placer_stmt_prototype.h"
-#include "schema.h"
+#include "SchemaPath.h"
 #include "com/diag/placer/placer_end.h"
 
 #include "com/diag/placer/placer_stmt_bind.h"
-#include "schema.h"
+#include "SchemaPath.h"
+#include "com/diag/placer/placer_end.h"
+
+/*
+ * Node Schema
+ */
+
+#include "com/diag/placer/placer_structure_definition.h"
+#include "SchemaNode.h"
+#include "com/diag/placer/placer_end.h"
+
+#include "com/diag/placer/placer_structure_prototype.h"
+#include "SchemaNode.h"
+#include "com/diag/placer/placer_end.h"
+
+#include "com/diag/placer/placer_structure_display.h"
+#include "SchemaNode.h"
+#include "com/diag/placer/placer_end.h"
+
+#include "com/diag/placer/placer_steps_prototype.h"
+#include "SchemaNode.h"
+#include "com/diag/placer/placer_end.h"
+
+#include "com/diag/placer/placer_steps_callback.h"
+#include "SchemaNode.h"
+#include "com/diag/placer/placer_end.h"
+
+#include "com/diag/placer/placer_stmt_prototype.h"
+#include "SchemaNode.h"
+#include "com/diag/placer/placer_end.h"
+
+#include "com/diag/placer/placer_stmt_bind.h"
+#include "SchemaNode.h"
 #include "com/diag/placer/placer_end.h"
 
 static const char * Program = (const char *)0;
 static int Debug = 0;
 static int Verbose = 0;
 static size_t Buffersize = 256;
+
+/*
+ * TEST9
+ *
+ * Derive the Node table from the Path table.
+ */
+
+static int derive(sqlite3 * db)
+{
+    return 0;
+}
 
 /*
  * TEST8
@@ -86,21 +133,18 @@ static size_t Buffersize = 256;
  * the same inode number.
  */
 
-static int reveal(void * vp, ino_t ino)
+static int reveal(sqlite3 * db, ino_t ino)
 {
     int xc = 0;
-    sqlite3 * db = (sqlite3 *)0;
     sqlite3_stmt * sp = (sqlite3_stmt *)0;
-    static const char SELECT[] = "SELECT * FROM Schema WHERE (ino = ?);";
+    static const char SELECT[] = "SELECT * FROM Path WHERE (ino = ?);";
     int rc = 0;
-    struct Schema data[8];
-    struct Schema * pointers[] = { &data[0], &data[1], &data[2], &data[3], &data[4], &data[5], &data[6], &data[7], (struct Schema *)0 };
-    struct Schema ** current = &pointers[0];
+    struct Path data[8];
+    struct Path * pointers[] = { &data[0], &data[1], &data[2], &data[3], &data[4], &data[5], &data[6], &data[7], (struct Path *)0 };
+    struct Path ** current = &pointers[0];
     int ii = 0;
  
     do {
-
-        db = (sqlite3 *)vp;
 
         /*
          * Select the row from the database.
@@ -118,7 +162,7 @@ static int reveal(void * vp, ino_t ino)
             break;
         }
 
-        rc = placer_steps(sp, placer_steps_struct_Schema_callback, &current);
+        rc = placer_steps(sp, placer_steps_struct_Path_callback, &current);
         if (rc != SQLITE_OK) {
             xc = -192;
             break;
@@ -127,7 +171,7 @@ static int reveal(void * vp, ino_t ino)
         printf("INODE: %lld\n", (long long)ino);
 
         for (ii = 0; &pointers[ii] != current; ++ii) {
-            placer_struct_Schema_display(stdout, &data[ii]);
+            placer_struct_Path_display(stdout, &data[ii]);
         }
 
     } while (0);
@@ -148,11 +192,11 @@ static int clean(sqlite3 * db)
     int rc = 0;
     sqlite3_stmt * sp = (sqlite3_stmt *)0;
     static const char * SQL[] = {
-        "SELECT * FROM Schema WHERE mark == 0;",
-        "SELECT * FROM Schema WHERE mark != 0;",
-        "DELETE FROM Schema WHERE mark == 1;",
-        "SELECT * FROM Schema WHERE mark == 0;",
-        "SELECT * FROM Schema WHERE mark != 0;",
+        "SELECT * FROM Path WHERE mark == 0;",
+        "SELECT * FROM Path WHERE mark != 0;",
+        "DELETE FROM Path WHERE mark == 1;",
+        "SELECT * FROM Path WHERE mark == 0;",
+        "SELECT * FROM Path WHERE mark != 0;",
     };
     placer_generic_callback_t state = PLACER_GENERIC_CALLBACK_INITIALIZER;
     int ii = 0;
@@ -199,9 +243,9 @@ static int mark(sqlite3 * db)
     int rc = 0;
     sqlite3_stmt * sp = (sqlite3_stmt *)0;
     static const char * SQL[] = {
-        "SELECT * FROM Schema WHERE mark != 0;",
+        "SELECT * FROM Path WHERE mark != 0;",
         "UPDATE Schema SET mark = 1;",
-        "SELECT * FROM Schema WHERE mark != 0;",
+        "SELECT * FROM Path WHERE mark != 0;",
     };
     placer_generic_callback_t state = PLACER_GENERIC_CALLBACK_INITIALIZER;
     int ii = 0;
@@ -271,7 +315,7 @@ static int identify(void * vp, const char * name, const char * path, size_t dept
     int rc = 0;
     sqlite3 * db = (sqlite3 *)0;
     sqlite3_stmt * sp = (sqlite3_stmt *)0;
-    static const char SELECT[] = "SELECT * FROM Schema WHERE (ino = ?) AND (devmajor = ?) AND (devminor = ?) AND (nlink > 1);";
+    static const char SELECT[] = "SELECT * FROM Path WHERE (ino = ?) AND (devmajor = ?) AND (devminor = ?) AND (nlink > 1);";
     int ii = 0;
    
     do {
@@ -340,11 +384,11 @@ static int enumerate(void * vp, const char * name, const char * path, size_t dep
     int xc = 0;
     sqlite3 * db = (sqlite3 *)0;
     sqlite3_stmt * sp = (sqlite3_stmt *)0;
-    static const char SELECT[] = "SELECT * FROM Schema WHERE (path = ?);";
+    static const char SELECT[] = "SELECT * FROM Path WHERE (path = ?);";
     int rc = 0;
-    struct Schema data[2];
-    struct Schema * pointers[] = { &data[0], &data[1], (struct Schema *)0 };
-    struct Schema ** current = &pointers[0];
+    struct Path data[2];
+    struct Path * pointers[] = { &data[0], &data[1], (struct Path *)0 };
+    struct Path ** current = &pointers[0];
  
     do {
 
@@ -366,7 +410,7 @@ static int enumerate(void * vp, const char * name, const char * path, size_t dep
             break;
         }
 
-        rc = placer_steps(sp, placer_steps_struct_Schema_callback, &current);
+        rc = placer_steps(sp, placer_steps_struct_Path_callback, &current);
         if (rc != SQLITE_OK) {
             xc = -132;
             break;
@@ -376,11 +420,11 @@ static int enumerate(void * vp, const char * name, const char * path, size_t dep
             fprintf(stdout, "NONE: \"%s\"\n", path);
         } else if (current == &pointers[1]) {
             fprintf(stdout, "ONLY: \"%s\"\n", path);
-            placer_struct_Schema_display(stdout, &data[0]);
+            placer_struct_Path_display(stdout, &data[0]);
         } else if (current == &pointers[2]) {
             fprintf(stdout, "MANY: \"%s\"\n", path);
-            placer_struct_Schema_display(stdout, &data[0]);
-            placer_struct_Schema_display(stdout, &data[1]);
+            placer_struct_Path_display(stdout, &data[0]);
+            placer_struct_Path_display(stdout, &data[1]);
         } else {
             diminuto_core_fatal();
         }
@@ -407,7 +451,7 @@ static int extract(sqlite3 * db, diminuto_fs_type_t type)
     char * sql = (char *)0;
     placer_generic_callback_t state = PLACER_GENERIC_CALLBACK_INITIALIZER;
     sqlite3_stmt * sp = (sqlite3_stmt *)0;
-    static const char SELECT[] = "SELECT * FROM Schema WHERE (type = '%s') AND (mode > %u);";
+    static const char SELECT[] = "SELECT * FROM Path WHERE (type = '%s') AND (mode > %u);";
 
     do {
 
@@ -456,9 +500,9 @@ static int replace(void * vp, const char * name, const char * path, size_t depth
     int rc = 0;
     placer_generic_callback_t state = PLACER_GENERIC_CALLBACK_INITIALIZER;
 #include "com/diag/placer/placer_sql_replace.h"
-#include "schema.h"
+#include "SchemaPath.h"
 #include "com/diag/placer/placer_end.h"
-    struct Schema schema;
+    struct Path schema;
 
     if (!Verbose) {
         state.fp = (FILE *)0;
@@ -492,13 +536,13 @@ static int replace(void * vp, const char * name, const char * path, size_t depth
 
         db = (sqlite3 *)vp;
 
-        sp = placer_prepare(db, PLACER_SQL_struct_Schema_REPLACE);
+        sp = placer_prepare(db, PLACER_SQL_struct_Path_REPLACE);
         if (sp == (sqlite3_stmt *)0) {
             xc = -150;
             break;
         }
 
-        rc = placer_stmt_struct_Schema_bind(sp, &schema);
+        rc = placer_stmt_struct_Path_bind(sp, &schema);
         if (rc != SQLITE_OK) {
             xc = -151;
             break;
@@ -529,9 +573,9 @@ static int insert(void * vp, const char * name, const char * path, size_t depth,
     int rc = 0;
     placer_generic_callback_t state = PLACER_GENERIC_CALLBACK_INITIALIZER;
 #include "com/diag/placer/placer_sql_insert.h"
-#include "schema.h"
+#include "SchemaPath.h"
 #include "com/diag/placer/placer_end.h"
-    struct Schema schema;
+    struct Path schema;
 
     if (!Verbose) {
         state.fp = (FILE *)0;
@@ -565,13 +609,13 @@ static int insert(void * vp, const char * name, const char * path, size_t depth,
 
     do {
 
-        sp = placer_prepare(db, PLACER_SQL_struct_Schema_INSERT);
+        sp = placer_prepare(db, PLACER_SQL_struct_Path_INSERT);
         if (sp == (sqlite3_stmt *)0) {
             xc = -160;
             break;
         }
 
-        rc = placer_stmt_struct_Schema_bind(sp, &schema);
+        rc = placer_stmt_struct_Path_bind(sp, &schema);
         if (rc != SQLITE_OK) {
             xc = -161;
             break;
@@ -600,7 +644,7 @@ static int show(sqlite3 * db)
     int rc = 0;
     placer_generic_callback_t state = PLACER_GENERIC_CALLBACK_INITIALIZER;
     sqlite3_stmt * sp = (sqlite3_stmt *)0;
-    static const char SELECT[] = "SELECT * FROM Schema;";
+    static const char SELECT[] = "SELECT * FROM Path;";
 
     do {
 
@@ -636,13 +680,16 @@ static int create(sqlite3 * db)
     int xc = 0;
     int rc = 0;
 #include "com/diag/placer/placer_sql_create.h"
-#include "schema.h"
+#include "SchemaPath.h"
+#include "com/diag/placer/placer_end.h"
+#include "com/diag/placer/placer_sql_create.h"
+#include "SchemaNode.h"
 #include "com/diag/placer/placer_end.h"
     sqlite3_stmt * sp = (sqlite3_stmt *)0;
 
     do {
 
-        sp = placer_prepare(db, PLACER_SQL_struct_Schema_CREATE);
+        sp = placer_prepare(db, PLACER_SQL_struct_Path_CREATE);
         if (sp == (sqlite3_stmt *)0) {
             xc = -180;
             break;
@@ -651,6 +698,18 @@ static int create(sqlite3 * db)
         rc = placer_steps(sp, (placer_steps_callback_t *)0, (void *)0);
         if (rc != SQLITE_OK) {
             xc = -181;
+            break;
+        }
+
+        sp = placer_prepare(db, PLACER_SQL_struct_Node_CREATE);
+        if (sp == (sqlite3_stmt *)0) {
+            xc = -182;
+            break;
+        }
+
+        rc = placer_steps(sp, (placer_steps_callback_t *)0, (void *)0);
+        if (rc != SQLITE_OK) {
+            xc = -183;
             break;
         }
 
@@ -683,6 +742,7 @@ int main(int argc, char * argv[])
     int test6 = 0;
     int test7 = 0;
     int test8 = 0;
+    int test9 = 0;
     char * end = (char *)0;
     int opt = 0;
     extern char * optarg;
@@ -696,9 +756,9 @@ int main(int argc, char * argv[])
 
         cp = insert;
 
-        while ((opt = getopt(argc, argv, "?012345678B:D:I:P:cdirv")) >= 0) {
+        while ((opt = getopt(argc, argv, "?0123456789B:D:I:P:cdirv")) >= 0) {
 
-            static const char USAGE[] = "[ -? ] -D DATABASE [ -B BLOCKSIZE ] [ -d ] [ -v ] [ -0 ] [ -1 ] [ -2 ] [ -3 ] [ -4 ] [ -5 ] [ -6 ] [ -7 ] [ -8 ] [ -P PATH ] [ -I INODE ] [ [ -c ]  [ -i | -r ]  ROOT [ ROOT ... ] ]\n";
+            static const char USAGE[] = "[ -? ] -D DATABASE [ -B BLOCKSIZE ] [ -d ] [ -v ] [ -0 ] [ -1 ] [ -2 ] [ -3 ] [ -4 ] [ -5 ] [ -6 ] [ -7 ] [ -8 ] [ -9 ] [ -P PATH ] [ -I INODE ] [ [ -c ]  [ -i | -r ]  ROOT [ ROOT ... ] ]\n";
 
             switch (opt) {
             case '?':
@@ -730,6 +790,9 @@ int main(int argc, char * argv[])
                 break;
             case '8':
                 test8 = !0;
+                break;
+            case '9':
+                test9 = !0;
                 break;
             case 'B':
                 Buffersize = strtoul(optarg, &end, 0);
@@ -906,6 +969,14 @@ int main(int argc, char * argv[])
         if (!test8) {
             /* Do nothing. */
         } else if ((rc = reveal(db, ino)) == 0) {
+            /* Do nothing. */
+        } else {
+            xc = rc;
+        }
+
+        if (!test9) {
+            /* Do nothing. */
+        } else if ((rc = derive(db)) == 0) {
             /* Do nothing. */
         } else {
             xc = rc;
