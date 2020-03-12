@@ -16,6 +16,7 @@
 #include <errno.h>
 #include "sqlite3.h"
 #include "com/diag/diminuto/diminuto_types.h"
+#include "com/diag/diminuto/diminuto_fibonacci.h"
 #include "com/diag/placer/placer.h"
 #include "placer.h" /* Private API. */
 
@@ -24,9 +25,8 @@ char * placer_sql_vformata(size_t size, const char * format, va_list op)
     char * buffer = (char *)0;
     int length = 0;
     va_list ap;
-    size_t f0 = 1;
-    size_t f1 = 1;
-    size_t f2 = 0;
+    diminuto_fibonacci_state_t state = { 0, };
+    diminuto_fibonacci_value_t ff = 0;
     size_t ss = 0;
 
     do {
@@ -39,10 +39,14 @@ char * placer_sql_vformata(size_t size, const char * format, va_list op)
 
         ss = size;
 
+        diminuto_fibonacci_init_classic(&state);
+        (void)diminuto_fibonacci_next(&state);
+        ff = diminuto_fibonacci_next(&state);
+
         while (!0) {
 
             if (placer_Debug != (FILE *)0) {
-                fprintf(placer_Debug, "%s@%d: size=%zu ss=%zu f0=%zu f1=%zu f2=%zu\n", __FILE__, __LINE__, size, ss, f0, f1, f2);
+                fprintf(placer_Debug, "%s@%d: size=%zu ss=%zu ff=%u\n", __FILE__, __LINE__, size, ss, ff);
             }
 
             buffer = (char *)sqlite3_malloc(ss);
@@ -65,24 +69,15 @@ char * placer_sql_vformata(size_t size, const char * format, va_list op)
              * Scale the buffer size by the Fibonacci sequence. No, really.
              */
 
-            f2 = f0;
-            f0 = f1;
+            ff = diminuto_fibonacci_next(&state);
 
-            if (f1 > ((~(size_t)0) - f2)) {
+            if (size > ((~(size_t)0) / ff)) {
                 errno = E2BIG;
                 perror("size");
                 break;
             }
 
-            f1 += f2;
-
-            if (size > ((~(size_t)0) / f1)) {
-                errno = E2BIG;
-                perror("size");
-                break;
-            }
-
-            ss = size * f1;
+            ss = size * ff;
 
         }
 
