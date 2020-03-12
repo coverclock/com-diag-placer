@@ -716,6 +716,8 @@ install-include:
 
 ########## Unit Test
 
+.PHONY: sanity functional
+
 sanity:
 	R="PASSED."; \
 	mkdir -p $(OUT)/log; \
