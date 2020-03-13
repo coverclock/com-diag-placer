@@ -17,7 +17,7 @@
  *
  * USAGE
  *
- * survey [ -? ] -D DATABASE [ -B BLOCKSIZE ] [ -d ] [ -v ] [ -0 ] [ -1 ] [ -2 ] [ -3 ] [ -4 ] [ -5 ] [ -6 ] [ -7 ] [ -8 ] [ -P PATH ] [ -I INODE ] [ [ -c ]  [ -i | -r ]  ROOT [ ROOT ... ] ]
+ * survey [ -? ] -D DATABASE [ -B BLOCKSIZE ] [ -d ] [ -v ] [ -0 ] [ -1 ] [ -2 ] [ -3 ] [ -4 ] [ -5 ] [ -6 ] [ -7 ] [ -8 ] [ -9 ] [ -P PATH ] [ -I INODE ] [ [ -c ]  [ -i | -r ]  ROOT [ ROOT ... ] ]
  *
  * EXAMPLES
  *
@@ -43,6 +43,7 @@
 #include "com/diag/diminuto/diminuto_fs.h"
 #include "com/diag/diminuto/diminuto_countof.h"
 #include "com/diag/diminuto/diminuto_core.h"
+#include "com/diag/diminuto/diminuto_log.h"
 #include "com/diag/placer/placer.h"
 
 /*
@@ -113,16 +114,227 @@ static const char * Program = (const char *)0;
 static int Debug = 0;
 static int Verbose = 0;
 static size_t Buffersize = 256;
+static const char * Directory = (const char *)0;
 
 /*
  * TEST9
  *
- * Derive the Node table from the Path table.
+ * Derive the Node table from the Path table. Note: does NOt use the Write
+ * Ahead Log (WAL) which wouyld allow readers too work concurrently with
+ * a writer.
  */
+
+static int derive_select_path_callback(sqlite3_stmt * sp, void * vp)
+{
+    int rc = SQLITE_OK;
+    FILE * fp = (FILE *)0;
+    struct Path path =
+#include "com/diag/placer/placer_structure_initializer.h"
+#include "SchemaPath.h"
+#include "com/diag/placer/placer_end.h"
+    struct Node node =
+#include "com/diag/placer/placer_structure_initializer.h"
+#include "SchemaNode.h"
+#include "com/diag/placer/placer_end.h"
+    struct Path * list[] = { &path, (struct Path *)0 };
+    struct Path ** here = (struct Path **)0;
+    placer_generic_callback_t state = PLACER_GENERIC_CALLBACK_INITIALIZER;
+    size_t size = 0;
+
+    do {
+
+        fp = (FILE *)vp;
+
+        here = &list[0];
+        rc = placer_struct_Path_steps_callback(sp, &here);
+        if (rc != SQLITE_OK) {
+            placer_error(rc);
+            break;
+        }
+
+        if (Verbose) {
+            state.count = 1;
+            rc = placer_generic_steps_callback(sp, &state);
+            if (rc != SQLITE_OK) {
+                placer_error(rc);
+                break;
+            }
+        }
+
+        node.ino = path.ino;
+        node.nlink = path.nlink;
+        node.uid = path.uid;
+        node.gid = path.gid;
+        node.mode = path.mode;
+        node.blocks = path.blocks;
+        node.size = path.size;
+        node.devmajor = path.devmajor;
+        node.devminor = path.devminor;
+        node.ctime = path.ctime;
+        
+        size = fwrite(&node, sizeof(node), 1, fp);
+        if (size != 1) {
+            diminuto_perror("fwrite");
+            rc = SQLITE_ERROR;
+            break;
+        }
+
+    } while (0);
+
+    return rc;
+}
 
 static int derive(sqlite3 * db)
 {
-    return 0;
+    int xc = 0;
+    int rc = 0;
+    char * temporary = (char *)0;
+    int fd = -1;
+    FILE * fp = (FILE *)0;
+    sqlite3_stmt * sp = (sqlite3_stmt *)0;
+    static const char SELECTPATH[] = "SELECT * FROM Path";
+#include "com/diag/placer/placer_sql_replace.h"
+#include "SchemaNode.h"
+#include "com/diag/placer/placer_end.h"
+    struct Node node =
+#include "com/diag/placer/placer_structure_initializer.h"
+#include "SchemaNode.h"
+#include "com/diag/placer/placer_end.h"
+    placer_generic_callback_t state = PLACER_GENERIC_CALLBACK_INITIALIZER;
+    static const char SELECTNODE[] = "SELECT * FROM Node";
+    size_t size = 0;
+
+    do {
+
+        size = strlen(Directory) + 1 + strlen(Program) + 1 + sizeof("XXXXXX");
+        temporary = (char *)malloc(size);
+        if (temporary == (char *)0) {
+            diminuto_perror("malloc");
+            xc = -200;
+            break;
+        }
+
+        strcpy(temporary, Directory);
+        strcat(temporary, "/");
+        strcat(temporary, Program);
+        strcat(temporary, "-");
+        strcat(temporary, "XXXXXX");
+
+        if (Verbose) {
+            fputs(temporary, stdout);
+            fputc('\n', stdout);
+        }
+
+        fd = mkstemp(temporary);
+        if (fd < 0) {
+            diminuto_perror(temporary);
+            xc = -201;
+            break;
+        }
+
+        fp = fdopen(fd, "r+");
+        if (fp == (FILE *)0) {
+            diminuto_perror(temporary);
+            xc = -202;
+            break;
+        }
+
+        sp = placer_prepare(db, SELECTPATH);
+        if (sp == (sqlite3_stmt *)0) {
+            xc = -203;
+            break;
+        }
+
+        rc = placer_steps(sp, derive_select_path_callback, fp);
+        if (rc != SQLITE_OK) {
+            xc = -204;
+            break;
+        }
+
+        rewind(fp);
+
+        while (!0) {
+
+            size = fread(&node, sizeof(node), 1, fp);
+            if (size == 1) {
+                /* Do nothing. */
+            } else if (feof(fp)) {
+                break;
+            } else {
+                diminuto_perror(temporary);
+                xc = -205;
+                break;
+            }
+
+            sp = placer_prepare(db, PLACER_struct_Node_SQL_REPLACE);
+            if (sp == (sqlite3_stmt *)0) {
+                xc = -206;
+                break;
+            }
+
+            rc = placer_struct_Node_stmt_bind(sp, &node);
+            if (rc != SQLITE_OK) {
+                xc = -207;
+                break;
+            }
+
+            rc = placer_steps(sp, placer_generic_steps_callback, &state);
+            if (rc != SQLITE_OK) {
+                xc = -208;
+                break;
+            }
+
+        }
+
+        if (xc != 0) {
+            break;
+        }
+
+        if (Verbose) {
+
+            sp = placer_prepare(db, SELECTNODE);
+            if (sp == (sqlite3_stmt *)0) {
+                xc = -208;
+                break;
+            }
+
+            state.count = 0;
+
+            rc = placer_steps(sp, placer_generic_steps_callback, &state);
+            if (rc != SQLITE_OK) {
+                xc = -209;
+                break;
+            }
+
+        }
+
+    } while (0);
+
+    if (fp == (FILE *)0) {
+        /* Do nothing. */
+    } else if (fclose(fp) != EOF) {
+        /* Do nothing. */
+    }  else {
+        diminuto_perror(temporary);
+        xc = -220;
+    }
+
+#if 0
+    if (fd < 0) {
+        /* Do nothing. */
+    } else if (unlink(temporary) == 0) {
+        /* Do nothing. */
+    } else {
+        diminuto_perror(temporary);
+        xc = SQLITE_ERROR;
+    }
+#endif
+
+    if (temporary != (char *)0) {
+        free(temporary);
+    }
+
+    return xc;
 }
 
 /*
@@ -162,7 +374,7 @@ static int reveal(sqlite3 * db, ino_t ino)
             break;
         }
 
-        rc = placer_steps(sp, placer_steps_struct_Path_callback, &current);
+        rc = placer_steps(sp, placer_struct_Path_steps_callback, &current);
         if (rc != SQLITE_OK) {
             xc = -192;
             break;
@@ -218,7 +430,7 @@ static int clean(sqlite3 * db)
             break;
         }
 
-        rc = placer_steps(sp, placer_steps_generic_callback, &state);
+        rc = placer_steps(sp, placer_generic_steps_callback, &state);
         if (rc != SQLITE_OK) {
             xc = -101;
             break;
@@ -267,7 +479,7 @@ static int mark(sqlite3 * db)
             break;
         }
 
-        rc = placer_steps(sp, placer_steps_generic_callback, &state);
+        rc = placer_steps(sp, placer_generic_steps_callback, &state);
         if (rc != SQLITE_OK) {
             xc = -111;
             break;
@@ -410,7 +622,7 @@ static int enumerate(void * vp, const char * name, const char * path, size_t dep
             break;
         }
 
-        rc = placer_steps(sp, placer_steps_struct_Path_callback, &current);
+        rc = placer_steps(sp, placer_struct_Path_steps_callback, &current);
         if (rc != SQLITE_OK) {
             xc = -132;
             break;
@@ -476,7 +688,7 @@ static int extract(sqlite3 * db, diminuto_fs_type_t type)
             break;
         }
 
-        rc = placer_steps(sp, placer_steps_generic_callback, &state);
+        rc = placer_steps(sp, placer_generic_steps_callback, &state);
         if (rc != SQLITE_OK) {
             xc = -142;
             break;
@@ -536,19 +748,19 @@ static int replace(void * vp, const char * name, const char * path, size_t depth
 
         db = (sqlite3 *)vp;
 
-        sp = placer_prepare(db, PLACER_SQL_struct_Path_REPLACE);
+        sp = placer_prepare(db, PLACER_struct_Path_SQL_REPLACE);
         if (sp == (sqlite3_stmt *)0) {
             xc = -150;
             break;
         }
 
-        rc = placer_stmt_struct_Path_bind(sp, &schema);
+        rc = placer_struct_Path_stmt_bind(sp, &schema);
         if (rc != SQLITE_OK) {
             xc = -151;
             break;
         }
 
-        rc = placer_steps(sp, placer_steps_generic_callback, &state);
+        rc = placer_steps(sp, placer_generic_steps_callback, &state);
         if (rc != SQLITE_OK) {
             xc = -152;
             break;
@@ -609,19 +821,19 @@ static int insert(void * vp, const char * name, const char * path, size_t depth,
 
     do {
 
-        sp = placer_prepare(db, PLACER_SQL_struct_Path_INSERT);
+        sp = placer_prepare(db, PLACER_struct_Path_SQL_INSERT);
         if (sp == (sqlite3_stmt *)0) {
             xc = -160;
             break;
         }
 
-        rc = placer_stmt_struct_Path_bind(sp, &schema);
+        rc = placer_struct_Path_stmt_bind(sp, &schema);
         if (rc != SQLITE_OK) {
             xc = -161;
             break;
         }
 
-        rc = placer_steps(sp, placer_steps_generic_callback, &state);
+        rc = placer_steps(sp, placer_generic_steps_callback, &state);
         if (rc != SQLITE_OK) {
             xc = -162;
             break;
@@ -658,7 +870,7 @@ static int show(sqlite3 * db)
             break;
         }
 
-        rc = placer_steps(sp, placer_steps_generic_callback, &state);
+        rc = placer_steps(sp, placer_generic_steps_callback, &state);
         if (rc != SQLITE_OK) {
             xc = -171;
             break;
@@ -689,7 +901,7 @@ static int create(sqlite3 * db)
 
     do {
 
-        sp = placer_prepare(db, PLACER_SQL_struct_Path_CREATE);
+        sp = placer_prepare(db, PLACER_struct_Path_SQL_CREATE);
         if (sp == (sqlite3_stmt *)0) {
             xc = -180;
             break;
@@ -701,7 +913,7 @@ static int create(sqlite3 * db)
             break;
         }
 
-        sp = placer_prepare(db, PLACER_SQL_struct_Node_CREATE);
+        sp = placer_prepare(db, PLACER_struct_Node_SQL_CREATE);
         if (sp == (sqlite3_stmt *)0) {
             xc = -182;
             break;
@@ -729,8 +941,9 @@ int main(int argc, char * argv[])
     int ii = 0;
     sqlite3 * db = (sqlite3 *)0;
     diminuto_fs_walker_t * cp = (diminuto_fs_walker_t *)0;
-    const char * database = (const char *)0;
-    const char * path = (const char *)0;
+    char * database = (char *)0;
+    char * path = (char *)0;
+    char * here = (char *)0;
     ino_t ino = 1;
     int creating = 0;
     int test0 = 0;
@@ -872,6 +1085,18 @@ int main(int argc, char * argv[])
             /* Do nothing. */
         }
 
+        /*
+         * Save the directory path.
+         */
+
+        Directory = database;
+        here = strrchr(Directory, '/');
+        if (here != (const char *)0) {
+            *here = '\0';
+        } else {
+            Directory = ".";
+        }
+        
         /*
          * Create, or Do Nothing.
          */

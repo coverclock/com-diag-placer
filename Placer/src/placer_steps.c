@@ -20,7 +20,7 @@
 #include "com/diag/placer/placer.h"
 #include "placer.h" /* Private API. */
 
-int placer_steps_generic_callback(sqlite3_stmt * sp, void * vp) {
+int placer_generic_steps_callback(sqlite3_stmt * sp, void * vp) {
     placer_generic_callback_t * pp = (placer_generic_callback_t *)0;
     int ncols = 0;
     int ii = 0;

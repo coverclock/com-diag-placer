@@ -19,7 +19,7 @@
 #include "com/diag/placer/placer.h"
 #include "placer.h" /* Private API. */
 
-int placer_exec_BLOB_import(placer_BLOB_t * dest, const char * src, size_t items)
+int placer_BLOB_exec_import(placer_BLOB_t * dest, const char * src, size_t items)
 {
     int rc = SQLITE_OK;
 
@@ -28,7 +28,7 @@ int placer_exec_BLOB_import(placer_BLOB_t * dest, const char * src, size_t items
     return rc;
 }
 
-int placer_exec_FLOAT_import(placer_FLOAT_t * dest, const char * src)
+int placer_FLOAT_exec_import(placer_FLOAT_t * dest, const char * src)
 {
     int rc = SQLITE_ERROR;
     char * end = (char *)0;
@@ -43,7 +43,7 @@ int placer_exec_FLOAT_import(placer_FLOAT_t * dest, const char * src)
     return rc;
 }
 
-int placer_exec_INTEGER_import(placer_INTEGER_t * dest, const char * src)
+int placer_INTEGER_exec_import(placer_INTEGER_t * dest, const char * src)
 {
     int rc = SQLITE_ERROR;
     char * end = (char *)0;
@@ -58,7 +58,7 @@ int placer_exec_INTEGER_import(placer_INTEGER_t * dest, const char * src)
     return rc;
 }
 
-int placer_exec_INTEGER64_import(placer_INTEGER64_t * dest, const char * src)
+int placer_INTEGER64_exec_import(placer_INTEGER64_t * dest, const char * src)
 {
     int rc = SQLITE_ERROR;
     char * end = (char *)0;
@@ -73,7 +73,7 @@ int placer_exec_INTEGER64_import(placer_INTEGER64_t * dest, const char * src)
     return rc;
 }
 
-int placer_exec_TEXT_import(placer_TEXT_t * dest, const char * src, size_t items)
+int placer_TEXT_exec_import(placer_TEXT_t * dest, const char * src, size_t items)
 {
     int rc = SQLITE_OK;
 
@@ -82,7 +82,7 @@ int placer_exec_TEXT_import(placer_TEXT_t * dest, const char * src, size_t items
     return rc;
 }
 
-int placer_exec_TEXT16_import(placer_TEXT16_t * dest, const char * src, size_t items)
+int placer_TEXT16_exec_import(placer_TEXT16_t * dest, const char * src, size_t items)
 {
     int rc = SQLITE_OK;
     placer_TEXT16_t * dp = (placer_TEXT16_t *)0;
@@ -99,7 +99,7 @@ int placer_exec_TEXT16_import(placer_TEXT16_t * dest, const char * src, size_t i
     return rc;
 }
 
-int placer_exec_generic_callback(void * vp, int ncols, char ** value, char ** keyword)
+int placer_generic_exec_callback(void * vp, int ncols, char ** value, char ** keyword)
 {
     placer_generic_callback_t * pp = (placer_generic_callback_t *)0;
     int ii = 0;

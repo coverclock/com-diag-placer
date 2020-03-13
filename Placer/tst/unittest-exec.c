@@ -56,13 +56,13 @@ int main(void)
         placer_INTEGER_t result = 0xa5a5a5a5;
 
         TEST();
-        EXPECT(placer_exec_INTEGER_import(&result, "INVALID") == SQLITE_ERROR);
-        EXPECT(placer_exec_INTEGER_import(&result, "1NV8L1D") == SQLITE_ERROR);
-        EXPECT(placer_exec_INTEGER_import(&result, "0") == SQLITE_OK);
+        EXPECT(placer_INTEGER_exec_import(&result, "INVALID") == SQLITE_ERROR);
+        EXPECT(placer_INTEGER_exec_import(&result, "1NV8L1D") == SQLITE_ERROR);
+        EXPECT(placer_INTEGER_exec_import(&result, "0") == SQLITE_OK);
         EXPECT(result == 0);
-        EXPECT(placer_exec_INTEGER_import(&result, "2147483647") == SQLITE_OK);
+        EXPECT(placer_INTEGER_exec_import(&result, "2147483647") == SQLITE_OK);
         EXPECT(result == 2147483647);
-        EXPECT(placer_exec_INTEGER_import(&result, "-1") == SQLITE_OK);
+        EXPECT(placer_INTEGER_exec_import(&result, "-1") == SQLITE_OK);
         EXPECT(result == -1);
         STATUS();
     }
@@ -71,13 +71,13 @@ int main(void)
         placer_INTEGER64_t result = 0xa5a5a5a5a5a5a5a5LL;
 
         TEST();
-        EXPECT(placer_exec_INTEGER64_import(&result, "INVALID") == SQLITE_ERROR);
-        EXPECT(placer_exec_INTEGER64_import(&result, "1NV8L1D") == SQLITE_ERROR);
-        EXPECT(placer_exec_INTEGER64_import(&result, "0") == SQLITE_OK);
+        EXPECT(placer_INTEGER64_exec_import(&result, "INVALID") == SQLITE_ERROR);
+        EXPECT(placer_INTEGER64_exec_import(&result, "1NV8L1D") == SQLITE_ERROR);
+        EXPECT(placer_INTEGER64_exec_import(&result, "0") == SQLITE_OK);
         EXPECT(result == 0);
-        EXPECT(placer_exec_INTEGER64_import(&result, "9223372036854775807") == SQLITE_OK);
+        EXPECT(placer_INTEGER64_exec_import(&result, "9223372036854775807") == SQLITE_OK);
         EXPECT(result == 9223372036854775807LL);
-        EXPECT(placer_exec_INTEGER64_import(&result, "-1") == SQLITE_OK);
+        EXPECT(placer_INTEGER64_exec_import(&result, "-1") == SQLITE_OK);
         EXPECT(result == -1);
         STATUS();
     }
@@ -86,15 +86,15 @@ int main(void)
         placer_FLOAT_t result = 165.165;
 
         TEST();
-        EXPECT(placer_exec_FLOAT_import(&result, "INVALID") == SQLITE_ERROR);
-        EXPECT(placer_exec_FLOAT_import(&result, "1NV8L1D") == SQLITE_ERROR);
-        EXPECT(placer_exec_FLOAT_import(&result, "0") == SQLITE_OK);
+        EXPECT(placer_FLOAT_exec_import(&result, "INVALID") == SQLITE_ERROR);
+        EXPECT(placer_FLOAT_exec_import(&result, "1NV8L1D") == SQLITE_ERROR);
+        EXPECT(placer_FLOAT_exec_import(&result, "0") == SQLITE_OK);
         EXPECT(result == 0.0);
-        EXPECT(placer_exec_FLOAT_import(&result, "0.0") == SQLITE_OK);
+        EXPECT(placer_FLOAT_exec_import(&result, "0.0") == SQLITE_OK);
         EXPECT(result == 0.0);
-        EXPECT(placer_exec_FLOAT_import(&result, "526.625") == SQLITE_OK);
+        EXPECT(placer_FLOAT_exec_import(&result, "526.625") == SQLITE_OK);
         EXPECT(result == 526.625);
-        EXPECT(placer_exec_FLOAT_import(&result, "-1.0") == SQLITE_OK);
+        EXPECT(placer_FLOAT_exec_import(&result, "-1.0") == SQLITE_OK);
         EXPECT(result == -1.0);
         STATUS();
     }
@@ -103,14 +103,14 @@ int main(void)
         placer_TEXT_t result[] = { '0', '1', '2', '3', '4', '5', '6', '7', '\0', };
 
         TEST();
-        EXPECT(placer_exec_TEXT_import((placer_TEXT_t *)0, (const char *)0, 0) == SQLITE_OK);
-        EXPECT(placer_exec_TEXT_import(result, "", countof(result)) == SQLITE_OK);
+        EXPECT(placer_TEXT_exec_import((placer_TEXT_t *)0, (const char *)0, 0) == SQLITE_OK);
+        EXPECT(placer_TEXT_exec_import(result, "", countof(result)) == SQLITE_OK);
         EXPECT(result[0] == '\0');
-        EXPECT(placer_exec_TEXT_import(result, "A", countof(result)) == SQLITE_OK);
+        EXPECT(placer_TEXT_exec_import(result, "A", countof(result)) == SQLITE_OK);
         EXPECT(strcmp(result, "A") == 0);
-        EXPECT(placer_exec_TEXT_import(result, "BCDEFGHI", countof(result)) == SQLITE_OK);
+        EXPECT(placer_TEXT_exec_import(result, "BCDEFGHI", countof(result)) == SQLITE_OK);
         EXPECT(strcmp(result, "BCDEFGHI") == 0);
-        EXPECT(placer_exec_TEXT_import(result, "JKLMNOPQR", countof(result)) == SQLITE_OK);
+        EXPECT(placer_TEXT_exec_import(result, "JKLMNOPQR", countof(result)) == SQLITE_OK);
         EXPECT(strncmp(result, "JKLMNOPQR", sizeof(result)) == 0);
         STATUS();
     }
@@ -130,31 +130,31 @@ int main(void)
         TEST();
 
         COMMENT("0");
-        EXPECT(placer_exec_TEXT16_import((placer_TEXT16_t *)0, (const char *)0, 0) == SQLITE_OK);
+        EXPECT(placer_TEXT16_exec_import((placer_TEXT16_t *)0, (const char *)0, 0) == SQLITE_OK);
  
         COMMENT("1");
-        EXPECT(placer_exec_TEXT16_import(result, (char *)DATA1, countof(result)) == SQLITE_OK);
+        EXPECT(placer_TEXT16_exec_import(result, (char *)DATA1, countof(result)) == SQLITE_OK);
         diminuto_dump(stderr, DATA1, sizeof(DATA1));
         diminuto_dump(stderr, RESULT1, sizeof(RESULT1));
         diminuto_dump(stderr, result, sizeof(result));
         EXPECT(result[0] == '\0');
  
         COMMENT("2");
-        EXPECT(placer_exec_TEXT16_import(result, (char *)DATA2, countof(result)) == SQLITE_OK);
+        EXPECT(placer_TEXT16_exec_import(result, (char *)DATA2, countof(result)) == SQLITE_OK);
         diminuto_dump(stderr, DATA2, sizeof(DATA2));
         diminuto_dump(stderr, RESULT2, sizeof(RESULT2));
         diminuto_dump(stderr, result, sizeof(result));
         EXPECT(placer_TEXT16_compare(result, RESULT2, countof(result)) == 0);
  
         COMMENT("3");
-        EXPECT(placer_exec_TEXT16_import(result, (char *)DATA3, countof(result)) == SQLITE_OK);
+        EXPECT(placer_TEXT16_exec_import(result, (char *)DATA3, countof(result)) == SQLITE_OK);
         diminuto_dump(stderr, DATA3, sizeof(DATA3));
         diminuto_dump(stderr, RESULT3, sizeof(RESULT3));
         diminuto_dump(stderr, result, sizeof(result));
         EXPECT(placer_TEXT16_compare(result, RESULT3, countof(result)) == 0);
  
         COMMENT("4");
-        EXPECT(placer_exec_TEXT16_import(result, (char *)DATA4, countof(result)) == SQLITE_OK);
+        EXPECT(placer_TEXT16_exec_import(result, (char *)DATA4, countof(result)) == SQLITE_OK);
         diminuto_dump(stderr, DATA4, sizeof(DATA4));
         diminuto_dump(stderr, RESULT4, sizeof(RESULT4));
         diminuto_dump(stderr, result, sizeof(result));
@@ -172,12 +172,12 @@ int main(void)
 
         TEST();
 
-        EXPECT(placer_exec_BLOB_import((placer_BLOB_t *)0, (const char *)0, 0) == SQLITE_OK);
+        EXPECT(placer_BLOB_exec_import((placer_BLOB_t *)0, (const char *)0, 0) == SQLITE_OK);
 
-        EXPECT(placer_exec_BLOB_import(result, value[0], countof(result)) == SQLITE_OK);
+        EXPECT(placer_BLOB_exec_import(result, value[0], countof(result)) == SQLITE_OK);
         EXPECT(memcmp(result, value[0], sizeof(result)) == 0);
 
-        EXPECT(placer_exec_BLOB_import(result, value[1], countof(result)) == SQLITE_OK);
+        EXPECT(placer_BLOB_exec_import(result, value[1], countof(result)) == SQLITE_OK);
         EXPECT(memcmp(result, value[1], sizeof(result)) == 0);
 
         STATUS();
@@ -204,7 +204,7 @@ int main(void)
         TEST();
 
         COMMENT("1");        
-        rc = placer_exec_struct_UnitTestSchema_callback((void *)&here, 6, value[0], keyword);
+        rc = placer_struct_UnitTestSchema_exec_callback((void *)&here, 6, value[0], keyword);
         ASSERT(rc == SQLITE_OK);
         EXPECT(here = &(gather[1]));
         EXPECT(results[0].id == (int32_t)1);
@@ -217,7 +217,7 @@ int main(void)
         EXPECT(strcmp(results[0].ssn, "123456789") == 0);
 
         COMMENT("2");        
-        rc = placer_exec_struct_UnitTestSchema_callback((void *)&here, 6, value[1], keyword);
+        rc = placer_struct_UnitTestSchema_exec_callback((void *)&here, 6, value[1], keyword);
         ASSERT(rc == SQLITE_OK);
         EXPECT(here = &(gather[2]));
         EXPECT(results[1].id == (int32_t)2);
@@ -230,7 +230,7 @@ int main(void)
         EXPECT(strcmp(results[1].ssn, "234567890") == 0);
 
         COMMENT("3");        
-        rc = placer_exec_struct_UnitTestSchema_callback((void *)&here, 6, value[2], keyword);
+        rc = placer_struct_UnitTestSchema_exec_callback((void *)&here, 6, value[2], keyword);
         ASSERT(rc == SQLITE_OK);
         EXPECT(here = &(gather[3]));
         EXPECT(results[2].id == (int32_t)3);
@@ -243,7 +243,7 @@ int main(void)
         EXPECT(strcmp(results[2].ssn, "345678901") == 0);
 
         COMMENT("4");        
-        rc = placer_exec_struct_UnitTestSchema_callback((void *)&here, 6, value[3], keyword);
+        rc = placer_struct_UnitTestSchema_exec_callback((void *)&here, 6, value[3], keyword);
         ASSERT(rc == SQLITE_ERROR);
         EXPECT(here = &(gather[3]));
 

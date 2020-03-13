@@ -77,7 +77,7 @@ static int clean(sqlite3 * db)
             fputc('\n', stdout);
         }
 
-        rc = placer_exec(db, SQL[ii], placer_exec_generic_callback, &state);
+        rc = placer_exec(db, SQL[ii], placer_generic_exec_callback, &state);
         if (rc != SQLITE_OK) {
             xc = -101;
             break;
@@ -114,7 +114,7 @@ static int mark(sqlite3 * db)
             fputc('\n', stdout);
         }
 
-        rc = placer_exec(db, SQL[ii], placer_exec_generic_callback, &state);
+        rc = placer_exec(db, SQL[ii], placer_generic_exec_callback, &state);
         if (rc != SQLITE_OK) {
             xc = -111;
             break;
@@ -249,7 +249,7 @@ static int enumerate(void * vp, const char * name, const char * path, size_t dep
         }
 
         state.count = 0;
-        rc = placer_exec(db, sql, placer_exec_generic_callback, &state);
+        rc = placer_exec(db, sql, placer_generic_exec_callback, &state);
         sqlite3_free(sql);
         if (rc != SQLITE_OK) {
             xc = -141;
@@ -313,7 +313,7 @@ static int extract(sqlite3 * db, diminuto_fs_type_t type)
             fputc('\n', stdout);
         }
 
-        rc = placer_exec(db, sql, placer_exec_generic_callback, &state);
+        rc = placer_exec(db, sql, placer_generic_exec_callback, &state);
         sqlite3_free(sql);
         if (rc != SQLITE_OK) {
             xc = -151;
@@ -382,7 +382,7 @@ static int replace(void * vp, const char * name, const char * path, size_t depth
             fputc('\n', stdout);
         }
 
-        rc = placer_exec(db, sql, placer_exec_generic_callback, &state);
+        rc = placer_exec(db, sql, placer_generic_exec_callback, &state);
         sqlite3_free(sql);
         if (rc != SQLITE_OK) {
             xc = -161;
@@ -452,7 +452,7 @@ static int insert(void * vp, const char * name, const char * path, size_t depth,
             fputc('\n', stdout);
         }
 
-        rc = placer_exec(db, sql, placer_exec_generic_callback, &state);
+        rc = placer_exec(db, sql, placer_generic_exec_callback, &state);
         sqlite3_free(sql);
         if (rc != SQLITE_OK) {
             xc = -171;
@@ -496,7 +496,7 @@ static int show(sqlite3 * db)
             fputc('\n', stdout);
         }
 
-        rc = placer_exec(db, sql, placer_exec_generic_callback, &state);
+        rc = placer_exec(db, sql, placer_generic_exec_callback, &state);
         sqlite3_free(sql);
         if (rc != SQLITE_OK) {
             xc = -181;

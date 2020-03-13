@@ -76,15 +76,19 @@
 #include "unittest-schema.h"
 #include "com/diag/placer/placer_end.h"
 
-#include "com/diag/placer/placer_array_name.h"
+#include "com/diag/placer/placer_structure_name.h"
 #include "unittest-schema.h"
 #include "com/diag/placer/placer_end.h"
 
-#include "com/diag/placer/placer_array_type.h"
+#include "com/diag/placer/placer_field_name.h"
 #include "unittest-schema.h"
 #include "com/diag/placer/placer_end.h"
 
-#include "com/diag/placer/placer_array_sizeof.h"
+#include "com/diag/placer/placer_field_type.h"
+#include "unittest-schema.h"
+#include "com/diag/placer/placer_end.h"
+
+#include "com/diag/placer/placer_field_sizeof.h"
 #include "unittest-schema.h"
 #include "com/diag/placer/placer_end.h"
 
@@ -109,37 +113,38 @@ int main(void)
 
     {
         TEST();
-        EXPECT(countof(PLACER_ARRAY_struct_UnitTestSchema_BYTES) == 6);
-        EXPECT(PLACER_ARRAY_struct_UnitTestSchema_BYTES[0] == 4);
-        EXPECT(PLACER_ARRAY_struct_UnitTestSchema_BYTES[1] == (64 * 2));
-        EXPECT(PLACER_ARRAY_struct_UnitTestSchema_BYTES[2] == 8);
-        EXPECT(PLACER_ARRAY_struct_UnitTestSchema_BYTES[3] == (256 * 1));
-        EXPECT(PLACER_ARRAY_struct_UnitTestSchema_BYTES[4] == 8);
-        EXPECT(PLACER_ARRAY_struct_UnitTestSchema_BYTES[5] == (10 * 1));
+        EXPECT(countof(PLACER_struct_UnitTestSchema_FIELD_BYTES) == 6);
+        EXPECT(PLACER_struct_UnitTestSchema_FIELD_BYTES[0] == 4);
+        EXPECT(PLACER_struct_UnitTestSchema_FIELD_BYTES[1] == (64 * 2));
+        EXPECT(PLACER_struct_UnitTestSchema_FIELD_BYTES[2] == 8);
+        EXPECT(PLACER_struct_UnitTestSchema_FIELD_BYTES[3] == (256 * 1));
+        EXPECT(PLACER_struct_UnitTestSchema_FIELD_BYTES[4] == 8);
+        EXPECT(PLACER_struct_UnitTestSchema_FIELD_BYTES[5] == (10 * 1));
         STATUS();
     }
 
     {
         TEST();
-        EXPECT(countof(PLACER_ARRAY_struct_UnitTestSchema_NAME) == 6);
-        EXPECT(strcmp(PLACER_ARRAY_struct_UnitTestSchema_NAME[0], "id") == 0);
-        EXPECT(strcmp(PLACER_ARRAY_struct_UnitTestSchema_NAME[1], "name") == 0);
-        EXPECT(strcmp(PLACER_ARRAY_struct_UnitTestSchema_NAME[2], "age") == 0);
-        EXPECT(strcmp(PLACER_ARRAY_struct_UnitTestSchema_NAME[3], "image") == 0);
-        EXPECT(strcmp(PLACER_ARRAY_struct_UnitTestSchema_NAME[4], "sn") == 0);
-        EXPECT(strcmp(PLACER_ARRAY_struct_UnitTestSchema_NAME[5], "ssn") == 0);
+        EXPECT(strcmp(PLACER_struct_UnitTestSchema_SCHEMA_NAME, "UnitTestSchema") == 0);
+        EXPECT(countof(PLACER_struct_UnitTestSchema_FIELD_NAME) == 6);
+        EXPECT(strcmp(PLACER_struct_UnitTestSchema_FIELD_NAME[0], "id") == 0);
+        EXPECT(strcmp(PLACER_struct_UnitTestSchema_FIELD_NAME[1], "name") == 0);
+        EXPECT(strcmp(PLACER_struct_UnitTestSchema_FIELD_NAME[2], "age") == 0);
+        EXPECT(strcmp(PLACER_struct_UnitTestSchema_FIELD_NAME[3], "image") == 0);
+        EXPECT(strcmp(PLACER_struct_UnitTestSchema_FIELD_NAME[4], "sn") == 0);
+        EXPECT(strcmp(PLACER_struct_UnitTestSchema_FIELD_NAME[5], "ssn") == 0);
         STATUS();
     }
 
     {
         TEST();
-        EXPECT(countof(PLACER_ARRAY_struct_UnitTestSchema_TYPE) == 6);
-        EXPECT(PLACER_ARRAY_struct_UnitTestSchema_TYPE[0] == SQLITE_INTEGER);
-        EXPECT(PLACER_ARRAY_struct_UnitTestSchema_TYPE[1] == SQLITE_TEXT);
-        EXPECT(PLACER_ARRAY_struct_UnitTestSchema_TYPE[2] == SQLITE_FLOAT);
-        EXPECT(PLACER_ARRAY_struct_UnitTestSchema_TYPE[3] == SQLITE_BLOB);
-        EXPECT(PLACER_ARRAY_struct_UnitTestSchema_TYPE[4] == SQLITE_INTEGER);
-        EXPECT(PLACER_ARRAY_struct_UnitTestSchema_TYPE[5] == SQLITE_TEXT);
+        EXPECT(countof(PLACER_struct_UnitTestSchema_FIELD_TYPE) == 6);
+        EXPECT(PLACER_struct_UnitTestSchema_FIELD_TYPE[0] == SQLITE_INTEGER);
+        EXPECT(PLACER_struct_UnitTestSchema_FIELD_TYPE[1] == SQLITE_TEXT);
+        EXPECT(PLACER_struct_UnitTestSchema_FIELD_TYPE[2] == SQLITE_FLOAT);
+        EXPECT(PLACER_struct_UnitTestSchema_FIELD_TYPE[3] == SQLITE_BLOB);
+        EXPECT(PLACER_struct_UnitTestSchema_FIELD_TYPE[4] == SQLITE_INTEGER);
+        EXPECT(PLACER_struct_UnitTestSchema_FIELD_TYPE[5] == SQLITE_TEXT);
         STATUS();
     }
 
@@ -175,8 +180,8 @@ int main(void)
 #include "com/diag/placer/placer_end.h"
 
         TEST();
-        COMMENT("create=\"%s\"\n", PLACER_SQL_struct_UnitTestSchema_CREATE);
-        EXPECT(strcmp(PLACER_SQL_struct_UnitTestSchema_CREATE, CREATE) == 0);
+        COMMENT("create=\"%s\"\n", PLACER_struct_UnitTestSchema_SQL_CREATE);
+        EXPECT(strcmp(PLACER_struct_UnitTestSchema_SQL_CREATE, CREATE) == 0);
         STATUS();
     }
 
@@ -187,8 +192,8 @@ int main(void)
 #include "com/diag/placer/placer_end.h"
 
         TEST();
-        COMMENT("insert=\"%s\"\n", PLACER_SQL_struct_UnitTestSchema_INSERT);
-        EXPECT(strcmp(PLACER_SQL_struct_UnitTestSchema_INSERT, INSERT) == 0);
+        COMMENT("insert=\"%s\"\n", PLACER_struct_UnitTestSchema_SQL_INSERT);
+        EXPECT(strcmp(PLACER_struct_UnitTestSchema_SQL_INSERT, INSERT) == 0);
         STATUS();
     }
 
@@ -199,8 +204,8 @@ int main(void)
 #include "com/diag/placer/placer_end.h"
 
         TEST();
-        COMMENT("replace=\"%s\"\n", PLACER_SQL_struct_UnitTestSchema_REPLACE);
-        EXPECT(strcmp(PLACER_SQL_struct_UnitTestSchema_REPLACE, REPLACE) == 0);
+        COMMENT("replace=\"%s\"\n", PLACER_struct_UnitTestSchema_SQL_REPLACE);
+        EXPECT(strcmp(PLACER_struct_UnitTestSchema_SQL_REPLACE, REPLACE) == 0);
         STATUS();
     }
 
@@ -255,7 +260,7 @@ int main(void)
         ASSERT(rc == SQLITE_OK);
 
         COMMENT("create");
-        stmt = placer_prepare(db, PLACER_SQL_struct_UnitTestSchema_CREATE);
+        stmt = placer_prepare(db, PLACER_struct_UnitTestSchema_SQL_CREATE);
         ASSERT(stmt != (sqlite3_stmt *)0);
         rc = placer_steps(stmt, (placer_steps_callback_t *)0, (void *)0);
         ASSERT(rc == SQLITE_OK);
@@ -264,9 +269,9 @@ int main(void)
         for (ii = 0; ii < countof(INSERTED); ++ii) {
             COMMENT("%d\n", ii);
             placer_struct_UnitTestSchema_display(stderr, &INSERTED[ii]);
-            stmt = placer_prepare(db, PLACER_SQL_struct_UnitTestSchema_INSERT);
+            stmt = placer_prepare(db, PLACER_struct_UnitTestSchema_SQL_INSERT);
             ASSERT(stmt != (sqlite3_stmt *)0);
-            rc = placer_stmt_struct_UnitTestSchema_bind(stmt, &INSERTED[ii]);
+            rc = placer_struct_UnitTestSchema_stmt_bind(stmt, &INSERTED[ii]);
             ASSERT(rc == SQLITE_OK);
             rc = placer_steps(stmt, (placer_steps_callback_t *)0, (void *)0);
             ASSERT(rc == SQLITE_OK);
@@ -277,7 +282,7 @@ int main(void)
         here = &rows[0];
         stmt = placer_prepare(db, SELECT);
         ASSERT(stmt != (sqlite3_stmt *)0);
-        rc = placer_steps(stmt, placer_steps_struct_UnitTestSchema_callback, &here);
+        rc = placer_steps(stmt, placer_struct_UnitTestSchema_steps_callback, &here);
         ASSERT(rc == SQLITE_OK);
         EXPECT(here == &(rows[4]));
 
@@ -325,9 +330,9 @@ int main(void)
         for (ii = 0; ii < countof(REPLACED); ++ii) {
             COMMENT("%d\n", ii);
             placer_struct_UnitTestSchema_display(stderr, &REPLACED[ii]);
-            stmt = placer_prepare(db, PLACER_SQL_struct_UnitTestSchema_REPLACE);
+            stmt = placer_prepare(db, PLACER_struct_UnitTestSchema_SQL_REPLACE);
             ASSERT(stmt != (sqlite3_stmt *)0);
-            rc = placer_stmt_struct_UnitTestSchema_bind(stmt, &REPLACED[ii]);
+            rc = placer_struct_UnitTestSchema_stmt_bind(stmt, &REPLACED[ii]);
             ASSERT(rc == SQLITE_OK);
             rc = placer_steps(stmt, (placer_steps_callback_t *)0, (void *)0);
             ASSERT(rc == SQLITE_OK);
@@ -336,7 +341,7 @@ int main(void)
         COMMENT("exec");
         memset(row, 0, sizeof(row));
         here = &rows[0];
-        rc = placer_exec(db, SELECT, placer_exec_struct_UnitTestSchema_callback, &here);
+        rc = placer_exec(db, SELECT, placer_struct_UnitTestSchema_exec_callback, &here);
         ASSERT(rc == SQLITE_OK);
         EXPECT(here == &(rows[4]));
 
@@ -377,7 +382,7 @@ int main(void)
         EXPECT(separator == '|');
         stmt = placer_prepare(db, SELECT);
         ASSERT(stmt != (sqlite3_stmt *)0);
-        rc = placer_steps(stmt, placer_steps_generic_callback, &generic);
+        rc = placer_steps(stmt, placer_generic_steps_callback, &generic);
         ASSERT(rc == SQLITE_OK);
         ASSERT(generic.count == 4);
 

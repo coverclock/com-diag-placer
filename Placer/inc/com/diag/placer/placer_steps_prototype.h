@@ -20,7 +20,7 @@
  * @a _STRUCTURE_ is the schema name.
  */
 #define PLACER_SCHEMA(_STRUCTURE_) \
-extern int placer_steps_struct_##_STRUCTURE_##_callback(sqlite3_stmt * sp, void * vp)
+extern int placer_struct_##_STRUCTURE_##_steps_callback(sqlite3_stmt * sp, void * vp)
 
 /**
  * @def PLACER_BLOB(_NAME_, _ITEMS_)

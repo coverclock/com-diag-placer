@@ -17,7 +17,7 @@
  * @a _STRUCTURE_ is the schema name.
  */
 #define PLACER_SCHEMA(_STRUCTURE_) \
-    static const char PLACER_SQL_struct_##_STRUCTURE_##_CREATE[] = \
+    static const char PLACER_struct_##_STRUCTURE_##_SQL_CREATE[] = \
         "CREATE TABLE " #_STRUCTURE_ " ("
 
 /**

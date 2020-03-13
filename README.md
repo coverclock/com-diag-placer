@@ -1,6 +1,6 @@
 # com-diag-placer
 
-Musings with SQLite,  X-Macros, and UTF-16
+Musings with SQLite,  X-Macros, and UTF-16 (A WORK IN PROGRESS)
 
 # Copyright
 
@@ -283,9 +283,9 @@ Preceed with . out/host/bin/setup to setup PATH etc.
 
 # Code Generators
 
-* placer_array_name - Generates an array of field names for a schema.
-* placer_array_sizeof - Generates an array of field sizes for a schema.
-* placer_array_type - Generates an array of field SQLite3 types for a schema.
+* placer_field_name - Generates an array of field names for a schema.
+* placer_field_sizeof - Generates an array of field sizes for a schema.
+* placer_field_type - Generates an array of field SQLite3 types for a schema.
 * placer_exec_callback - Generates an exec callback function for a schema.
 * placer_exec_prototype - Generates a prototype for an exec callback function.
 * placer_null - Generates no code for a schema.
@@ -299,6 +299,7 @@ Preceed with . out/host/bin/setup to setup PATH etc.
 * placer_structure_definition - Generates a C structure definition for a schema.
 * placer_structure_display - Generates a display function for a schema.
 * placer_structure_initializer - Generates a C structure initializer for a schema.
+* placer_structure_name- Generates a variable containing the schema name.
 * placer_structure_prototype - Generates a prototype for a display function.
 
 # Directories

@@ -6,8 +6,7 @@
  * Copyright 2020 Digital Aggregates Corporation, Colorado, USA.
  * Licensed under the terms in LICENSE.txt.
  *
- * The Array Size Of feature generates an array of field sizes in bytes from
- * a schema.
+ * The Field Name feature generates an array  of field names from a schema.
  *
  * N.B. THIS HEADER FILE CAN BE INCLUDED MORE THAN ONCE.
  */
@@ -16,12 +15,13 @@
 
 /**
  * @def PLACER_SCHEMA(_STRUCTURE_)
- * This macro generates the front matter for an array that contains
- * the sizeof in bytes of every element in the schema.
+ * This macro generates the front matter for an array containing
+ * pointers to strings containing the names of each consecutive field
+ * in the schema.
  * @a _STRUCTURE_ is the schema name.
  */
 #define PLACER_SCHEMA(_STRUCTURE_) \
-    static const size_t PLACER_ARRAY_struct_##_STRUCTURE_##_BYTES[] = {
+    static const char * PLACER_struct_##_STRUCTURE_##_FIELD_NAME[] = {
 
 /**
  * @def PLACER_BLOB(_NAME_, _ITEMS_)
@@ -30,7 +30,7 @@
  * @a _ITEMS_ parameters is the number of placer_BLOB_t elements in the field.
  */
 #define PLACER_BLOB(_NAME_, _ITEMS_) \
-        (sizeof(placer_BLOB_t) * (_ITEMS_))
+        #_NAME_
 
 /**
  * @def PLACER_FLOAT(_ITEM_)
@@ -38,15 +38,14 @@
  * @a _NAME_ parameter is the field name.
  */
 #define PLACER_FLOAT(_NAME_) \
-        sizeof(placer_FLOAT_t)
-
+        #_NAME_
 /**
  * @def PLACER_INTEGER(_NAME_)
  * This macro generates the code for a field of type INTEGER.
  * @a _NAME_ parameter is the field name.
  */
 #define PLACER_INTEGER(_NAME_) \
-        sizeof(placer_INTEGER_t)
+        #_NAME_
 
 /**
  * @def PLACER_INTEGER64(_NAME_)
@@ -54,7 +53,7 @@
  * @a _NAME_ parameter is the field name.
  */
 #define PLACER_INTEGER64(_NAME_) \
-        sizeof(placer_INTEGER64_t)
+        #_NAME_
 
 /**
  * @def PLACER_TEXT(_NAME_, _ITEMS_)
@@ -63,7 +62,7 @@
  * @a _ITEMS_ parameters is the number of placer_TEXT_t elements in the field.
  */
 #define PLACER_TEXT(_NAME_, _ITEMS_) \
-        (sizeof(placer_TEXT_t) * (_ITEMS_))
+        #_NAME_
 
 /**
  * @def PLACER_TEXT16(_NAME_, _ITEMS_)
@@ -72,7 +71,7 @@
  * @a _ITEMS_ parameters is the number of placer_TEXT16_t elements in the field.
  */
 #define PLACER_TEXT16(_NAME_, _ITEMS_) \
-        (sizeof(placer_TEXT16_t) * (_ITEMS_))
+        #_NAME_
 
 /**
  * @def PLACER_FIELD(_CONSTRAINTS_)
@@ -91,8 +90,8 @@
 
 /**
  * @def PLACER_END(_CONSTRAINTS_)
- * This macro generates the end matter for an array that contains
- * the sizeof in bytes of every element in a schema.
+ * This macro generates the end matter for a schema name array.
+ * @a _CONSTRAINTS_ is any additional contraints on the schema.
  */
 #define PLACER_END(_CONSTRAINTS_) \
     };

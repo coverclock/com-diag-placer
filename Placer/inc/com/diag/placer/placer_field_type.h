@@ -6,7 +6,7 @@
  * Copyright 2020 Digital Aggregates Corporation, Colorado, USA.
  * Licensed under the terms in LICENSE.txt.
 
- * The Array Type feature generates an array of SQLite3 field (not data)
+ * The Field Type feature generates an array of SQLite3 field (not data)
  * type numbers from a schema. Note that there are no SQLITE_INTEGER64 or
  * SQLITE_TEXT16 field types.
  *
@@ -24,7 +24,7 @@
  * @a _STRUCTURE_ is the schema name.
  */
 #define PLACER_SCHEMA(_STRUCTURE_) \
-    static const int PLACER_ARRAY_struct_##_STRUCTURE_##_TYPE[] = {
+    static const int PLACER_struct_##_STRUCTURE_##_FIELD_TYPE[] = {
 
 /**
  * @def PLACER_BLOB(_NAME_, _ITEMS_)

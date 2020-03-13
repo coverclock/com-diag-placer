@@ -208,7 +208,7 @@ extern char * placer_sql_formata(size_t size, const char * format, ...);
  * @param src points to the data provided by SQLite3.
  * @param items it the number of bytes in the BLOB field.
  */
-extern int placer_exec_BLOB_import(placer_BLOB_t * dest, const char * src, size_t items);
+extern int placer_BLOB_exec_import(placer_BLOB_t * dest, const char * src, size_t items);
 
 /**
  * Import a FLOAT from a characcter pointer provided by SQLite3 to the exec
@@ -216,7 +216,7 @@ extern int placer_exec_BLOB_import(placer_BLOB_t * dest, const char * src, size_
  * @param dest points to the FLOAT field in the schema strructure.
  * @param src points to the data provided by SQLite3.
  */
-extern int placer_exec_FLOAT_import(placer_FLOAT_t * dest, const char * src);
+extern int placer_FLOAT_exec_import(placer_FLOAT_t * dest, const char * src);
 
 /**
  * Import a INTEGER from a characcter pointer provided by SQLite3 to the exec
@@ -224,7 +224,7 @@ extern int placer_exec_FLOAT_import(placer_FLOAT_t * dest, const char * src);
  * @param dest points to the INTEGER field in the schema strructure.
  * @param src points to the data provided by SQLite3.
  */
-extern int placer_exec_INTEGER_import(placer_INTEGER_t * dest, const char * src);
+extern int placer_INTEGER_exec_import(placer_INTEGER_t * dest, const char * src);
 
 /**
  * Import a INTERGER64 from a characcter pointer provided by SQLite3 to the exec
@@ -232,7 +232,7 @@ extern int placer_exec_INTEGER_import(placer_INTEGER_t * dest, const char * src)
  * @param dest points to the INTEGER64 field in the schema strructure.
  * @param src points to the data provided by SQLite3.
  */
-extern int placer_exec_INTEGER64_import(placer_INTEGER64_t * dest, const char * src);
+extern int placer_INTEGER64_exec_import(placer_INTEGER64_t * dest, const char * src);
 
 /**
  * Import a TEXT string from a characcter pointer provided by SQLite3 to the exec
@@ -243,7 +243,7 @@ extern int placer_exec_INTEGER64_import(placer_INTEGER64_t * dest, const char * 
  * @param src points to the data provided by SQLite3.
  * @param items it the number of UTF-8 charactgers in the TEXT field.
  */
-extern int placer_exec_TEXT_import(placer_TEXT_t * dest, const char * src, size_t items);
+extern int placer_TEXT_exec_import(placer_TEXT_t * dest, const char * src, size_t items);
 
 /**
  * Import a TEXT16 string from a characcter pointer provided by SQLite3 to the
@@ -254,7 +254,7 @@ extern int placer_exec_TEXT_import(placer_TEXT_t * dest, const char * src, size_
  * @param src points to the data provided by SQLite3.
  * @param items it the number of UTF-16 characters (NOT BYTES) in the TEXT16 field.
  */
-extern int placer_exec_TEXT16_import(placer_TEXT16_t * dest, const char * src, size_t items);
+extern int placer_TEXT16_exec_import(placer_TEXT16_t * dest, const char * src, size_t items);
 
 /**
  * Implement a generic SQLite exec callback useful for debugging.
@@ -264,7 +264,7 @@ extern int placer_exec_TEXT16_import(placer_TEXT16_t * dest, const char * src, s
  * @param keyword is the array of column names provided by SQLite.
  * @return always SQLITE_OK (0).
  */
-extern int placer_exec_generic_callback(void * vp, int ncols, char ** value, char ** keyword);
+extern int placer_generic_exec_callback(void * vp, int ncols, char ** value, char ** keyword);
 
 /**
  * A convenience function that calls sqlite3_exec(), emits any error messages to standard
@@ -301,7 +301,7 @@ extern sqlite3_stmt * placer_prepare(sqlite3 * db, const char * sql);
  * @param vp is a pointer to a generic callback structure or NULL.
  * @return always SQLITE_OK (0).
  */
-extern int placer_steps_generic_callback(sqlite3_stmt * sp, void * vp);
+extern int placer_generic_steps_callback(sqlite3_stmt * sp, void * vp);
 
 /**
  * Incrementally runs the SQLite3 step function with the provided statement
