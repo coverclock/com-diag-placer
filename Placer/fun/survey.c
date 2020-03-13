@@ -192,7 +192,7 @@ static int derive(sqlite3 * db)
     int fd = -1;
     FILE * fp = (FILE *)0;
     sqlite3_stmt * sp = (sqlite3_stmt *)0;
-    static const char SELECTPATH[] = "SELECT * FROM Path";
+    static const char SELECTPATH[] = "SELECT * FROM Path;";
 #include "com/diag/placer/placer_sql_replace.h"
 #include "SchemaNode.h"
 #include "com/diag/placer/placer_end.h"
@@ -201,7 +201,7 @@ static int derive(sqlite3 * db)
 #include "SchemaNode.h"
 #include "com/diag/placer/placer_end.h"
     placer_generic_callback_t state = PLACER_GENERIC_CALLBACK_INITIALIZER;
-    static const char SELECTNODE[] = "SELECT * FROM Node";
+    static const char SELECTNODE[] = "SELECT * FROM Node;";
     size_t size = 0;
 
     do {
@@ -912,6 +912,8 @@ static int create(sqlite3 * db)
             xc = -181;
             break;
         }
+
+fprintf(stderr, "CREATE=\"%s\"\n", PLACER_struct_Node_SQL_CREATE);
 
         sp = placer_prepare(db, PLACER_struct_Node_SQL_CREATE);
         if (sp == (sqlite3_stmt *)0) {
