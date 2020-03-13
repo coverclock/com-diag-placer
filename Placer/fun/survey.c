@@ -171,6 +171,10 @@ static int derive_select_path_callback(sqlite3_stmt * sp, void * vp)
         node.devmajor = path.devmajor;
         node.devminor = path.devminor;
         node.ctime = path.ctime;
+
+        if (Verbose) {
+            placer_struct_Node_display(stdout, &node);
+        }
         
         size = fwrite(&node, sizeof(node), 1, fp);
         if (size != 1) {
