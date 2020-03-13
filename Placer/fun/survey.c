@@ -350,42 +350,70 @@ static int derive(sqlite3 * db)
 static int reveal(sqlite3 * db, ino_t ino)
 {
     int xc = 0;
-    sqlite3_stmt * sp = (sqlite3_stmt *)0;
-    static const char SELECT[] = "SELECT * FROM Path WHERE (ino = ?);";
     int rc = 0;
-    struct Path data[8];
-    struct Path * pointers[] = { &data[0], &data[1], &data[2], &data[3], &data[4], &data[5], &data[6], &data[7], (struct Path *)0 };
-    struct Path ** current = &pointers[0];
+    sqlite3_stmt * sp = (sqlite3_stmt *)0;
     int ii = 0;
- 
+
     do {
-
-        /*
-         * Select the row from the database.
-         */
-
-        sp = placer_prepare(db, SELECT);
-        if (sp == (sqlite3_stmt *)0) {
-            xc = -190;
-            break;
-        }
-
-        rc = sqlite3_bind_int(sp, 1, ino);
-        if (rc != SQLITE_OK) {
-            xc = -191;
-            break;
-        }
-
-        rc = placer_steps(sp, placer_struct_Path_steps_callback, &current);
-        if (rc != SQLITE_OK) {
-            xc = -192;
-            break;
-        }
 
         printf("INODE: %lld\n", (long long)ino);
 
-        for (ii = 0; &pointers[ii] != current; ++ii) {
-            placer_struct_Path_display(stdout, &data[ii]);
+        {
+            static const char SELECT[] = "SELECT * FROM Node WHERE (ino = ?);";
+            struct Node data[8];
+            struct Node * pointers[] = { &data[0], &data[1], &data[2], &data[3], &data[4], &data[5], &data[6], &data[7], (struct Node *)0 };
+            struct Node ** current = &pointers[0];
+
+            sp = placer_prepare(db, SELECT);
+            if (sp == (sqlite3_stmt *)0) {
+                xc = -190;
+                break;
+            }
+
+            rc = sqlite3_bind_int(sp, 1, ino);
+            if (rc != SQLITE_OK) {
+                xc = -191;
+                break;
+            }
+
+            rc = placer_steps(sp, placer_struct_Node_steps_callback, &current);
+            if (rc != SQLITE_OK) {
+                xc = -192;
+                break;
+            }
+
+            for (ii = 0; &pointers[ii] != current; ++ii) {
+                placer_struct_Node_display(stdout, &data[ii]);
+            }
+        }
+
+        {
+            static const char SELECT[] = "SELECT * FROM Path WHERE (ino = ?);";
+            struct Path data[8];
+            struct Path * pointers[] = { &data[0], &data[1], &data[2], &data[3], &data[4], &data[5], &data[6], &data[7], (struct Path *)0 };
+            struct Path ** current = &pointers[0];
+
+            sp = placer_prepare(db, SELECT);
+            if (sp == (sqlite3_stmt *)0) {
+                xc = -190;
+                break;
+            }
+
+            rc = sqlite3_bind_int(sp, 1, ino);
+            if (rc != SQLITE_OK) {
+                xc = -191;
+                break;
+            }
+
+            rc = placer_steps(sp, placer_struct_Path_steps_callback, &current);
+            if (rc != SQLITE_OK) {
+                xc = -192;
+                break;
+            }
+
+            for (ii = 0; &pointers[ii] != current; ++ii) {
+                placer_struct_Path_display(stdout, &data[ii]);
+            }
         }
 
     } while (0);

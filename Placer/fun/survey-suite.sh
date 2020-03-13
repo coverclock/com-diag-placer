@@ -15,12 +15,12 @@ rm ${OUT}/tmp/SURVEY_TEST_FILE_1
 survey -D ${OUT}/sql/survey.db -r -v .
 survey -D ${OUT}/sql/survey.db -v -6
 survey -D ${OUT}/sql/survey.db -v -0
+survey -D ${OUT}/sql/survey.db -v -9
 survey -D ${OUT}/sql/survey.db -7 -P $(realpath ${OUT}/tmp/SURVEY_TEST_FILE_2)
 survey -D ${OUT}/sql/survey.db -7 -P $(realpath ${OUT}/tmp/SURVEY_TEST_FILE_3)
 survey -D ${OUT}/sql/survey.db -7 -P $(realpath ${OUT}/tmp/SURVEY_TEST_FILE_4)
 survey -D ${OUT}/sql/survey.db -7 -P $(realpath ${OUT}/tmp/SURVEY_TEST_FILE_5)
 survey -D ${OUT}/sql/survey.db -8 -I $(ls -i ${OUT}/tmp/SURVEY_TEST_FILE_2 | cut -d ' ' -f 1)
-survey -D ${OUT}/sql/survey.db -v -9
 rm ${OUT}/tmp/SURVEY_TEST_FILE_2
 rm ${OUT}/tmp/SURVEY_TEST_FILE_3
 rm ${OUT}/tmp/SURVEY_TEST_FILE_4
