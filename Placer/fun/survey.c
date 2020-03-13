@@ -319,7 +319,6 @@ static int derive(sqlite3 * db)
         xc = -220;
     }
 
-#if 0
     if (fd < 0) {
         /* Do nothing. */
     } else if (unlink(temporary) == 0) {
@@ -328,7 +327,6 @@ static int derive(sqlite3 * db)
         diminuto_perror(temporary);
         xc = SQLITE_ERROR;
     }
-#endif
 
     if (temporary != (char *)0) {
         free(temporary);
