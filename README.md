@@ -195,9 +195,11 @@ system starting at a specified location.
 * PLACER_FINAL(_CONSTRAINTS_) - The ending of any field that is the last field, adding _CONSTRAINTS_ constraints.
 * PLACER_END(_CONSTRAINTS_) - The end matter for the schema, adding _CONSTRAINTS_ contraints.
 
-# Schema Example
+# Schema Examples
 
-    PLACER_SCHEMA(Schema)
+## Schema Path
+
+    PLACER_SCHEMA(Path)
     PLACER_TEXT(path, PATH_MAX) PLACER_FIELD(PRIMARY KEY)
     PLACER_TEXT16(type, sizeof("'")) PLACER_FIELD()
     PLACER_INTEGER64(nlink) PLACER_FIELD()
@@ -214,6 +216,21 @@ system starting at a specified location.
     PLACER_INTEGER64(ctime) PLACER_FIELD()
     PLACER_BLOB(status, sizeof(struct stat)) PLACER_FIELD()
     PLACER_INTEGER(mark) PLACER_FINAL()
+    PLACER_END()
+
+## Schema Node
+
+    PLACER_SCHEMA(Node)
+    PLACER_INTEGER64(ino) PLACER_FIELD(PRIMARY KEY)
+    PLACER_INTEGER64(nlink) PLACER_FIELD()
+    PLACER_INTEGER(uid) PLACER_FIELD()
+    PLACER_INTEGER(gid) PLACER_FIELD()
+    PLACER_INTEGER(mode) PLACER_FIELD()
+    PLACER_INTEGER64(blocks) PLACER_FIELD()
+    PLACER_INTEGER64(size) PLACER_FIELD()
+    PLACER_INTEGER(devmajor) PLACER_FIELD()
+    PLACER_INTEGER(devminor) PLACER_FIELD()
+    PLACER_INTEGER64(ctime) PLACER_FINAL()
     PLACER_END()
 
 # Code Generators
