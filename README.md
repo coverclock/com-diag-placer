@@ -55,95 +55,7 @@ hold the data from a database row, to generate C code describing SQL
 commands, to generate C functions for the binding of structure fields
 to SQL commands like INSERT and REPLACE, and C functions to import data
 from SQL operations like SELECT.
-
-# Functional Tests Using the Simpler Exec Approach
-
-Set up the PATH, LD_LIBRARY_PATH, and other environmental variables in the
-context of your current shell.
-
-    ./out/host/bin/setup
-
-Create a database, walk the file system tree starting at some convenient
-place, and INSERT the files encountered along with their metadata into
-the database, using placer_exec(). The full path name of the file is used
-as the primary index. You can start at / root too, but it is likely
-to take a long time. You can drop the -v command line flag for less
-output and to run a lot faster too.
-
-    cp /dev/null ./TEST_FILE
-    census -D out/host/sql/census.db -c -i -v .
-
-Mark all of the entries in the database.
-
-    census -D out/host/sql/census.db -v -5
-
-Update an existing database by walking the file system and doing a REPLACE
-of the files encountered with their metadata, using placer_exec().
-.
-
-    rm ./TEST_FILE
-    census -D out/host/sql/census.db -r -v .
-
-Delete all of the entries in the database that are marked. This deletes
-the entries that are stale.
-
-    census -D out/host/sql/census.db -v -6
-
-Dump the contents of the database. If you drop the -v command line flag
-you just get a count of the number of items in the database.
-
-    census -D out/host/sql/census.db -v -0
-
-# Functional Tests Using the More Powerful Steps Approach
-
-Set up the PATH, LD_LIBRARY_PATH, and other environmental variables in the
-context of your current shell.
-
-    ./out/host/bin/setup
-
-Create a database, walk the file system tree starting at some convenient
-place, and INSERT the files encountered along with their metadata into the
-database, using placer_steps(). The full path name of the file is used as
-the primary index. You can start at / root too, but it is likely to take
-a long time. You can drop the -v command line flag for less output and
-to run a lot faster too.
-
-    cp /dev/null ./TEST_FILE
-    survey -D out/host/sql/survey.db -c -i -v .
-
-Mark all of the entries in the database.
-
-    survey -D out/host/sql/survey.db -v -5
-
-Update an existing database by walking the file system and doing a REPLACE
-of the files encountered with their metadata, using placer_steps().
-
-    rm ./TEST_FILE
-    survey -D out/host/sql/survey.db -r -v .
-
-Delete all of the entries in the database that are marked. This deletes
-the entries that are stale.
-
-    survey -D out/host/sql/survey.db -v -6
-
-Dump the contents of the database. If you drop the -v command line flag
-you just get a count of the number of items in the database.
-
-    survey -D out/host/sql/survey.db -v -0
-
-Display the entries in the database that have the specified path name.
-There should be at most one.
-
-    survey -D out/host/sql/survey.db -7 -P $(realpath ./doxygen.cf)
-
-Display the entries in the database that have the specified inode number.
-You can find out the inode number of a file using for example "ls -i
-./doxygen.cf".  There may be zero to many, depending on your fondness
-for hard links, up to the limit of the buffer in the application, which
-is eight.
-
-    survey -D out/host/sql/survey.db -8 -I $(ls -i ./doxygen.cf | cut -d ' ' -f 1)
-
+    
 # Targets
 
 "Rhodium"    
@@ -228,24 +140,28 @@ expects it, some minor Makefile hacking might be required.)
     make depend
     make all
 
-Run the unit tests and functional tests.
+# Unit Tests
+
+Run the unit test.
 
     cd ~/src/com-diag-placer/Placer
     . out/host/bin/setup
     make sanity
-    make functional
 
 # Functional Tests
 
-* census - file system walker with tests using placer_exec().
-* survey - file system walker with tests using placer_steps().
+There are two functional tests, census and survey, and each have a shell
+script, census-suite and survey-suite, that runs a suite of tests using
+them.  The census functional test program uses the simpler text-based
+sqlite3_exec() approach. The survey functional test program uses the
+more flexible sqlite3_steps() approach. Both functional tests implement
+command line options that select a variety of subtests to run based on
+one or more tables built by the functional test as it walks the file
+system starting at a specified location.
 
-# Unit Tests
-
-Preceed with . out/host/bin/setup to setup PATH etc.
-
-* make functional - these tests run in just a few minutes.
-* make sanity - these tests run in just a minute or two.
+    cd ~/src/com-diag-placer/Placer
+    . out/host/bin/setup
+    make functional
 
 # Schema Operators
 
