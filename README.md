@@ -163,6 +163,25 @@ system starting at a specified location.
     . out/host/bin/setup
     make functional
 
+## census-suite
+
+1. census -D CENSUSDATABASE -c -i -v ROOT # Create the database CENSUSDATABASE with table Census. Walk the file system starting at ROOT. Insert paths found into the database in table Census. Be verbose.
+2. census -D CENSUSDATABASE -v -5 # Mark every entry in the database.
+3. census -D CENSUSDATABASE -r -v ROOT # Walk the file system starting at ROOT. Replace or insert paths found into the database.
+4. census -D CENSUSDATABASE -v -6 # Remove every marked entry in the database.
+5. census -D CENSUSDATABASE -v -0 # Display every path entry in the database.
+
+## survey-suite
+
+1. survey -D SURVEYDATABASE -c -i -v ROOT # Create the database SURVEYDATABASE with tables Path and Node. Walk the file system starting at ROOT. Insert paths found into the database in table Path. Be verbose.
+2. survey -D SURVEYDATABASE -v -5 # Mark every entry in the database.
+3. survey -D SURVEYDATABASE -r -v ROOT # Walk the file system starting at ROOT. Replace or insert paths found into the database.
+4. survey -D SURVEYDATABASE -v -6 # Remove every marked entry in the database.
+5. survey -D SURVEYDATABASE -v -0 # Display every path entry in the database.
+6. survey -D SURVEYDATABASE -v -9 # For every path entry in the database write a node entry in table Node.
+7. survey -D SURVEYDATABASE -7 -P PATH # Display entry for PATH in the Path table.
+8. survey -D SURVEYDATABASE -8 -I INODE # Display entry for INODE in the Path or Node tables.
+
 # Schema Operators
 
 * PLACER_SCHEMA(_STRUCTURE_) - The front matter for a schema named _STRUCTURE_.
