@@ -45,6 +45,8 @@ int placer_struct_##_STRUCTURE_##_steps_callback(sqlite3_stmt * sp, void * vp) {
     do { \
         if (pp == (struct _STRUCTURE_ *)0) { break; } \
         count = sqlite3_column_count(sp); \
+        name = sqlite3_column_table_name(sp, 0); \
+        if (strcmp(name, #_STRUCTURE_) != 0) { break; }
 
 /**
  * @def PLACER_BLOB(_NAME_, _ITEMS_)

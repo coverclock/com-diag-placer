@@ -28,8 +28,10 @@
 #define PLACER_SCHEMA(_STRUCTURE_) \
 int placer_struct_##_STRUCTURE_##_stmt_bind(sqlite3_stmt * sp, const struct _STRUCTURE_ * pp) { \
     int rc = SQLITE_ERROR; \
-    int ii = 0; \
     int ll = 0; \
+    int ii = 0; \
+    const char * name = (const char *)0; \
+    int bc = SQLITE_ERROR; \
     do { \
         ll = sqlite3_bind_parameter_count(sp);
 
@@ -41,9 +43,11 @@ int placer_struct_##_STRUCTURE_##_stmt_bind(sqlite3_stmt * sp, const struct _STR
  */
 #define PLACER_BLOB(_NAME_, _ITEMS_) \
         { \
-            if (ii >= ll) { rc = SQLITE_ERROR; break; } \
+            if (ii >= ll) { break; } \
             ii += 1; \
-            if ((rc = sqlite3_bind_blob(sp, ii, pp->_NAME_, (_ITEMS_) * sizeof(placer_BLOB_t), (placer_bind_callback_t *)0)) != SQLITE_OK) { break; } \
+            name = sqlite3_bind_parameter_name(sp, ii); \
+            if (strcmp(name + 1, #_NAME_) != 0) { break; } \
+            if ((bc = sqlite3_bind_blob(sp, ii, pp->_NAME_, (_ITEMS_) * sizeof(placer_BLOB_t), (placer_bind_callback_t *)0)) != SQLITE_OK) { rc = bc; break; } \
         }
     
 /**
@@ -53,9 +57,11 @@ int placer_struct_##_STRUCTURE_##_stmt_bind(sqlite3_stmt * sp, const struct _STR
  */
 #define PLACER_FLOAT(_NAME_) \
         { \
-            if (ii >= ll) { rc = SQLITE_ERROR; break; } \
+            if (ii >= ll) { break; } \
             ii += 1; \
-            if ((rc = sqlite3_bind_double(sp, ii, pp->_NAME_)) != SQLITE_OK) { break; } \
+            name = sqlite3_bind_parameter_name(sp, ii); \
+            if (strcmp(name + 1, #_NAME_) != 0) { break; } \
+            if ((bc = sqlite3_bind_double(sp, ii, pp->_NAME_)) != SQLITE_OK) { rc = bc; break; } \
         }
 
 /**
@@ -65,9 +71,11 @@ int placer_struct_##_STRUCTURE_##_stmt_bind(sqlite3_stmt * sp, const struct _STR
  */
 #define PLACER_INTEGER(_NAME_) \
         { \
-            if (ii >= ll) { rc = SQLITE_ERROR; break; } \
+            if (ii >= ll) { break; } \
             ii += 1; \
-            if ((rc = sqlite3_bind_int(sp, ii, pp->_NAME_)) != SQLITE_OK) { break; } \
+            name = sqlite3_bind_parameter_name(sp, ii); \
+            if (strcmp(name + 1, #_NAME_) != 0) { break; } \
+            if ((bc = sqlite3_bind_int(sp, ii, pp->_NAME_)) != SQLITE_OK) { rc = bc; break; } \
         }
 
 /**
@@ -77,9 +85,11 @@ int placer_struct_##_STRUCTURE_##_stmt_bind(sqlite3_stmt * sp, const struct _STR
  */
 #define PLACER_INTEGER64(_NAME_) \
         { \
-            if (ii >= ll) { rc = SQLITE_ERROR; break; } \
+            if (ii >= ll) { break; } \
             ii += 1; \
-            if ((rc = sqlite3_bind_int64(sp, ii, pp->_NAME_)) != SQLITE_OK) { break; } \
+            name = sqlite3_bind_parameter_name(sp, ii); \
+            if (strcmp(name + 1, #_NAME_) != 0) { break; } \
+            if ((bc = sqlite3_bind_int64(sp, ii, pp->_NAME_)) != SQLITE_OK) { rc = bc; break; } \
         }
 
 /**
@@ -90,9 +100,11 @@ int placer_struct_##_STRUCTURE_##_stmt_bind(sqlite3_stmt * sp, const struct _STR
  */
 #define PLACER_TEXT(_NAME_, _ITEMS_) \
         { \
-            if (ii >= ll) { rc = SQLITE_ERROR; break; } \
+            if (ii >= ll) { break; } \
             ii += 1; \
-            if ((rc = sqlite3_bind_text(sp, ii, pp->_NAME_, strnlen(pp->_NAME_, (_ITEMS_)) * sizeof(placer_TEXT_t), (placer_bind_callback_t *)0)) != SQLITE_OK) { break; } \
+            name = sqlite3_bind_parameter_name(sp, ii); \
+            if (strcmp(name + 1, #_NAME_) != 0) { break; } \
+            if ((bc = sqlite3_bind_text(sp, ii, pp->_NAME_, strnlen(pp->_NAME_, (_ITEMS_)) * sizeof(placer_TEXT_t), (placer_bind_callback_t *)0)) != SQLITE_OK) { rc = bc; break; } \
         }
 
 /**
@@ -103,9 +115,11 @@ int placer_struct_##_STRUCTURE_##_stmt_bind(sqlite3_stmt * sp, const struct _STR
  */
 #define PLACER_TEXT16(_NAME_, _ITEMS_) \
         { \
-            if (ii >= ll) { rc = SQLITE_ERROR; break; } \
+            if (ii >= ll) { break; } \
             ii += 1; \
-            if ((rc = sqlite3_bind_text16(sp, ii, pp->_NAME_, placer_TEXT16_length(pp->_NAME_, (_ITEMS_)) * sizeof(placer_TEXT16_t), (placer_bind_callback_t *)0)) != SQLITE_OK) { break; } \
+            name = sqlite3_bind_parameter_name(sp, ii); \
+            if (strcmp(name + 1, #_NAME_) != 0) { break; } \
+            if ((bc = sqlite3_bind_text16(sp, ii, pp->_NAME_, placer_TEXT16_length(pp->_NAME_, (_ITEMS_)) * sizeof(placer_TEXT16_t), (placer_bind_callback_t *)0)) != SQLITE_OK) { rc = bc; break; } \
         }
 
 /**

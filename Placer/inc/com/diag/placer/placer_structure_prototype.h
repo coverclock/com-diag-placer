@@ -22,7 +22,7 @@
  * @a _STRUCTURE_ is the schema name.
  */
 #define PLACER_SCHEMA(_STRUCTURE_) \
-    extern void placer_struct_##_STRUCTURE_##_display(FILE * fp, const struct _STRUCTURE_ * pp);
+    extern void placer_struct_##_STRUCTURE_##_display(FILE * fp, const struct _STRUCTURE_ * pp)
 
 /**
  * @def PLACER_BLOB(_NAME_, _ITEMS_)

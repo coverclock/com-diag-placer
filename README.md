@@ -324,6 +324,9 @@ F. Yergeau, "UTF-8, a transformation format of ISO 10646", *RFC 3629*, 2003-11,
 Chip Overclock, "When Learning By Doing Goes To Eleven", 2020-03,
 <https://coverclock.blogspot.com/2020/03/when-learning-by-doing-goes-to-eleven.html>
 
+Chip Overclock, "Placer: X Macros, Sqlite, and Schema", 2020-03,
+<https://coverclock.blogspot.com/2020/03/placer-x-macros-sqlite-and-schema.html>
+
 # Soundtrack
 
 <https://www.youtube.com/playlist?list=PLd7Yo1333iA8enrRacXyINR3oUbKBWDSH>
