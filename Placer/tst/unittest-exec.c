@@ -56,8 +56,8 @@ int main(void)
         placer_INTEGER_t result = 0xa5a5a5a5;
 
         TEST();
-        EXPECT(placer_INTEGER_exec_import(&result, "INVALID") == SQLITE_ERROR);
-        EXPECT(placer_INTEGER_exec_import(&result, "1NV8L1D") == SQLITE_ERROR);
+        EXPECT(placer_INTEGER_exec_import(&result, "INVALID") != SQLITE_OK);
+        EXPECT(placer_INTEGER_exec_import(&result, "1NV8L1D") != SQLITE_OK);
         EXPECT(placer_INTEGER_exec_import(&result, "0") == SQLITE_OK);
         EXPECT(result == 0);
         EXPECT(placer_INTEGER_exec_import(&result, "2147483647") == SQLITE_OK);
@@ -71,8 +71,8 @@ int main(void)
         placer_INTEGER64_t result = 0xa5a5a5a5a5a5a5a5LL;
 
         TEST();
-        EXPECT(placer_INTEGER64_exec_import(&result, "INVALID") == SQLITE_ERROR);
-        EXPECT(placer_INTEGER64_exec_import(&result, "1NV8L1D") == SQLITE_ERROR);
+        EXPECT(placer_INTEGER64_exec_import(&result, "INVALID") != SQLITE_OK);
+        EXPECT(placer_INTEGER64_exec_import(&result, "1NV8L1D") != SQLITE_OK);
         EXPECT(placer_INTEGER64_exec_import(&result, "0") == SQLITE_OK);
         EXPECT(result == 0);
         EXPECT(placer_INTEGER64_exec_import(&result, "9223372036854775807") == SQLITE_OK);
@@ -86,8 +86,8 @@ int main(void)
         placer_FLOAT_t result = 165.165;
 
         TEST();
-        EXPECT(placer_FLOAT_exec_import(&result, "INVALID") == SQLITE_ERROR);
-        EXPECT(placer_FLOAT_exec_import(&result, "1NV8L1D") == SQLITE_ERROR);
+        EXPECT(placer_FLOAT_exec_import(&result, "INVALID") != SQLITE_OK);
+        EXPECT(placer_FLOAT_exec_import(&result, "1NV8L1D") != SQLITE_OK);
         EXPECT(placer_FLOAT_exec_import(&result, "0") == SQLITE_OK);
         EXPECT(result == 0.0);
         EXPECT(placer_FLOAT_exec_import(&result, "0.0") == SQLITE_OK);
@@ -244,7 +244,7 @@ int main(void)
 
         COMMENT("4");        
         rc = placer_struct_UnitTestSchema_exec_callback((void *)&here, 6, value[3], keyword);
-        ASSERT(rc == SQLITE_ERROR);
+        ASSERT(rc != SQLITE_OK);
         EXPECT(here = &(gather[3]));
 
         STATUS();

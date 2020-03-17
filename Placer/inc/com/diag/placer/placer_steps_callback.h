@@ -30,7 +30,7 @@
  */
 #define PLACER_SCHEMA(_STRUCTURE_) \
 int placer_struct_##_STRUCTURE_##_steps_callback(sqlite3_stmt * sp, void * vp) { \
-    int rc = SQLITE_ERROR; \
+    int rc = SQLITE_ABORT; \
     struct _STRUCTURE_ *** ip = (struct _STRUCTURE_ ***)0; \
     struct _STRUCTURE_ ** ap = (struct _STRUCTURE_ **)0; \
     struct _STRUCTURE_ * pp = (struct _STRUCTURE_ *)0; \

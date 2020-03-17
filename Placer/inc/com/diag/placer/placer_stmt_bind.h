@@ -27,11 +27,11 @@
  */
 #define PLACER_SCHEMA(_STRUCTURE_) \
 int placer_struct_##_STRUCTURE_##_stmt_bind(sqlite3_stmt * sp, const struct _STRUCTURE_ * pp) { \
-    int rc = SQLITE_ERROR; \
+    int rc = SQLITE_ABORT; \
     int ll = 0; \
     int ii = 0; \
     const char * name = (const char *)0; \
-    int bc = SQLITE_ERROR; \
+    int bc = SQLITE_ABORT; \
     do { \
         ll = sqlite3_bind_parameter_count(sp);
 
