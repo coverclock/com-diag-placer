@@ -65,7 +65,11 @@ there are lots of reasons for the code where these checks are performed
 to be legitimately bypassed or otherwise not invoked.  So a mistake like
 altering a schema field or adding a new field and using the resulting
 code against an existing database can go undetected for some time unless
-careful testing is performed.
+careful testing is performed. I tested these error paths by creating the
+database using the unaltered survey functional test, altering the Path
+schema in different ways (and sometimes altering survey if necessary),
+rebuilding, and running survey subtest 9 on the same database. (Yeah: I
+should have a fixed unit test.)
 
 # Targets
 
