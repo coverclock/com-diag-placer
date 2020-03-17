@@ -91,15 +91,7 @@ Linux 4.13.0
 gcc 5.4.0    
 sqlite 3.22.0    
 
-# Notes
-
-On Rhodium, I installed SQLite3 3.30 manually by downloading and
-building it and installing the build artifacts in the default root
-of /usr/local. On Nickel, I just installed the Debian sqlite3 and
-libsqlite3-dev 3.22 packages which places the binary, header, and library
-in the usual locations. But the same Makefile rules worked for me in
-either case, since on Nickel the build found the necessary components
-in the standard locations. Your mileage may vary.
+# Issues
 
 ARMv8 valgrind(1) seems to be broken in the Debian package that installs
 on Rhodium. I've been successfully running it instead on Nickel, even
@@ -116,6 +108,11 @@ to support it for business reasons. But here I am. SQLite3 supports both
 UTF-8 and UTF-16. I've written some code for this project to do basic
 TEXT16 stuff as implemented by SQLite3, but I haven't yet given up on
 using existing libraries like libunistring which GNU provides.
+
+On Rhodium, the SQLite in the Debian package does not appear to have
+been build with the SQLITE_ENABLE_COLUMN_METADATA option enabled. This
+eliminates the availability of the sqlite3_column_table_name() function
+(and others).
 
 # Dependencies
 
