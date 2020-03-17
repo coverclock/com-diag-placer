@@ -1,6 +1,6 @@
 # com-diag-placer
 
-Musings with SQLite,  X-Macros, and UTF-16 (A WORK IN PROGRESS)
+Musings with SQLite,  X-Macros, and UTF-16.
 
 # Copyright
 
