@@ -163,7 +163,7 @@ expects it, some minor Makefile hacking might be required.)
 
 # Unit Tests
 
-Run the unit test.
+Run the unit tests.
 
     cd ~/src/com-diag-placer/Placer
     . out/host/bin/setup
