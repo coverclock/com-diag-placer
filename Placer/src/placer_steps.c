@@ -86,7 +86,7 @@ int placer_generic_steps_callback(sqlite3_stmt * sp, void * vp) {
 int placer_steps(sqlite3_stmt * sp, placer_steps_callback_t * cp, void * vp)
 {
     int rc = SQLITE_ERROR;
-    int tc = SQLITE_ERROR;
+    int fc = SQLITE_ERROR;
     int ii = 0;
 
     while (!0) {
@@ -103,7 +103,6 @@ int placer_steps(sqlite3_stmt * sp, placer_steps_callback_t * cp, void * vp)
 
         if (rc == SQLITE_OK) {
             rc = SQLITE_ERROR;
-            placer_error(rc);
             break;
         }
 
@@ -113,24 +112,25 @@ int placer_steps(sqlite3_stmt * sp, placer_steps_callback_t * cp, void * vp)
         }
 
         if (rc != SQLITE_ROW) {
-            placer_error(rc);
             break;
         }
 
         if (cp != (placer_steps_callback_t *)0) {
             rc = (*cp)(sp, vp);
             if (rc != SQLITE_OK) {
-                placer_error(rc);
                 break;
             }
         }
 
     } 
 
-    tc = sqlite3_finalize(sp);
-    if (tc != SQLITE_OK) {
-        placer_error(tc);
-        rc = tc;
+    fc = sqlite3_finalize(sp);
+    if (fc != SQLITE_OK) {
+        rc = fc;
+    }
+
+    if (rc != SQLITE_OK) {
+        placer_error(rc);
     }
 
     return rc;
