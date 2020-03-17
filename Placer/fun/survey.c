@@ -486,7 +486,7 @@ static int mark(sqlite3 * db)
     sqlite3_stmt * sp = (sqlite3_stmt *)0;
     static const char * SQL[] = {
         "SELECT * FROM Path WHERE mark != 0;",
-        "UPDATE Schema SET mark = 1;",
+        "UPDATE Path SET mark = 1;",
         "SELECT * FROM Path WHERE mark != 0;",
     };
     placer_generic_callback_t state = PLACER_GENERIC_CALLBACK_INITIALIZER;
