@@ -16,6 +16,7 @@
 #include <sqlite3.h>
 #include "placer.h"
 
+#if defined(SQLITE_ENABLE_COLUMN_METADATA)
 /**
  * @def PLACER_SCHEMA(_STRUCTURE_)
  * This macro generates the front matter for a placer_steps() callback
@@ -45,10 +46,39 @@ int placer_struct_##_STRUCTURE_##_steps_callback(sqlite3_stmt * sp, void * vp) {
     do { \
         if (pp == (struct _STRUCTURE_ *)0) { break; } \
         count = sqlite3_column_count(sp); \
-        /* \
         name = sqlite3_column_table_name(sp, 0); \
-        if (strcmp(name, #_STRUCTURE_) != 0) { break; } \
-        */
+        if (strcmp(name, #_STRUCTURE_) != 0) { break; }
+#else
+/**
+ * @def PLACER_SCHEMA(_STRUCTURE_)
+ * This macro generates the front matter for a placer_steps() callback
+ * function that loads the data from a single selected row in a table
+ * into a structure for the schema. The structure is pointed to by an
+ * element in a null-terminated array of structure pointers through which
+ * successive calls to the callback function indexes. Each successive row
+ * is loaded into the next structure until either the selection of rows is
+ * exhausted or the null pointer at the end of the structure pointer array
+ * is reached.
+ * @a _STRUCTURE_ is the schema name.
+ */
+#define PLACER_SCHEMA(_STRUCTURE_) \
+int placer_struct_##_STRUCTURE_##_steps_callback(sqlite3_stmt * sp, void * vp) { \
+    int rc = SQLITE_ABORT; \
+    struct _STRUCTURE_ *** ip = (struct _STRUCTURE_ ***)0; \
+    struct _STRUCTURE_ ** ap = (struct _STRUCTURE_ **)0; \
+    struct _STRUCTURE_ * pp = (struct _STRUCTURE_ *)0; \
+    int count = 0; \
+    int type = 0; \
+    int bytes = 0; \
+    int ii = 0; \
+    const char * name = (const char *)0; \
+    ip = (struct _STRUCTURE_ ***)vp; \
+    ap = *ip; \
+    pp = *ap; \
+    do { \
+        if (pp == (struct _STRUCTURE_ *)0) { break; } \
+        count = sqlite3_column_count(sp);
+#endif
 
 /**
  * @def PLACER_BLOB(_NAME_, _ITEMS_)
