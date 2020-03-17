@@ -119,7 +119,7 @@ TEXT16 stuff as implemented by SQLite3, but I haven't yet given up on
 using existing libraries like libunistring which GNU provides.
 
 On Rhodium, the SQLite in the Debian package does not appear to have
-been build with the SQLITE_ENABLE_COLUMN_METADATA option enabled. This
+been built with the SQLITE_ENABLE_COLUMN_METADATA option enabled. This
 eliminates the availability of the sqlite3_column_table_name() function
 (and others).
 
