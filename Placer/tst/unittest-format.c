@@ -51,7 +51,16 @@ int main(void)
         ss = placer_sql_format(buffer, sizeof(buffer), "SELECT * FROM %s;", "table");
         EXPECT(ss == strnlen(buffer, sizeof(buffer)));
         EXPECT(buffer[ss] == '\0');
-        EXPECT(strcmp("SELECT * FROM table;", buffer) == 0);
+        EXPECT(strncmp("SELECT * FROM table;", buffer, sizeof(buffer)) == 0);
+        STATUS();
+    }
+    {
+        char buffer[sizeof("SELECT")] = { '\0', };
+        size_t ss;
+        TEST();
+        ss = placer_sql_format(buffer, sizeof(buffer), "SELECT * FROM %s;", "table");
+        EXPECT(ss >= sizeof(buffer));
+        EXPECT(strncmp("SELECT", buffer, sizeof(buffer)) == 0);
         STATUS();
     }
     {
