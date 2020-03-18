@@ -1,6 +1,6 @@
 # com-diag-placer
 
-Musings with SQLite,  X-Macros, and UTF-16.
+Applying X Macros To Generate C Code To Implement SQLite Schema
 
 # Copyright
 
