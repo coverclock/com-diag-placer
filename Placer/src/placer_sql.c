@@ -11,7 +11,6 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdarg.h>
 #include <string.h>
 #include <errno.h>
 #include "sqlite3.h"
@@ -19,6 +18,33 @@
 #include "com/diag/diminuto/diminuto_fibonacci.h"
 #include "com/diag/placer/placer.h"
 #include "placer.h" /* Private API. */
+
+size_t placer_sql_vformat(char * buffer, size_t size, const char * format, va_list ap)
+{
+    size_t ss = 0;
+
+    if (buffer == (char *)0) {
+        /*  Do nothing. */
+    } else if (size == 0) {
+        /* Do nothing. */
+    } else {
+        ss = vsnprintf(buffer, size, format, ap);
+    }
+
+    return ss;
+}
+
+size_t placer_sql_format(char * buffer, size_t size, const char * format, ...)
+{
+    va_list ap;
+    size_t ss = 0;
+
+    va_start(ap, format);
+    ss = placer_sql_vformat(buffer, size, format, ap);
+    va_end(ap);
+
+    return ss;
+}
 
 char * placer_sql_vformata(size_t size, const char * format, va_list op)
 {
@@ -56,7 +82,7 @@ char * placer_sql_vformata(size_t size, const char * format, va_list op)
             }
 
             va_copy(ap, op);
-            length = vsnprintf(buffer, ss, format, ap);
+            length = placer_sql_vformat(buffer, ss, format, ap);
 
             if (length < ss) {
                 break; 

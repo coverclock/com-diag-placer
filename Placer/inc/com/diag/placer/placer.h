@@ -15,6 +15,7 @@
 
 #include <stdint.h>
 #include <stdio.h>
+#include <stdarg.h>
 #include <sys/types.h>
 #include "sqlite3.h"
 
@@ -173,6 +174,29 @@ extern char * placer_str_expanda(const char * from);
 /*******************************************************************************
  * STRUCTURE QUERY LANGUAGE
  ******************************************************************************/
+
+/**
+ * Format arguments in an vsnprintf(3) manner into a caller-provided 
+ * buffer, If the returned value is size or larger, the resulting string
+ * did not fit in the buffer.
+ * @param buffer points to the buffer.
+ * @param size is the size of the buffer in bytes.
+ * @param format is the snprintf(3) format string.
+ * @param op is the variable length argument list.
+ * @return the size of the formatted string not including the terminating nul.
+ */
+extern size_t placer_sql_vformat(char * buffer, size_t size, const char * format, va_list ap);
+
+/**
+ * Format arguments in an snprintf(3) manner into a caller-provided 
+ * buffer, If the returned value is size or larger, the resulting string
+ * did not fit in the buffer.
+ * @param buffer points to the buffer.
+ * @param size is the size of the buffer in bytes.
+ * @param format is the snprintf(3) format string.
+ * @return the size of the formatted string not including the terminating nul.
+ */
+extern size_t placer_sql_format(char * buffer, size_t size, const char * format, ...);
 
 /**
  * Format arguments in an vsnprintf(3) manner into a dynamically acquired

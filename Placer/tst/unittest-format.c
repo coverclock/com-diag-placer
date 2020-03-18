@@ -23,14 +23,46 @@ int main(void)
     debug = placer_debug(stderr);
 
     {
-        char * pp = (char *)0;
+        size_t ss;
+        TEST();
+        ss = placer_sql_format((char *)0, 0, "SELECT * FROM %s;", "table");
+        EXPECT(ss == 0);
+        STATUS();
+    }
+    {
+        char buffer[64];
+        size_t ss;
+        TEST();
+        ss = placer_sql_format(buffer, 0, "SELECT * FROM %s;", "table");
+        EXPECT(ss == 0);
+        STATUS();
+    }
+    {
+        size_t ss;
+        TEST();
+        ss = placer_sql_format((char *)0, 64, "SELECT * FROM %s;", "table");
+        EXPECT(ss == 0);
+        STATUS();
+    }
+    {
+        char buffer[64] = { '\0', };
+        size_t ss;
+        TEST();
+        ss = placer_sql_format(buffer, sizeof(buffer), "SELECT * FROM %s;", "table");
+        EXPECT(ss == strnlen(buffer, sizeof(buffer)));
+        EXPECT(buffer[ss] == '\0');
+        EXPECT(strcmp("SELECT * FROM table;", buffer) == 0);
+        STATUS();
+    }
+    {
+        char * pp;
         TEST();
         pp = placer_sql_formata(0, "SELECT * FROM %s;", "table");
         EXPECT(pp == (char *)0);
         STATUS();
     }
     {
-        char * pp = (char *)0;
+        char * pp;
         TEST();
         pp = placer_sql_formata(1, "SELECT * FROM %s;", "table");
         ASSERT(pp != (char *)0);
@@ -39,7 +71,7 @@ int main(void)
         STATUS();
     }
     {
-        char * pp = (char *)0;
+        char * pp;
         TEST();
         pp = placer_sql_formata(2, "SELECT * FROM %s;", "table");
         ASSERT(pp != (char *)0);
@@ -48,7 +80,7 @@ int main(void)
         STATUS();
     }
     {
-        char * pp = (char *)0;
+        char * pp;
         TEST();
         pp = placer_sql_formata(512, "SELECT * FROM %s;", "table");
         ASSERT(pp != (char *)0);
@@ -61,4 +93,3 @@ int main(void)
 
     EXIT();
 }
-
