@@ -1,6 +1,6 @@
 # com-diag-placer
 
-Applying X Macros To Generate C Code To Implement SQLite Schema
+Applying X Macros To Generate C Code To Implement SQLite Schema.
 
 # Copyright
 
