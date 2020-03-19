@@ -77,7 +77,7 @@ should have a fixed unit test.)
 Raspberry Pi 4 Model B    
 ARMv8 64-bit    
 Broadcom BCM2711 Cortex-A72 ARMv8 @ 1.5GHz x 4    
-Raspbian 10 "Buster"    
+Raspbian 10 "buster"    
 Linux 4.19.93    
 gcc 8.3.0    
 sqlite 3.30.1    
