@@ -46,11 +46,11 @@ size_t placer_sql_format(char * buffer, size_t size, const char * format, ...)
     return ss;
 }
 
-char * placer_sql_vformata(size_t size, const char * format, va_list op)
+char * placer_sql_vformata(size_t size, const char * format, va_list ap)
 {
     char * buffer = (char *)0;
     int length = 0;
-    va_list ap;
+    va_list np;
     diminuto_fibonacci_state_t state = { 0, };
     diminuto_fibonacci_value_t ff = 0;
     size_t ss = 0;
@@ -81,8 +81,8 @@ char * placer_sql_vformata(size_t size, const char * format, va_list op)
                 break;
             }
 
-            va_copy(ap, op);
-            length = placer_sql_vformat(buffer, ss, format, ap);
+            va_copy(np, ap);
+            length = placer_sql_vformat(buffer, ss, format, np);
 
             if (length < ss) {
                 break; 
