@@ -182,7 +182,7 @@ extern char * placer_str_expanda(const char * from);
  * @param buffer points to the buffer.
  * @param size is the size of the buffer in bytes.
  * @param format is the snprintf(3) format string.
- * @param op is the variable length argument list.
+ * @param ap is the variable length argument list.
  * @return the size of the formatted string not including the terminating nul.
  */
 extern size_t placer_sql_vformat(char * buffer, size_t size, const char * format, va_list ap);
