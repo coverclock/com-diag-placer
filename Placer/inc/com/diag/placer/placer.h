@@ -46,12 +46,12 @@ typedef int64_t placer_INTEGER64_t;
 /**
  * This is the type that Placer uses for SQLite3 TEXT (UTF-8) data.
  */
-typedef unsigned char placer_TEXT_t;
+typedef uint8_t placer_TEXT_t;
 
 /**
  * This is the type that Placer uses for SQLite3 TEXT16 (UTF-16) data.
  */
-typedef unsigned short placer_TEXT16_t;
+typedef uint16_t placer_TEXT16_t;
 
 /*******************************************************************************
  * STRUCTURES
