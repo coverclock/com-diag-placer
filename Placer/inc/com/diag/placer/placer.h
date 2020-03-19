@@ -320,7 +320,7 @@ extern sqlite3_stmt * placer_prepare(sqlite3 * db, const char * sql);
  ******************************************************************************/
 
 /**
- * Implement a generlc SQLite steps callback useful for debugging.
+ * Implement a generic SQLite steps callback useful for debugging.
  * @param sp points to the active statement structure.
  * @param vp is a pointer to a generic callback structure or NULL.
  * @return always SQLITE_OK (0).
