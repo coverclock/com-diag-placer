@@ -83,17 +83,17 @@ typedef struct PlacerGenericCallback {
  ******************************************************************************/
 
 /**
- * THis is the prototype for the callback function for the Placer exec feature.
+ * This is the prototype for the callback function for the Placer exec feature.
  */
 typedef int (placer_exec_callback_t)(void *, int, char **, char **);
 
 /**
- * THis is the prototype for the free function for the Placer bind feature.
+ * This is the prototype for the free function for the Placer bind feature.
  */
 typedef void (placer_bind_callback_t)(void *);
 
 /**
- * THis is the prototype for the callback function for the Placer steps feature.
+ * This is the prototype for the callback function for the Placer steps feature.
  */
 typedef int (placer_steps_callback_t)(sqlite3_stmt *, void *);
 
