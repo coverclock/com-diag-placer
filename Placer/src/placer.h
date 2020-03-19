@@ -5,10 +5,9 @@
 /**
  * @file
  *
- * Copyright 2020 Digital Aggregates Corporation, Colorado, USA<BR>
- * Licensed under the terms in LICENSE.txt<BR>
- * Chip Overclock (coverclock@diag.com)<BR>
- * https://github.com/coverclock/com-diag-placer<BR>
+ * Copyright 2020 Digital Aggregates Corporation, Colorado, USA.
+ * Licensed under the terms in LICENSE.txt.
+ *
  * This defines the private API for Placer.
  */
 
@@ -19,7 +18,7 @@
  ******************************************************************************/
 
 /**
- * This declares the global debug flag.
+ * This is the global debug flag.
  */
 extern FILE * placer_Debug;
 
