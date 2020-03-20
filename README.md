@@ -121,7 +121,11 @@ using existing libraries like libunistring which GNU provides.
 On Rhodium, the SQLite in the Debian package does not appear to have
 been built with the SQLITE_ENABLE_COLUMN_METADATA option enabled. This
 eliminates the availability of the sqlite3_column_table_name() function
-(and others).
+(and others) used in inc/com/diag/placer/placer_steps_callback.h to verify
+that the correct callback is being used with a schema. That header file
+can be conditionally compiled to use this function by defining that symbol
+(for example, by adding -DSQLITE_ENABLE_COLUMN_METADATA=1 to the value
+of CFLAGS in the Makefile).
 
 # Dependencies
 
