@@ -116,7 +116,9 @@ and the wchar_t type), although I've worked in lots of systems that had
 to support it for business reasons. But here I am. SQLite3 supports both
 UTF-8 and UTF-16. I've written some code for this project to do basic
 TEXT16 stuff as implemented by SQLite3, but I haven't yet given up on
-using existing libraries like libunistring which GNU provides.
+using existing libraries like libunistring which GNU provides. Given my
+level of ignorance on the topic, it's likely I've gotten something
+quite wrong.
 
 On Rhodium, the SQLite in the Debian package does not appear to have
 been built with the SQLITE_ENABLE_COLUMN_METADATA option enabled. This
