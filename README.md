@@ -354,6 +354,9 @@ Wikibooks, "C Programming/Serialization",
 F. Yergeau, "UTF-8, a transformation format of ISO 10646", *RFC 3629*, 2003-11,
 <https://www.rfc-editor.org/rfc/pdfrfc/rfc3629.txt.pdf>
 
+A. Zhiyanov, "SQLite is not a toy database",
+<https://antonz.org/sqlite-is-not-a-toy-database/>
+
 # Soundtrack
 
 <https://www.youtube.com/playlist?list=PLd7Yo1333iA8enrRacXyINR3oUbKBWDSH>
