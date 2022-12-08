@@ -4,7 +4,7 @@ Applying X Macros to generate C code to implement SQLite schema.
 
 # Copyright
 
-Copyright 2020 by the Digital Aggregates Corporation, Colorado, USA.
+Copyright 2020-2022 by the Digital Aggregates Corporation, Colorado, USA.
 
 # License
 
