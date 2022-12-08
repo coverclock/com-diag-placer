@@ -2,7 +2,7 @@
 /**
  * @file
  *
- * Copyright 2020 Digital Aggregates Corporation, Colorado, USA<BR>
+ * Copyright 2020-2022 Digital Aggregates Corporation, Colorado, USA<BR>
  * Licensed under the terms in LICENSE.txt<BR>
  * Chip Overclock (coverclock@diag.com)<BR>
  * https://github.com/coverclock/com-diag-placer<BR>
@@ -55,7 +55,7 @@ int placer_generic_steps_callback(sqlite3_stmt * sp, void * vp) {
                 }
                 tt = sqlite3_column_type(sp, ii);
                 if (tt != SQLITE_BLOB) {
-                    vv = sqlite3_column_text(sp, ii);
+                    vv = (const char *)sqlite3_column_text(sp, ii);
                     fputs(vv, pp->fp);
                 } else {
                     size_t current = 0;

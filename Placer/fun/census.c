@@ -2,7 +2,7 @@
 /**
  * @file
  *
- * Copyright 2020 Digital Aggregates Corporation, Colorado, USA<BR>
+ * Copyright 2020-2022 Digital Aggregates Corporation, Colorado, USA<BR>
  * Licensed under the terms in LICENSE.txt<BR>
  * Chip Overclock (coverclock@diag.com)<BR>
  * https://github.com/coverclock/com-diag-placer<BR>
@@ -59,7 +59,6 @@ static int clean(sqlite3 * db)
 {
     int xc = 0;
     int rc = 0;
-    char * sql = (char *)0;
     static const char * SQL[] = {
         "SELECT * FROM Census WHERE mark == 0;",
         "SELECT * FROM Census WHERE mark != 0;",
@@ -98,7 +97,6 @@ static int mark(sqlite3 * db)
 {
     int xc = 0;
     int rc = 0;
-    char * sql = (char *)0;
     placer_generic_callback_t state = PLACER_GENERIC_CALLBACK_INITIALIZER;
     static const char * SQL[] = {
         "SELECT * FROM Census WHERE mark != 0;",
@@ -541,7 +539,6 @@ int main(int argc, char * argv[])
 {
     int xc = 0;
     int rc = 0;
-    int ii = 0;
     sqlite3 * db = (sqlite3 *)0;
     diminuto_fs_walker_t * cp = (diminuto_fs_walker_t *)0;
     const char * database = (const char *)0;

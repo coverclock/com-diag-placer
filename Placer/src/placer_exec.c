@@ -2,7 +2,7 @@
 /**
  * @file
  *
- * Copyright 2020 Digital Aggregates Corporation, Colorado, USA<BR>
+ * Copyright 2020-2022 Digital Aggregates Corporation, Colorado, USA<BR>
  * Licensed under the terms in LICENSE.txt<BR>
  * Chip Overclock (coverclock@diag.com)<BR>
  * https://github.com/coverclock/com-diag-placer<BR>
@@ -77,7 +77,7 @@ int placer_TEXT_exec_import(placer_TEXT_t * dest, const char * src, size_t items
 {
     int rc = SQLITE_OK;
 
-    (void)strncpy(dest, (placer_TEXT_t *)src, items);
+    (void)strncpy((char *)dest, src, items);
 
     return rc;
 }

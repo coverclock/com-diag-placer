@@ -2,7 +2,7 @@
 /**
  * @file
  *
- * Copyright 2020 Digital Aggregates Corporation, Colorado, USA<BR>
+ * Copyright 2020-2022 Digital Aggregates Corporation, Colorado, USA<BR>
  * Licensed under the terms in LICENSE.txt<BR>
  * Chip Overclock <coverclock@diag.com><BR>
  * https://github.com/coverclock/com-diag-placer<BR>
@@ -107,7 +107,7 @@ int main(void)
         to = placer_str_expanda(from);
         ASSERT(to != (char *)0);
         COMMENT("from=\"%s\" to=\"%s\"\n", from, to);
-        EXPECT(strncmp(to, "''''AA''''BB''''CC''''", sizeof(to)) == 0);
+        EXPECT(strcmp(to, "''''AA''''BB''''CC''''") == 0);
         sqlite3_free(to);
         STATUS();
     }
@@ -118,7 +118,7 @@ int main(void)
         to = placer_str_expanda(from);
         ASSERT(to != (char *)0);
         COMMENT("from=\"%s\" to=\"%s\"\n", from, to);
-        EXPECT(strncmp(to, "''''''''''''''''", sizeof(to)) == 0);
+        EXPECT(strcmp(to, "''''''''''''''''") == 0);
         sqlite3_free(to);
         STATUS();
     }

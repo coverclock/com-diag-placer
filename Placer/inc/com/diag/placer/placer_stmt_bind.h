@@ -3,7 +3,7 @@
 /**
  * @file
  *
- * Copyright 2020 Digital Aggregates Corporation, Colorado, USA.
+ * Copyright 2020-2022 Digital Aggregates Corporation, Colorado, USA.
  * Licensed under the terms in LICENSE.txt.
  *
  * The Statement Bind feature generates a bind function from a schema.
@@ -104,7 +104,7 @@ int placer_struct_##_STRUCTURE_##_stmt_bind(sqlite3_stmt * sp, const struct _STR
             ii += 1; \
             name = sqlite3_bind_parameter_name(sp, ii); \
             if (strcmp(name + 1, #_NAME_) != 0) { break; } \
-            if ((bc = sqlite3_bind_text(sp, ii, pp->_NAME_, strnlen(pp->_NAME_, (_ITEMS_)) * sizeof(placer_TEXT_t), (placer_bind_callback_t *)0)) != SQLITE_OK) { rc = bc; break; } \
+            if ((bc = sqlite3_bind_text(sp, ii, (const char *)(pp->_NAME_), strnlen((const char *)(pp->_NAME_), (_ITEMS_)) * sizeof(placer_TEXT_t), (placer_bind_callback_t *)0)) != SQLITE_OK) { rc = bc; break; } \
         }
 
 /**

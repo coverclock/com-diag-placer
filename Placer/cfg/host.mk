@@ -1,4 +1,4 @@
-# Copyright 2020 Digital Aggregates Corporation
+# Copyright 2020-2022 Digital Aggregates Corporation
 # Licensed under the terms in LICENSE.txt
 # author:Chip Overclock
 # mailto:coverclock@diag.com
@@ -23,7 +23,7 @@ KERNELCHAIN			:=
 KERNEL_REV			:=	$(shell uname -r)
 KERNEL_DIR			:=	/lib/modules/$(KERNEL_REV)/build
 CPPARCH				:=	-isystem /usr/src/linux-headers-$(KERNEL_REV)
-CARCH				:=	-rdynamic -fPIC
+CARCH				:=	-rdynamic -fPIC -Wall
 CXXARCH				:=	$(CARCH)
 LDARCH				:=	-L$(OUT)/$(LIB_DIR)
 MOARCH				:=	-L$(OUT)/$(LIB_DIR)

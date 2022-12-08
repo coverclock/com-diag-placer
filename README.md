@@ -333,6 +333,8 @@ Richard Hipp at al., "Why SQLite succeeded as a database", *The Changelog*, 2016
 P. Hoffman, F. Yergeau, "UTF-16, an encoding of ISO 10646", *RFC 2781*, 2000-02,
 <https://www.rfc-editor.org/rfc/pdfrfc/rfc2781.txt.pdf>
 
+Alan Jones, private communication, LGS Innovations LLC, 2012
+
 Jay A. Kreibich, *Using SQLite*, O'Reilly, 2010
 
 Anthony Molinaro, *SQL Cookbook*, O'Reilly, 2006

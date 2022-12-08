@@ -3,7 +3,7 @@
 /**
  * @file
  *
- * Copyright 2020 Digital Aggregates Corporation, Colorado, USA.
+ * Copyright 2020-2022 Digital Aggregates Corporation, Colorado, USA.
  * Licensed under the terms in LICENSE.txt.
  *
  * The Steps Callback feature generates a step callback function from
@@ -37,7 +37,6 @@ int placer_struct_##_STRUCTURE_##_steps_callback(sqlite3_stmt * sp, void * vp) {
     struct _STRUCTURE_ * pp = (struct _STRUCTURE_ *)0; \
     int count = 0; \
     int type = 0; \
-    int bytes = 0; \
     int ii = 0; \
     const char * name = (const char *)0; \
     ip = (struct _STRUCTURE_ ***)vp; \
@@ -69,7 +68,6 @@ int placer_struct_##_STRUCTURE_##_steps_callback(sqlite3_stmt * sp, void * vp) {
     struct _STRUCTURE_ * pp = (struct _STRUCTURE_ *)0; \
     int count = 0; \
     int type = 0; \
-    int bytes = 0; \
     int ii = 0; \
     const char * name = (const char *)0; \
     ip = (struct _STRUCTURE_ ***)vp; \
@@ -89,6 +87,7 @@ int placer_struct_##_STRUCTURE_##_steps_callback(sqlite3_stmt * sp, void * vp) {
 #define PLACER_BLOB(_NAME_, _ITEMS_) \
         { \
             const placer_BLOB_t * blob = (const placer_BLOB_t *)0; \
+            int bytes = 0; \
             if (ii >= count) { break; } \
             type = sqlite3_column_type(sp, ii); \
             if (type != SQLITE_BLOB) {  break; } \
@@ -158,6 +157,7 @@ int placer_struct_##_STRUCTURE_##_steps_callback(sqlite3_stmt * sp, void * vp) {
 #define PLACER_TEXT(_NAME_, _ITEMS_) \
         { \
             const placer_TEXT_t * text = (const placer_TEXT_t *)0; \
+            int bytes = 0; \
             if (ii >= count) { break; } \
             type = sqlite3_column_type(sp, ii); \
             if (type != SQLITE_TEXT) { break; } \
@@ -166,7 +166,7 @@ int placer_struct_##_STRUCTURE_##_steps_callback(sqlite3_stmt * sp, void * vp) {
             text = sqlite3_column_text(sp, ii); \
             bytes = sqlite3_column_bytes(sp, ii); \
             if (bytes > ((_ITEMS_) * sizeof(placer_TEXT_t))) { break; } \
-            strncpy(pp->_NAME_, text, bytes); \
+            strncpy((char *)(pp->_NAME_), (const char *)text, bytes); \
             if (bytes < ((_ITEMS_) * sizeof(placer_TEXT_t))) { pp->_NAME_[bytes / sizeof(placer_TEXT_t)] = '\0'; } \
             ii += 1; \
         }
@@ -180,6 +180,7 @@ int placer_struct_##_STRUCTURE_##_steps_callback(sqlite3_stmt * sp, void * vp) {
 #define PLACER_TEXT16(_NAME_, _ITEMS_) \
         { \
             const placer_TEXT16_t * text16 = (const placer_TEXT16_t *)0; \
+            int bytes = 0; \
             if (ii >= count) { break; } \
             type = sqlite3_column_type(sp, ii); \
             if (type != SQLITE_TEXT) { break; } \

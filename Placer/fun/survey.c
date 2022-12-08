@@ -2,7 +2,7 @@
 /**
  * @file
  *
- * Copyright 2020 Digital Aggregates Corporation, Colorado, USA<BR>
+ * Copyright 2020-2022 Digital Aggregates Corporation, Colorado, USA<BR>
  * Licensed under the terms in LICENSE.txt<BR>
  * Chip Overclock (coverclock@diag.com)<BR>
  * https://github.com/coverclock/com-diag-placer<BR>
@@ -533,18 +533,17 @@ static int mark(sqlite3 * db)
 
 static int identifier(sqlite3_stmt * sp, void * vp)
 {
-    const char * pp = (char *)0;
-    const char * vv = (char *)0;
-    int ii = 0;
+    const unsigned char * pp = (const unsigned char *)0;
+    const unsigned char * vv = (const unsigned char *)0;
 
-    pp = (const char *)vp;
+    pp = (const unsigned char *)vp;
     vv = sqlite3_column_text(sp, 0);
 
-    if (strcmp(pp, vv) != 0) {
+    if (strcmp((const char *)pp, (const char *)vv) != 0) {
         fputs("Aliased: \"", stdout);
-        fputs(vv, stdout);
+        fputs((const char *)vv, stdout);
         fputs("\" \"", stdout);
-        fputs(pp, stdout);
+        fputs((const char *)pp, stdout);
         fputs("\"\n", stdout);
     }
 
@@ -753,7 +752,7 @@ static int replace(void * vp, const char * name, const char * path, size_t depth
         fputc('\n', stdout);
     }
 
-    strncpy(schema.path, path, sizeof(schema.path));
+    strncpy((char *)schema.path, path, sizeof(schema.path));
     schema.type[0] = diminuto_fs_type(statp->st_mode); schema.type[1] = '\0';
     schema.nlink = statp->st_nlink;
     schema.uid = statp->st_uid;
@@ -826,8 +825,9 @@ static int insert(void * vp, const char * name, const char * path, size_t depth,
         fputc('\n', stdout);
     }
 
-    strncpy(schema.path, path, sizeof(schema.path));
-    schema.type[0] = diminuto_fs_type(statp->st_mode); schema.type[1] = '\0';
+    strncpy((char *)schema.path, path, sizeof(schema.path));
+    schema.type[0] = diminuto_fs_type(statp->st_mode);
+    schema.type[1] = '\0';
     schema.nlink = statp->st_nlink;
     schema.uid = statp->st_uid;
     schema.gid = statp->st_gid;
@@ -970,7 +970,6 @@ int main(int argc, char * argv[])
 {
     int xc = 0;
     int rc = 0;
-    int ii = 0;
     sqlite3 * db = (sqlite3 *)0;
     diminuto_fs_walker_t * cp = (diminuto_fs_walker_t *)0;
     char * database = (char *)0;

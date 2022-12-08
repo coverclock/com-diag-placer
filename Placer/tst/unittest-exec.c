@@ -2,7 +2,7 @@
 /**
  * @file
  *
- * Copyright 2020 Digital Aggregates Corporation, Colorado, USA<BR>
+ * Copyright 2020-2022 Digital Aggregates Corporation, Colorado, USA<BR>
  * Licensed under the terms in LICENSE.txt<BR>
  * Chip Overclock <coverclock@diag.com><BR>
  * https://github.com/coverclock/com-diag-placer<BR>
@@ -107,11 +107,11 @@ int main(void)
         EXPECT(placer_TEXT_exec_import(result, "", countof(result)) == SQLITE_OK);
         EXPECT(result[0] == '\0');
         EXPECT(placer_TEXT_exec_import(result, "A", countof(result)) == SQLITE_OK);
-        EXPECT(strcmp(result, "A") == 0);
+        EXPECT(strcmp((const char *)result, "A") == 0);
         EXPECT(placer_TEXT_exec_import(result, "BCDEFGHI", countof(result)) == SQLITE_OK);
-        EXPECT(strcmp(result, "BCDEFGHI") == 0);
+        EXPECT(strcmp((const char *)result, "BCDEFGHI") == 0);
         EXPECT(placer_TEXT_exec_import(result, "JKLMNOPQR", countof(result)) == SQLITE_OK);
-        EXPECT(strncmp(result, "JKLMNOPQR", sizeof(result)) == 0);
+        EXPECT(strcmp((const char *)result, "JKLMNOPQR") == 0);
         STATUS();
     }
 
@@ -120,7 +120,6 @@ int main(void)
         static const char DATA2[] = "A";
         static const char DATA3[] = "BCDEFGHI";
         static const char DATA4[] = "JKLMNOPQR";
-        static const char DATA5[] = "JLLMNOPQ";
         static const placer_TEXT16_t RESULT1[] = { '\0' };
         static const placer_TEXT16_t RESULT2[] = { 'A', '\0' };
         static const placer_TEXT16_t RESULT3[] = { 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', '\0' };
@@ -187,7 +186,6 @@ int main(void)
         static const placer_TEXT16_t RESULT1[] = { 'C', 'h', 'i', 'p', ' ', 'O', 'v', 'e', 'r', 'c', 'l', 'o', 'c', 'k', 0 };
         static const placer_TEXT16_t RESULT2[] = { 'R', 'e', 'd', ' ', 'B', 'l', 'a', 'c', 'k', 0 };
         static const placer_TEXT16_t RESULT3[] = { 'T', 'h', 'e', ' ', 'F', 'r', 'e', 'n', 'c', 'h', ' ', 'W', 'o', 'm', 'a', 'n', 0 };
-        static const placer_TEXT16_t RESULT4[] = { 'D', 'r', 'e', 'a', 'd', ' ', 'P', 'i', 'r', 'a', 't', 'e', ' ', 'R', 'o', 'b', 'e', 'r', 't', 's', 0 }; /* Not used. */
         struct UnitTestSchema results[3] = { { 0, } };
         struct UnitTestSchema * gather[] = { &(results[0]), &(results[1]), &(results[2]), (struct UnitTestSchema *)0 };
         struct UnitTestSchema ** here = &(gather[0]);
@@ -214,7 +212,7 @@ int main(void)
         EXPECT(results[0].age == (double)63.625);
         EXPECT(results[0].image[0] == (uint8_t)0x11);
         EXPECT(results[0].sn == (int64_t)42);
-        EXPECT(strcmp(results[0].ssn, "123456789") == 0);
+        EXPECT(strcmp((const char *)results[0].ssn, "123456789") == 0);
 
         COMMENT("2");        
         rc = placer_struct_UnitTestSchema_exec_callback((void *)&here, 6, value[1], keyword);
@@ -227,7 +225,7 @@ int main(void)
         EXPECT(results[1].age == (double)51.0);
         EXPECT(results[1].image[0] == (uint8_t)0x22);
         EXPECT(results[1].sn == (int64_t)86);
-        EXPECT(strcmp(results[1].ssn, "234567890") == 0);
+        EXPECT(strcmp((const char *)results[1].ssn, "234567890") == 0);
 
         COMMENT("3");        
         rc = placer_struct_UnitTestSchema_exec_callback((void *)&here, 6, value[2], keyword);
@@ -240,7 +238,7 @@ int main(void)
         EXPECT(results[2].age == (double)62);
         EXPECT(results[2].image[0] == (uint8_t)0x33);
         EXPECT(results[2].sn == (int64_t)99);
-        EXPECT(strcmp(results[2].ssn, "345678901") == 0);
+        EXPECT(strcmp((const char *)results[2].ssn, "345678901") == 0);
 
         COMMENT("4");        
         rc = placer_struct_UnitTestSchema_exec_callback((void *)&here, 6, value[3], keyword);

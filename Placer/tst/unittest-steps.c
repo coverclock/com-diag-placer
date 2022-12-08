@@ -2,7 +2,7 @@
 /**
  * @file
  *
- * Copyright 2020 Digital Aggregates Corporation, Colorado, USA<BR>
+ * Copyright 2020-2022 Digital Aggregates Corporation, Colorado, USA<BR>
  * Licensed under the terms in LICENSE.txt<BR>
  * Chip Overclock <coverclock@diag.com><BR>
  * https://github.com/coverclock/com-diag-placer<BR>
@@ -125,14 +125,14 @@ int main(void)
 
     {
         TEST();
-        EXPECT(strcmp(PLACER_struct_UnitTestSchema_SCHEMA_NAME, "UnitTestSchema") == 0);
+        EXPECT(strcmp((const char *)PLACER_struct_UnitTestSchema_SCHEMA_NAME, "UnitTestSchema") == 0);
         EXPECT(countof(PLACER_struct_UnitTestSchema_FIELD_NAME) == 6);
-        EXPECT(strcmp(PLACER_struct_UnitTestSchema_FIELD_NAME[0], "id") == 0);
-        EXPECT(strcmp(PLACER_struct_UnitTestSchema_FIELD_NAME[1], "name") == 0);
-        EXPECT(strcmp(PLACER_struct_UnitTestSchema_FIELD_NAME[2], "age") == 0);
-        EXPECT(strcmp(PLACER_struct_UnitTestSchema_FIELD_NAME[3], "image") == 0);
-        EXPECT(strcmp(PLACER_struct_UnitTestSchema_FIELD_NAME[4], "sn") == 0);
-        EXPECT(strcmp(PLACER_struct_UnitTestSchema_FIELD_NAME[5], "ssn") == 0);
+        EXPECT(strcmp((const char *)PLACER_struct_UnitTestSchema_FIELD_NAME[0], "id") == 0);
+        EXPECT(strcmp((const char *)PLACER_struct_UnitTestSchema_FIELD_NAME[1], "name") == 0);
+        EXPECT(strcmp((const char *)PLACER_struct_UnitTestSchema_FIELD_NAME[2], "age") == 0);
+        EXPECT(strcmp((const char *)PLACER_struct_UnitTestSchema_FIELD_NAME[3], "image") == 0);
+        EXPECT(strcmp((const char *)PLACER_struct_UnitTestSchema_FIELD_NAME[4], "sn") == 0);
+        EXPECT(strcmp((const char *)PLACER_struct_UnitTestSchema_FIELD_NAME[5], "ssn") == 0);
         STATUS();
     }
 
@@ -181,7 +181,7 @@ int main(void)
 
         TEST();
         COMMENT("create=\"%s\"\n", PLACER_struct_UnitTestSchema_SQL_CREATE);
-        EXPECT(strcmp(PLACER_struct_UnitTestSchema_SQL_CREATE, CREATE) == 0);
+        EXPECT(strcmp((const char *)PLACER_struct_UnitTestSchema_SQL_CREATE, (const char *)CREATE) == 0);
         STATUS();
     }
 
@@ -193,7 +193,7 @@ int main(void)
 
         TEST();
         COMMENT("insert=\"%s\"\n", PLACER_struct_UnitTestSchema_SQL_INSERT);
-        EXPECT(strcmp(PLACER_struct_UnitTestSchema_SQL_INSERT, INSERT) == 0);
+        EXPECT(strcmp((const char *)PLACER_struct_UnitTestSchema_SQL_INSERT, (const char *)INSERT) == 0);
         STATUS();
     }
 
@@ -205,7 +205,7 @@ int main(void)
 
         TEST();
         COMMENT("replace=\"%s\"\n", PLACER_struct_UnitTestSchema_SQL_REPLACE);
-        EXPECT(strcmp(PLACER_struct_UnitTestSchema_SQL_REPLACE, REPLACE) == 0);
+        EXPECT(strcmp((const char *)PLACER_struct_UnitTestSchema_SQL_REPLACE, (const char *)REPLACE) == 0);
         STATUS();
     }
 
@@ -294,7 +294,7 @@ int main(void)
         EXPECT(row[0].age == INSERTED[0].age);
         EXPECT(row[0].image[0] == INSERTED[0].image[0]);
         EXPECT(row[0].sn == INSERTED[0].sn);
-        EXPECT(strcmp(row[0].ssn, INSERTED[0].ssn) == 0);
+        EXPECT(strcmp((const char *)row[0].ssn, (const char *)INSERTED[0].ssn) == 0);
 
         COMMENT("1");
         EXPECT(row[1].id == INSERTED[1].id);
@@ -304,7 +304,7 @@ int main(void)
         EXPECT(row[1].age == INSERTED[1].age);
         EXPECT(row[1].image[0] == INSERTED[1].image[0]);
         EXPECT(row[1].sn == INSERTED[1].sn);
-        EXPECT(strcmp(row[1].ssn, INSERTED[1].ssn) == 0);
+        EXPECT(strcmp((const char *)row[1].ssn, (const char *)INSERTED[1].ssn) == 0);
 
         COMMENT("2");
         EXPECT(row[2].id == INSERTED[2].id);
@@ -314,7 +314,7 @@ int main(void)
         EXPECT(row[2].age == INSERTED[2].age);
         EXPECT(row[2].image[0] == INSERTED[2].image[0]);
         EXPECT(row[2].sn == INSERTED[2].sn);
-        EXPECT(strcmp(row[2].ssn, INSERTED[2].ssn) == 0);
+        EXPECT(strcmp((const char *)row[2].ssn, (const char *)INSERTED[2].ssn) == 0);
 
         COMMENT("3");
         EXPECT(row[3].id == INSERTED[3].id);
@@ -324,7 +324,7 @@ int main(void)
         EXPECT(row[3].age == INSERTED[3].age);
         EXPECT(row[3].image[0] == INSERTED[3].image[0]);
         EXPECT(row[3].sn == INSERTED[3].sn);
-        EXPECT(strcmp(row[3].ssn, INSERTED[3].ssn) == 0);
+        EXPECT(strcmp((const char *)row[3].ssn, (const char *)INSERTED[3].ssn) == 0);
 
         COMMENT("replace");
         for (ii = 0; ii < countof(REPLACED); ++ii) {
@@ -351,7 +351,7 @@ int main(void)
         EXPECT(row[0].age == REPLACED[0].age);
         EXPECT(row[0].image[0] == REPLACED[0].image[0]);
         EXPECT(row[0].sn == REPLACED[0].sn);
-        EXPECT(strcmp(row[0].ssn, REPLACED[0].ssn) == 0);
+        EXPECT(strcmp((const char *)row[0].ssn, (const char *)REPLACED[0].ssn) == 0);
 
         COMMENT("1");
         EXPECT(row[1].id == REPLACED[1].id);
@@ -359,7 +359,7 @@ int main(void)
         EXPECT(row[1].age == REPLACED[1].age);
         EXPECT(row[1].image[0] == REPLACED[1].image[0]);
         EXPECT(row[1].sn == REPLACED[1].sn);
-        EXPECT(strcmp(row[1].ssn, REPLACED[1].ssn) == 0);
+        EXPECT(strcmp((const char *)row[1].ssn, (const char *)REPLACED[1].ssn) == 0);
 
         COMMENT("2");
         EXPECT(row[2].id == REPLACED[2].id);
@@ -367,7 +367,7 @@ int main(void)
         EXPECT(row[2].age == REPLACED[2].age);
         EXPECT(row[2].image[0] == REPLACED[2].image[0]);
         EXPECT(row[2].sn == REPLACED[2].sn);
-        EXPECT(strcmp(row[2].ssn, REPLACED[2].ssn) == 0);
+        EXPECT(strcmp((const char *)row[2].ssn, (const char *)REPLACED[2].ssn) == 0);
 
         COMMENT("3");
         EXPECT(row[3].id == REPLACED[3].id);
@@ -375,7 +375,7 @@ int main(void)
         EXPECT(row[3].age == REPLACED[3].age);
         EXPECT(row[3].image[0] == REPLACED[3].image[0]);
         EXPECT(row[3].sn == REPLACED[3].sn);
-        EXPECT(strcmp(row[3].ssn, REPLACED[3].ssn) == 0);
+        EXPECT(strcmp((const char *)row[3].ssn, (const char *)REPLACED[3].ssn) == 0);
 
         COMMENT("generic");
         separator = placer_separator(':');

@@ -3,7 +3,7 @@
 /**
  * @file
  *
- * Copyright 2020 Digital Aggregates Corporation, Colorado, USA.
+ * Copyright 2020-2022 Digital Aggregates Corporation, Colorado, USA.
  * Licensed under the terms in LICENSE.txt.
  *
  * The Structure Display feature generates a structure display function
@@ -98,7 +98,7 @@
             int end = 0; \
             fprintf(fp, "%s=\"", #_NAME_); \
             tt = &(pp->_NAME_[0]); \
-            ll = strnlen(pp->_NAME_, (_ITEMS_)); \
+            ll = strnlen((const char *)(pp->_NAME_), (_ITEMS_)); \
             for (ii = 0; ii < ll; ++ii, ++tt) { \
                 if (*tt == '\"') { \
                     fputs("\\\"", fp); \
@@ -120,8 +120,6 @@
             const placer_TEXT16_t * uu = (const placer_TEXT16_t *)0; \
             size_t ll = 0; \
             int ii = 0; \
-            size_t current = 0; \
-            int end = 0; \
             fprintf(fp, "%s=\"", #_NAME_); \
             uu = &(pp->_NAME_[0]); \
             ll = placer_TEXT16_length(pp->_NAME_, (_ITEMS_)); \
