@@ -111,7 +111,7 @@ int main(void)
         EXPECT(placer_TEXT_exec_import(result, "BCDEFGHI", countof(result)) == SQLITE_OK);
         EXPECT(strcmp((const char *)result, "BCDEFGHI") == 0);
         EXPECT(placer_TEXT_exec_import(result, "JKLMNOPQR", countof(result)) == SQLITE_OK);
-        EXPECT(strcmp((const char *)result, "JKLMNOPQR") == 0);
+        EXPECT(strncmp((const char *)result, "JKLMNOPQR", countof(result)) == 0);
         STATUS();
     }
 
