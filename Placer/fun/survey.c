@@ -753,7 +753,7 @@ static int replace(void * vp, const char * name, const char * path, size_t depth
     }
 
     strncpy((char *)schema.path, path, sizeof(schema.path));
-    schema.type[0] = diminuto_fs_type(statp->st_mode); schema.type[1] = '\0';
+    schema.type[0] = diminuto_fs_mode2type(statp->st_mode); schema.type[1] = '\0';
     schema.nlink = statp->st_nlink;
     schema.uid = statp->st_uid;
     schema.gid = statp->st_gid;
@@ -826,7 +826,7 @@ static int insert(void * vp, const char * name, const char * path, size_t depth,
     }
 
     strncpy((char *)schema.path, path, sizeof(schema.path));
-    schema.type[0] = diminuto_fs_type(statp->st_mode);
+    schema.type[0] = diminuto_fs_mode2type(statp->st_mode);
     schema.type[1] = '\0';
     schema.nlink = statp->st_nlink;
     schema.uid = statp->st_uid;

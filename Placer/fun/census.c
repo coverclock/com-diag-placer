@@ -354,7 +354,7 @@ static int replace(void * vp, const char * name, const char * path, size_t depth
         sql = placer_sql_formata(Buffersize,
             "REPLACE INTO census VALUES ('%s', '%c', %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %lld, %d);"
             , to
-            , diminuto_fs_type(statp->st_mode)
+            , diminuto_fs_mode2type(statp->st_mode)
             , statp->st_nlink
             , statp->st_uid
             , statp->st_gid
@@ -424,7 +424,7 @@ static int insert(void * vp, const char * name, const char * path, size_t depth,
         sql = placer_sql_formata(Buffersize,
             "INSERT INTO census VALUES ('%s', '%c', %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %lld, %d);"
             , to
-            , diminuto_fs_type(statp->st_mode)
+            , diminuto_fs_mode2type(statp->st_mode)
             , statp->st_nlink
             , statp->st_uid
             , statp->st_gid
